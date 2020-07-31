@@ -1,0 +1,401 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPFormSectionDataController">
+    
+    <aura:attribute name="caseId" type="String" />
+    <aura:attribute name="entityType" type="String" default=""/>
+    
+    <aura:attribute name="individualTitle" type="String"/>
+    <aura:attribute name="individualSex" type="String"/>
+    <aura:attribute name="individualFamilyName" type="String"/>
+    <aura:attribute name="individualFirstName" type="String"/>
+    <aura:attribute name="individualOtherName" type="String"/>
+    <aura:attribute name="individualDOB" type="String"/>
+    <aura:attribute name="individualDriverLicenceNumber" type="String"/>
+    <aura:attribute name="individualDriverLicenceState" type="String"/>
+    <aura:attribute name="individualPhoneNumber" type="String"/>
+    <aura:attribute name="individualMobileNumber" type="String"/>
+    <aura:attribute name="individualEmail" type="String"/>
+    <aura:attribute name="individualBusinessName" type="String"/>
+    <aura:attribute name="individualRegistrationNumber" type="String"/>
+    <aura:attribute name="individualBusinessNumber" type="String"/>
+    
+    <aura:attribute name="residentialCity" type="String"/>
+    <aura:attribute name="residentialState" type="String" default="NSW"/>
+    <aura:attribute name="residentialPostcode" type="String"/>
+    <aura:attribute name="residentialStreet" type="String"/>
+    <aura:attribute name="residentialCountry" type="String" default="AUSTRALIA"/>
+    
+    <aura:attribute name="mailingCity" type="String"/>
+    <aura:attribute name="mailingState" type="String" default="NSW"/>
+    <aura:attribute name="mailingPostcode" type="String"/>
+    <aura:attribute name="mailingStreet" type="String"/>
+    <aura:attribute name="mailingCountry" type="String" default="AUSTRALIA"/>
+    
+    <aura:attribute name="otherNameDetails" type="String" default=""/>
+    <aura:attribute name="disqualifyingOffenceDetails" type="String" default=""/>
+    <aura:attribute name="currentASPDetails" type="String" default=""/>
+    <aura:attribute name="aspComplyDetails" type="String" default=""/>
+    <aura:attribute name="aspActionDetails" type="String" default=""/>
+    <aura:attribute name="aspRefusedDetails" type="String" default=""/>
+    <aura:attribute name="caDisqualifyingOffenceDetails" type="String" default=""/>
+    <aura:attribute name="caRefusalDetails" type="String" default=""/>
+    
+    <aura:attribute name="otherNameInput" type="boolean" />
+    <aura:attribute name="disqualifyingOffenceInput" type="boolean" />
+    <aura:attribute name="currentASPInput" type="boolean" />
+    <aura:attribute name="aspComplyInput" type="boolean" />   
+    <aura:attribute name="aspActionInput" type="boolean" />   
+    <aura:attribute name="aspRefusedInput" type="boolean" />   
+    <aura:attribute name="caDisqualifyingOffenceInput" type="boolean" />
+    <aura:attribute name="caRefusalInput" type="boolean" />
+    
+    <aura:attribute name="baseUrl" type="String" default="$A.get('$Label.c.Community_Base_Url')" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="aspCase" type="String"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <c:ASPFormSectionProgressIndicator currentSection="Individual" entityType="{!v.entityType}"/>
+    <br/>
+    
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#contact" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2>       
+                        Individual
+                    </h2>
+                    <b>Note:</b> If granted, the authorisation will be in the individual’s name.
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+            </div>
+        </div>
+        <hr style="margin: 0 auto;"/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            
+            <div class="slds-form--stacked">
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>
+                
+                
+                <fieldset>
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">Title</label>
+                            <ui:inputSelect aura:id="Title-Input" value="{!v.individualTitle}">
+                                <ui:inputSelectOption text="" label="Please Select"/>
+                                <ui:inputSelectOption text="Mr."/>
+                                <ui:inputSelectOption text="Mrs."/>
+                                <ui:inputSelectOption text="Ms."/>
+                                <ui:inputSelectOption text="Miss."/>
+                                <ui:inputSelectOption text="Other"/>
+                            </ui:inputSelect>
+                        </div>
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">Sex <span class="requiredField">*</span></label>
+                            <ui:inputSelect aura:id="Sex-Input" value="{!v.individualSex}">
+                                <ui:inputSelectOption text="" label="Please Select"/>
+                                <ui:inputSelectOption text="Male"/>
+                                <ui:inputSelectOption text="Female"/>
+                                <ui:inputSelectOption text="Unspecified"/>
+                            </ui:inputSelect>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">First Given Name <span class="requiredField">*</span></label>
+                            <ui:inputText aura:id="First-Given-Name-Input" class="sentenceCaseInput" value="{!v.individualFirstName}"/>
+                        </div>
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">Family Name <span class="requiredField">*</span></label>
+                            <ui:inputText aura:id="Family-Name-Input" class="upperCaseInput" value="{!v.individualFamilyName}"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">Other given names, if applicable</label>
+                            <ui:inputText aura:id="Other-Given-Name-Input" class="sentenceCaseInput" value="{!v.individualOtherName}"/>
+                        </div>
+                        <div class="slds-col">
+                          <!--  <label class="slds-form-element__label">Date of Birth <span class="requiredField">*</span></label>
+                            <ui:inputDate displayDatePicker="true" aura:id="DOB-Input" format="dd/MM/yyyy" value="{!v.individualDOB}"/> -->
+                            
+                            <c:DOBComponent fieldLabel="Date of Birth" isRequired="true" dob="{!v.individualDOB}" />
+                          
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">Are you now or have you ever been known by another name?</label>
+                            <br/>
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                            <ui:inputRadio aura:id="NoOtherName" name="otherNameGroup" label="" change="{!c.otherNameChange}"/>&nbsp;No
+                            &nbsp;&nbsp;
+                            <ui:inputRadio aura:id="YesOtherName" name="otherNameGroup" label="" change="{!c.otherNameChange}"/>&nbsp;Yes, provide details
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid" style="padding-left: 2%;width:80%;">
+                        <ui:inputTextarea aura:id="otherNameInputDetails" class="toggleDisplay" value="{!v.otherNameDetails}"/>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">Australian driver licence number and state of issue, if applicable</label>
+                            <ui:inputText aura:id="Driver-Licence-Number-Input" value="{!v.individualDriverLicenceNumber}"/>
+                            <br/>
+                        </div>
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">State</label>
+                            <ui:inputSelect aura:id="Driver-Licence-Number-State-Input" value="{!v.individualDriverLicenceState}">
+                                <ui:inputSelectOption text="" label="Please Select"/>
+                                <ui:inputSelectOption text="NSW"/>
+                                <ui:inputSelectOption text="ACT"/>
+                                <ui:inputSelectOption text="VIC"/>
+                                <ui:inputSelectOption text="QLD"/>
+                                <ui:inputSelectOption text="SA"/>
+                                <ui:inputSelectOption text="NT"/>
+                                <ui:inputSelectOption text="TAS"/>
+                                <ui:inputSelectOption text="WA"/>
+                            </ui:inputSelect>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">Residential Address <span class="requiredField">*</span></label>
+                            <c:AddressInputComponent aura:id="Residential-Address-Input" street="{!v.residentialStreet}" city="{!v.residentialCity}"
+                                                     state="{!v.residentialState}" country="{!v.residentialCountry}"
+                                                     postalcode="{!v.residentialPostcode}"/>
+                            <span id="ResidentialAddressError" class="customErrorMsg"></span>
+                        </div>
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">Mailing Address <span class="requiredField">*</span></label>
+                            <c:AddressInputComponent aura:id="Mailing-Address-Input" street="{!v.mailingStreet}" city="{!v.mailingCity}"
+                                                     state="{!v.mailingState}" country="{!v.mailingCountry}"
+                                                     postalcode="{!v.mailingPostcode}"/>
+                            <span id="MailingAddressError" class="customErrorMsg"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">Daytime Phone Number <span class="requiredField">*</span></label>
+                            <ui:inputNumber format="." aura:id="Daytime-Phone-Input" value="{!v.individualPhoneNumber}" maxlength="13"/>
+                            
+                            <!--
+                            <c:PhoneComponent fieldLabel="Daytime Phone Number" isRequired="true" phoneNumber="{!v.individualPhoneNumber}" />
+                            -->
+                            
+                        </div>
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">Mobile Number <span class="requiredField">*</span></label>
+                            <ui:inputNumber format="." aura:id="Mobile-Input" value="{!v.individualMobileNumber}"  maxlength="10"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">Registered Business Name, If Applicable</label>
+                            <ui:inputText aura:id="Business-Name-Input" class="sentenceCaseInput" value="{!v.individualBusinessName}"/>
+                        </div>
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">Email Address <span class="requiredField">*</span></label>
+                            <ui:inputEmail aura:id="Email-Input" value="{!v.individualEmail}"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">Registration Number</label>
+                            <ui:inputText aura:id="Business-Number-Input" class="upperCaseInput" value="{!v.individualRegistrationNumber}"/>
+                        </div>
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">Australian Business Number (ABN), If Applicable</label>
+                            <ui:inputNumber format="." aura:id="ABN-Input" value="{!v.individualBusinessNumber}"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">Have you been convicted of or do you have current proceedings against you for a disqualifying offence? <span class="requiredField">*</span></label>
+                            <br/>
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                            <ui:inputRadio aura:id="NoDisqualifyingOffence" name="disqualifyingOffenceGroup" label="" change="{!c.disqualifyingOffenceChange}"/>&nbsp;No
+                            &nbsp;&nbsp;
+                            <ui:inputRadio aura:id="YesDisqualifyingOffence" name="disqualifyingOffenceGroup" label="" change="{!c.disqualifyingOffenceChange}"/>&nbsp;Yes, provide details
+                            <br/>
+                            <span id="DisqualifyingOffenceError" class="customErrorMsg"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid" style="padding-left: 2%;width:100%;">
+                        <div style="width: 80% !important;">
+                            <ui:inputTextarea aura:id="disqualifyingOffenceInputDetails" class="toggleDisplay" value="{!v.disqualifyingOffenceDetails}"/>
+                        </div>
+                        <div style="width: 20% !important;margin-left: 10px;">
+                            &nbsp;<a aura:id="disqualifyingOffenceLink" target="_blank" href="{!baseUrl + 'article/Defination-of-disqualifying-offences?popup=false'}"  style="font-size: 14px;" class="toggleDisplay">Definition of disqualifying offences</a>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">Are you a current authorised service provider? <span class="requiredField">*</span></label>
+                            <br/>
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                            <ui:inputRadio aura:id="NoCurrentASP" name="currentASPGroup" label="" change="{!c.currentASPChange}"/>&nbsp;No
+                            &nbsp;&nbsp;
+                            <ui:inputRadio aura:id="YesCurrentASP" name="currentASPGroup" label="" change="{!c.currentASPChange}"/>&nbsp;Yes, provide details
+                            <br/>
+                            <span id="CurrentASPError" class="customErrorMsg"></span>
+                        </div>     
+                    </div>
+                    
+                    <div class="slds-grid" style="padding-left: 2%;width:80%;">
+                        <ui:inputTextarea aura:id="currentASPInputDetails" value="{!v.currentASPDetails}" class="toggleDisplay currentASPHandlerInputDetails"/>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col currentASPHandler toggleDisplay" style="width: 50% !important;">
+                            <label class="slds-form-element__label">If the applicant is a current authorised service provider, did they demonstrate that they comply with any additional standards applicable to the authorisation being applied for? <span class="requiredField">*</span></label>
+                            <br/>
+                        </div>
+                        <div class="slds-col currentASPHandler toggleDisplay" style="width: 50% !important;">
+                            <ui:inputRadio aura:id="NoASPComply" class="currentASPHandler" name="ASPComplyGroup" label="" change="{!c.aspComplyChange}"/>&nbsp;No
+                            &nbsp;&nbsp;
+                            <ui:inputRadio aura:id="YesASPComply" class="currentASPHandler" name="ASPComplyGroup" label="" change="{!c.aspComplyChange}"/>&nbsp;Yes, provide details
+                            <br/>
+                            <span id="ASPComplyError" class="customErrorMsg"></span>
+                        </div>      
+                    </div>
+                    
+                    <div class="slds-grid" style="padding-left: 2%;width:80%;">
+                        <ui:inputTextarea aura:id="aspComplyInputDetails" value="{!v.aspComplyDetails}" class="toggleDisplay currentASPHandlerInputDetails"/>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col currentASPHandler toggleDisplay" style="width: 50% !important;">
+                            <label class="slds-form-element__label">As a current authorised service provider, is your current authorisation subject to any action or proposed action being taken? <span class="requiredField">*</span></label>
+                            <br/>
+                        </div>
+                        <div class="slds-col currentASPHandler toggleDisplay" style="width: 50% !important;">
+                            <ui:inputRadio aura:id="NoASPAction" class="currentASPHandler" name="ASPActionGroup" label="" change="{!c.aspActionChange}"/>&nbsp;No
+                            &nbsp;&nbsp;
+                            <ui:inputRadio aura:id="YesASPAction" class="currentASPHandler" name="ASPActionGroup" label="" change="{!c.aspActionChange}"/>&nbsp;Yes, provide details
+                            <br/>
+                            <span id="ASPActionError" class="customErrorMsg"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid" style="padding-left: 2%;width:80%;">
+                        <ui:inputTextarea aura:id="aspActionInputDetails" value="{!v.aspActionDetails}" class="toggleDisplay currentASPHandlerInputDetails"/>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">Have you been refused authorisation or had an authorisation cancelled within the last 12 months? <span class="requiredField">*</span></label>
+                            <br/>
+                        </div>
+                        
+                        <div class="slds-col" style="width: 50% !important;">
+                            <ui:inputRadio aura:id="NoASPRefused" name="ASPRefusedGroup" label="" change="{!c.aspRefusedChange}"/>&nbsp;No
+                            &nbsp;&nbsp;
+                            <ui:inputRadio aura:id="YesASPRefused" name="ASPRefusedGroup" label="" change="{!c.aspRefusedChange}"/>&nbsp;Yes, provide details
+                            <br/>
+                            <span id="ASPRefusedError" class="customErrorMsg"></span>
+                        </div>    
+                    </div>
+                    
+                    <div class="slds-grid" style="padding-left: 2%;width:80%;">
+                        <ui:inputTextarea aura:id="aspRefusedInputDetails" value="{!v.aspRefusedDetails}" class="toggleDisplay currentASPHandlerInputDetails"/>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">Do you have a close associate that has been convicted of or have current proceedings against them for a disqualifying offence? <span class="requiredField">*</span></label>
+                            <br/>
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                            <ui:inputRadio aura:id="NoCADisqualifyingOffence" name="ASPCloseAssociateGroup" label="" change="{!c.caDisqualifyingOffenceChange}"/>&nbsp;No
+                            &nbsp;&nbsp;
+                            <ui:inputRadio aura:id="YesCADisqualifyingOffence" name="ASPCloseAssociateGroup" label="" change="{!c.caDisqualifyingOffenceChange}"/>&nbsp;Yes, provide details
+                            <br/>
+                            <span id="CADisqualifyingOffenceError" class="customErrorMsg"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid" style="padding-left: 2%;width:100%;">
+                        <div style="width: 80% !important;">
+                            <ui:inputTextarea aura:id="caDisqualifyingOffenceInputDetails" value="{!v.caDisqualifyingOffenceDetails}" class="toggleDisplay"/>
+                        </div> 
+                        <div style="width: 20% !important;margin-left: 10px;">
+                            &nbsp;<a aura:id="caDisqualifyingOffenceLink" target="_blank" href="{!baseUrl + 'article/Definitions-of-close-associate-and-disqualifying-offences?popup=false'}"  style="font-size: 14px;" class="toggleDisplay">Definitions of ‘close associate’ &amp; ‘disqualifying offences’</a>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">Do you have a close associate whose accreditation or authorisation to operate a taxi-cab network was cancelled or recently refused because they were not of good repute or fit and proper? <span class="requiredField">*</span></label>
+                            <br/>
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                            <ui:inputRadio aura:id="NoCARefused" name="ASPCloseAssociateRefusedGroup" label="" change="{!c.caRefusedChange}"/>&nbsp;No
+                            &nbsp;&nbsp;
+                            <ui:inputRadio aura:id="YesCARefused" name="ASPCloseAssociateRefusedGroup" label="" change="{!c.caRefusedChange}"/>&nbsp;Yes, provide details
+                            <br/>
+                            <span id="YesCARefusedError" class="customErrorMsg"></span>
+                        </div>     
+                    </div>
+                    
+                    <div class="slds-grid" style="padding-left: 2%;width:100%;">
+                        <div style="width: 80% !important;">
+                            <ui:inputTextarea aura:id="caRefusalInputDetails" value="{!v.caRefusalDetails}" class="toggleDisplay"/>
+                        </div>
+                        <div style="width: 20% !important;margin-left: 10px;">
+                            &nbsp;<a aura:id="caRefusalLink" target="_blank" href="{!baseUrl + 'article/Definition-of-close-associate?popup=false'}"  style="font-size: 14px;" class="toggleDisplay">Definition of close associate</a>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <c:FileUpload ParentRecordId="500O000000B2Uwx" acceptedFileTypes=".pdf" FileInputLabel="Attach Supporting Documents" AllowMultiple="true"/>
+                        </div>
+                    </div>
+                </fieldset>
+                
+            </div>
+        </div>
+        <div class="slds-card__footer">
+            <ui:button class="slds-button slds-button--neutral" press="{!c.saveFormState}"> 
+                <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Finish Later
+            </ui:button>
+            <ui:button class="slds-button slds-button--neutral" press="{!c.renderPrevSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+            </ui:button>
+            <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+            </ui:button>
+        </div>
+    </article>
+</aura:component>

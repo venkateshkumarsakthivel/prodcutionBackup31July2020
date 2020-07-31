@@ -1,0 +1,18 @@
+<aura:component >
+<div class="slds-grid slds-grid--vertical slds-navigation-list--vertical" style="color: #000000;">
+              <ul class="navigations">
+                <li style="padding: 0 0 0.5rem 0rem;" class="DriversListItem ListItem slds-is-active" aura:id="DriversListItem">
+                    <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Drivers" id="Drivers" >All Drivers</a>
+                </li>
+                <li style="padding: 0.5rem 0 0.5rem 0rem;" class="VehiclesListItem ListItem" aura:id="VehiclesListItem">
+                    <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Vehicles" id="Vehicles" >All Vehicles</a>
+                </li>
+                <li style="padding: 0.5rem 0 0.5rem 0rem;" class="DVDLogsListItem ListItem" aura:id="DVDLogsListItem">
+                    <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="DVDLogs" id="DVDLogs" >DVD Logs</a>
+                </li>
+                <li style="padding: 0.5rem 0 0.5rem 0rem;" class="HelpListItem ListItem" aura:id="HelpListItem">
+                    <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Help" id="Help" onclick="{!c.renderSection}">Help</a>
+                </li>
+              </ul>
+         </div>
+</aura:component>

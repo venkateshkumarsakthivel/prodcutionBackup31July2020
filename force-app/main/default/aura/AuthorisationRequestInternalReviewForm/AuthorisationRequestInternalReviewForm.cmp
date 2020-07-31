@@ -1,0 +1,203 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="RequestInternalReviewController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="POIUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="false" />
+    <aura:attribute name="isLoggedInUser" type="Boolean" default="false" />
+    <aura:attribute name="caseRecord" type="Object" />
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <article class="slds-card" id="formAuthorisationRequestInternalReview">
+        
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#contact'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">       
+                        {!$Label.c.Authorisation_Request_Internal_Review_Header}
+                    </h2>
+                </div>
+            </header>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <div class="slds-section" aura:id="sectiontitle">
+                    <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Click to expand or collapse">
+                        <button class="slds-button slds-section__title-action" onclick="{!c.toggleSectionContent}" style="background-color: #003577;color: #ffffff;">
+                            <aura:if isTrue="{!v.isSectionExpanded}">
+                                <i class="fa fa-minus" style="font-size: 0.875rem;" aria-hidden="true"></i>
+                                <aura:set attribute="else">
+                                    <i class="fa fa-plus" style="font-size: 0.875rem;" aria-hidden="true"></i>
+                                </aura:set>
+                            </aura:if>
+                            &nbsp;&nbsp;{!$Label.c.All_Applicant_Application_Checklist}
+                        </button>
+                    </h5>
+                    <div class="slds-section__content" style="border-width: 1px;border-style: solid;border-color: rgb(208, 208, 208);border-top: 0;">
+                        <p class="slds-form- -stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+                            <p>
+                                Use this form to apply for an internal review by the Point to Point Transport Commission of an authorisation decision.
+                            </p><br/>
+                            <span class="slds-form-element__legend">Checklist</span><br/>
+                            <ul class="slds-list--dotted">
+                                <li class="slds-item">A completed Application for internal review of authorisation decision form.</li>
+                                <li class="slds-item">A copy of the relevant decision notice, if available.</li>
+                            </ul>
+                            <br/>
+                            <span class="slds-form-element__legend">Note: </span>
+                            <p>For corporations, this application must be completed by the nominated director/s or manager/s.</p>
+                        </p>
+                    </div>
+                </div>
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div> 
+                <br/>
+                
+                <fieldset>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">{!$Label.c.Decision_Notice_Name}&nbsp;<span class="requiredField">*</span></label>
+                            <ui:inputText maxlength="255" class="sentenceCaseInput slds-input" 
+                                          aura:id="decisionNoticeNameInput"
+                                          value="{!v.caseRecord.Decision_Notice_Name__c}"/>
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <c:EmailAddressComponent fieldLabel="{!$Label.c.All_Applicant_Notice_Email}" isRequired="false"
+                                                     aura:id="noticeEmailInput" uniqueIdentifier="noticeEmailInputIdentifier" 
+                                                     email="{!v.caseRecord.Notice_Email__c}"/>
+                        </div>
+                        <div class="slds-col" style="width: 50% !important; padding-top: 22px;">
+                            <c:PhoneComponent isRequired="true" fieldLabel="Daytime Phone Number" 
+                                              aura:id="daytimePhoneInput" uniqueIdentifier="daytimePhoneInputIdentifier" 
+                                              phoneNumber="{!v.caseRecord.Daytime_phone_number__c}" />
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important; padding-top: 22px;">
+                            
+                            <div style="display:inline;">
+                                <legend class="slds-form-element__label">{!$Label.c.Notice_Address}&nbsp;<span class="requiredField">*</span></legend>
+                              
+                                <c:AddressInputComponent aura:id="noticeAddressTypeAddressInput" 
+                                                         unitType="{!v.caseRecord.noticeUnitType}" 
+                                                         street="{!v.caseRecord.Notice_Address_Street__c}" 
+                                                         city="{!v.caseRecord.Notice_Address_City__c}" 
+                                                         state="{!v.caseRecord.Notice_Address_State__c}" 
+                                                         postalcode="{!v.caseRecord.Notice_Address_Postal_Code__c}" 
+                                                         addressType="Notice_Address"
+                                                         isAustraliaAddress="true" 
+                                                         isInternationalAddress="false" 
+                                                         fullStreet="{!v.caseRecord.Notice_Address_Street__c}"/>  
+                            </div>
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                            <c:EmailAddressComponent fieldLabel="{!$Label.c.Individual_Email}" isRequired="true"
+                                                     aura:id="emailInput" uniqueIdentifier="emailInputIdentifier" 
+                                                     email="{!v.caseRecord.Email__c}"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">{!$Label.c.Decision_To_Review}&nbsp;<span class="requiredField">*</span></label>
+                            <ui:inputTextarea aura:id="decisionToBeReviewedInput" 
+                                              maxlength="1000" 
+                                              class="toggleDisplay" 
+                                              value="{!v.caseRecord.Decision_To_Be_Reviewed__c}"/>
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">{!$Label.c.Decision_Date}&nbsp;<span class="requiredField">*</span></label>
+                            <ui:inputDate aura:id="dateOfTheDecisionToBeReviewedInput" class="slds-input" value="{!v.caseRecord.Date_of_the_decision_to_be_reviewed__c}" displayDatePicker="true" /> 
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">{!$Label.c.Decision_Review_User_Comment}&nbsp;<span class="requiredField">*</span></label>
+                            <ui:inputTextarea aura:id="reviewNeededUserCommentsInput" 
+                                              maxlength="1000" 
+                                              class="toggleDisplay" 
+                                              value="{!v.caseRecord.Ground_For_Review__c}"/>
+                        </div>
+                    </div>
+                    
+                    <fieldset>
+                        <div class="slds-grid">
+                            <div class="slds-col">
+                                <c:P2POTAttachment category="POI" uploadStatus="{!v.POIUploadStatus}" uniqueIdentifier="poi-document" aura:id="poi-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of your proof of identity document" AllowMultiple="true" section="INT_REV" index="1" />
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">{!$Label.c.Privacy_Statement_Header}</label>
+                            
+                            <p>{!$Label.c.Privacy_Statement_Text_Content}</p><br/>
+                            <ul class="slds-is-nested slds-list--dotted">
+                                <li><a href="{!$Label.c.Privacy_statement_Link1}" target="_blank">
+                                    {!$Label.c.Privacy_statement_Label1}
+                                    </a></li>
+                                <li><a href="{!$Label.c.Privacy_statement_Link2}" target="_blank">
+                                    {!$Label.c.Privacy_statement_Label2}
+                                    </a></li>
+                                <li><a href="{!$Label.c.Privacy_statement_Link3}" target="_blank">
+                                    {!$Label.c.Privacy_statement_Label3}
+                                    </a></li>
+                                <li><a href="{!$Label.c.Privacy_statement_Link4}" target="_blank">
+                                    {!$Label.c.Privacy_statement_Label4}
+                                    </a></li>
+                                <li><a href="{!$Label.c.Privacy_statement_Link5}" target="_blank">
+                                    {!$Label.c.Privacy_statement_Label5}
+                                    </a></li>
+                            </ul>
+                            <br/>
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control">
+                                    <ui:inputCheckbox aura:id="isPrivacyStatementChecked" label="" value="{!v.caseRecord.Is_Privacy_Statement_Declared__c}" class="privacyCheckBox"/>{!$Label.c.Privacy_Statement_Is_Privacy_Statement_Declared}
+                                    <span id="privacyAcceptedError" class="customErrorMsg"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </fieldset>
+                
+            </div>
+        </div>
+        
+        <div class="slds-card__footer">
+            <ui:button class="slds-button slds-button--neutral" press="{!c.cancel}"> 
+                <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+            </ui:button>
+            <ui:button class="slds-button slds-button--neutral" press="{!c.lodge}"> 
+                <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Lodge
+            </ui:button>
+        </div>
+        
+    </article>
+    
+</aura:component>

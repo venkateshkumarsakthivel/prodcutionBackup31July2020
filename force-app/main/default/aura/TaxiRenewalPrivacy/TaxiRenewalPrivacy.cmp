@@ -1,0 +1,94 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiRenewalApplicationController">
+	
+    <aura:attribute name="readOnly" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="isReview" type="Boolean" default="false" access="public"/>
+	<aura:attribute name="paymentPending" type="Boolean" default="true"/>
+    <aura:attribute name="isPrivacyStatementAccepted" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="isInformationDeclared" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="entityType" type="String" default="Individual" access="public"/>
+    <aura:attribute name="caseId" type="String" access="public"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>    
+	<aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+   	<aura:if isTrue="{!v.isReview == false}">
+    <c:LicenceRenewalProgressIndicator currentSection="{!$Label.c.Privacy_Statement_Header}" />
+    <br/>   
+    </aura:if>
+    
+    <article class="slds-card" id="formPartG">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#document'}" 
+                               category="standard" size="large" name="document"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">      
+                        {!$Label.c.Privacy_Statement_Header}
+                    </h2>
+                </div>
+            </header>
+        </div>
+        
+        <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+            <span style="color: #ffffff;">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+            </span>
+        </div>
+        
+        
+        <hr style="margin: 0 auto;"/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            
+			<div class="slds-form--stacked">
+				<p><aura:unescapedHtml value="{!$Label.c.Taxi_Privacy_Declaration_Para_1}"/></p><br/>
+				<p><aura:unescapedHtml value="{!$Label.c.Taxi_Privacy_Declaration_Para_2}"/></p><br/>
+				<p><aura:unescapedHtml value="{!$Label.c.Taxi_Privacy_Declaration_Para_3}"/></p><br/>
+				
+				<h2 style="width: 100%;margin: 0;padding: 0;text-align: left;">
+					Declaration
+				</h2>
+				<p>{!$Label.c.Taxi_Declaration_Text}</p><br/>
+				
+				<div class="slds-form-element">
+					<div class="slds-form-element__control">
+						
+						<ui:inputCheckbox disabled="{!v.readOnly}" aura:id="isInformationDeclared" label="" value="{!v.isInformationDeclared}" class="privacyCheckBox"/>
+						<aura:if isTrue="{!v.entityType == $Label.c.Account_Entity_Type_Individual}">
+							{!$Label.c.Privacy_Information_Declared}
+						</aura:if>
+						<aura:if isTrue="{!v.entityType == $Label.c.Account_Entity_Type_Corporate}">
+							{!$Label.c.Privacy_Corporate_Information_Declared}
+						</aura:if>
+						<aura:if isTrue="{!v.entityType == $Label.c.Account_Entity_Type_Individual_Partnership || v.entityType == $Label.c.Account_Entity_Type_Corporate_Partnership}">
+							{!$Label.c.Privacy_Partnership_Information_Declared}
+						</aura:if>
+						
+						<span id="privacyDeclaredError" class="customErrorMsg"></span>
+					</div>
+				</div>
+						
+				<ui:inputCheckbox disabled="{!v.readOnly}" aura:id="privacyDeclarationCheck" label="" value="{!v.isPrivacyStatementAccepted}" class="privacyCheckBox"/>I declare that I have read the privacy statement.
+				<span id="privacyAcceptedError" class="customErrorMsg"></span>
+			</div>
+        </div>
+        
+        <div class="slds-card__footer">
+            <aura:if isTrue="{!not(v.isReview)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>                
+            </aura:if>
+            
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

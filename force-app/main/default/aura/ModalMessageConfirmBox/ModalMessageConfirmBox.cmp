@@ -1,0 +1,49 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPDashboardController">
+    
+    <aura:attribute name="message" type="String" default="sample message"/>
+    <aura:attribute name="entityType" type="String" default="Driver"/>
+    <aura:attribute name="title" type="String" default="Confirmation" access="public"/>
+    
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="confirmType" type="String" />
+     
+    <aura:registerEvent name="confirmChecks" type="c:ConfirmRunChecks"/>
+    <aura:registerEvent name="confirmChecksAll" type="c:ConfirmRunChecksAll"/>
+    <aura:registerEvent name="confirmRecordDelete" type="c:ConfirmRecordDeleteEvent"/>
+    <aura:registerEvent name="confirmPreviousPage" type="c:ConfirmPreviousPageEvent"/>
+    <aura:registerEvent name="confirmApplicationSubmission" type="c:ConfirmApplicationSubmission"/>
+    <aura:registerEvent name="confirmReturnDisclaimer" type="c:ConfirmReturnDisclaimer"/>
+    <aura:registerEvent name="confirmAuthorisationRenewal" type="c:ConfirmAuthorisationRenewal"/>
+	<aura:registerEvent name="confirmDeactivate" type="c:ConfirmRecordDeactivateEvent"/>
+    <aura:registerEvent name="confirmAddContact" type="c:AddContactEvent"/>
+    <aura:registerEvent name="confirmEditContact" type="c:EditContactEvent"/>
+    <aura:registerEvent name="confirmCreateSurrenderCase" type="c:createSurrenderCase"/>
+    <aura:registerEvent name="HideConfirmationBoxSpinnerOnCancel" type="c:CloseSurrenderConfirmationModalBox"/>
+    <aura:registerEvent name="confirmDeleteAttachment" type="c:DeleteAttachmentEvent"/>
+    <aura:registerEvent name="confirmCopyDocuments" type="c:CopyDocumentsEvent"/>
+    
+    
+	<div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aura:id="messageBox">
+    <div class="slds-modal__container">
+    <div class="slds-modal__header">
+      <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeMessageBox}">
+		<c:svgIcon class="dashboard_icon" svgPath="/resource/slds221/assets/icons/utility-sprite/svg/symbols.svg#close"
+                            	category="utility" size="x-small" name="close"></c:svgIcon>        
+        <span class="slds-assistive-text">Close</span>
+      </button>
+      <h2 id="header43" class="slds-text-heading--medium">{!v.title}</h2>
+    </div>        
+    <div class="slds-modal__content slds-p-around--medium">
+      <p class="confirmText">
+        <aura:unescapedHtml value="{!v.message}"></aura:unescapedHtml>          
+      </p>
+    </div>
+    <div class="slds-modal__footer">
+      <ui:button class="slds-button slds-button--neutral" press="{!c.closeMessageBox}" >Cancel</ui:button>
+      <ui:button class="slds-button slds-button--neutral" press="{!c.confirmAndClose}">Confirm</ui:button>
+    </div>
+  </div>
+</div>
+<div class="slds-backdrop slds-backdrop--open" aura:id="backdrop"></div>
+  
+</aura:component>

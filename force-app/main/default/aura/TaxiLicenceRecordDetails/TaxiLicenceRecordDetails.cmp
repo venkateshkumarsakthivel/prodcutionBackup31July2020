@@ -1,0 +1,46 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+    
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="licenceRecord" type="Authorisation__c" />
+    
+    <div class="slds-card__body">
+        
+        <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col" >
+               Licence #
+            </div>
+            <div class="slds-col" >
+                <ui:outputText class="slds-float_right" value="{!v.licenceRecord.Name}"/>
+            </div>
+        </div>
+        
+        <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col" >
+                Operating Area
+            </div>
+            <div class="slds-col" >
+                <ui:outputText class="slds-float_right" value="{!v.licenceRecord.Operation_Area__c}"/>
+            </div>
+        </div>
+        
+        <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col" >
+                Remaining Renewals
+            </div>
+            <div class="slds-col" >
+                <ui:outputNumber class="slds-float_right" value="{!v.licenceRecord.Renewal_Count_Remaining__c}"/>
+            </div>
+        </div>
+        
+        <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col">
+                Last Transferred Date
+            </div>
+            <div class="slds-col" >
+                <ui:outputDate class="slds-float_right" value="{!v.licenceRecord.Last_Transferred_Date__c}" format="dd-MMM-YYYY"/>
+            </div>
+        </div>
+        
+    </div>
+</aura:component>

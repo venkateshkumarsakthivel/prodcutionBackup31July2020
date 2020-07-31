@@ -1,0 +1,5 @@
+<aura:component implements="flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes" access="global" >
+	           
+    <span > </span>
+    
+</aura:component>

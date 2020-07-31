@@ -1,0 +1,174 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId" 
+                access="global" 
+                controller="GetAssessmentRequestController">
+    <style>
+       .slds-modal__container{
+               max-width: 70rem !important;
+               width:60% !important;
+        }
+    </style>
+    
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="assessmentRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+    <aura:attribute name="levyPeriod" type="Date" default=""/>
+    <aura:attribute name="currentTime" type="Date" default=""/>
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:attribute name="bspNumber" type="String"/>
+    <aura:attribute name="bspAssessedLiability" type="String"/>
+    <aura:attribute name="bspAmountReceived" type="String"/>
+    <aura:attribute name="bspOutstanding" type="String"/>
+    <aura:attribute name="tspNumber" type="String"/>
+    <aura:attribute name="tspAssessedLiability" type="String"/>
+    <aura:attribute name="tspAmountReceived" type="String"/>
+    <aura:attribute name="tspOutstanding" type="String"/>
+    
+    <aura:attribute name="collectionStatus" type="String" default="Outstanding"/>
+    <aura:attribute name="totalOutstanding" type="String"/>
+    <aura:attribute name="userName" type="String"/>
+    
+    <force:recordData aura:id="recordLoader"
+                      recordId="{!v.recordId}"
+                      layoutType="FULL"
+                      fields="Period_Start_Date__c,Period_End_Date__c,Taxpayer_Registration__r.Taxi_Service_Provider_Number__r.Authorisation_Number__c,
+                              Taxpayer_Registration__r.Booking_Service_Provider_Number__r.Authorisation_Number__c,
+                              Revenue_Assessment_Number_BSP__c, Revenue_Assessment_Number_TSP__c"
+                      targetRecord="{!v.record}"
+                      targetFields="{!v.assessmentRecord}"
+                      targetError="{!v.recordError}"
+                      recordUpdated="{!c.handleRecordUpdated}"
+                      />
+     
+    <div class="slds-card__body">
+        <label class="slds-form-element__label"><u>Outstanding Balance Enquiry</u></label> 
+        
+        <div class="slds-grid">
+            <div class="slds-col" >
+                <label class="slds-form-element__label">Levy Period</label>
+            </div>
+            <div class="slds-col" align = "right" style="padding-top:1%;">
+                {!v.levyPeriod}
+            </div>	
+        </div>
+        
+        <div class="slds-grid">
+            <div class="slds-col" >
+                Collection Status
+            </div>
+            <div class="slds-col" align = "right">
+                {!v.collectionStatus}
+            </div>
+        </div>
+        
+        <div class="slds-grid" >
+            <div class="slds-col" >
+                <label class="slds-form-element__label">BSP - {!v.bspNumber}</label>
+            </div>
+            <div class="slds-col" >
+            </div>
+        </div>
+        
+                <div class="slds-grid" style="padding-left:5%;">
+                    <div class="slds-col" >
+                        Assessed Liability
+                    </div>
+                    <div class="slds-col" align = "right">
+                        <ui:outputCurrency currencySymbol="$" value="{!v.bspAssessedLiability}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid" style="padding-left:5%;">
+                    <div class="slds-col" >
+                        Amount Received
+                    </div>
+                    <div class="slds-col" align = "right">
+                        <ui:outputCurrency currencySymbol="$" value="{!v.bspAmountReceived}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid" style="padding-left:5%;">
+                    <div class="slds-col" >
+                        Amount Outstanding
+                    </div>
+                    <div class="slds-col" align = "right">
+                        <ui:outputCurrency currencySymbol="$" value="{!v.bspOutstanding}"/>
+                    </div>
+                </div>
+        
+        <div class="slds-grid">
+            <div class="slds-col" >
+                <label class="slds-form-element__label">TSP - {!v.tspNumber}</label>
+             </div>
+            <div class="slds-col" >
+            </div>
+        </div>
+        
+                <div class="slds-grid" style="padding-left:5%;">
+                    <div class="slds-col" >
+                        Assessed Liability
+                    </div>
+                    <div class="slds-col" align = "right">
+                        <ui:outputCurrency currencySymbol="$" value="{!v.tspAssessedLiability}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid" style="padding-left:5%;">
+                    <div class="slds-col" >
+                        Amount Received
+                    </div>
+                    <div class="slds-col" align = "right">
+                        <ui:outputCurrency currencySymbol="$" value="{!v.tspAmountReceived}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid" style="padding-left:5%;">
+                    <div class="slds-col" >
+                        Amount Outstanding
+                    </div>
+                    <div class="slds-col" align = "right">
+                        <ui:outputCurrency currencySymbol="$" value="{!v.tspOutstanding}"/>
+                    </div>
+                </div>
+
+        <div class="slds-grid" style="padding-top:2%;">
+            <div class="slds-col" >
+                <label class="slds-form-element__label">Total Outstanding</label>
+            </div>
+            <div class="slds-col" align = "right" style="padding-top:1%;">
+                <ui:outputCurrency currencySymbol="$" value="{!v.totalOutstanding}"/>
+            </div>
+        </div>
+        
+        <div class="slds-grid" style="padding-top:2%;">
+            <div class="slds-col" >
+                Requested At
+            </div>
+            <div class="slds-col" align = "right">
+                {!v.currentTime}
+			</div>
+        </div>
+        
+        <div class="slds-grid">
+            <div class="slds-col" >
+                Requested By
+            </div>
+            <div class="slds-col" align = "right">
+                {!v.userName} 
+            </div>
+        </div>
+        
+        <div style="padding-top:3%;">
+            <i>Note: the balance may change at any time and does not include any uncleared payments</i>
+        </div>
+        
+        <div class="slds-grid" style="padding-top:2%;">
+            <div class="slds-col" ></div>
+            <div class="slds-col" >
+                  <div align="right">
+                      <ui:button class="slds-button slds-button--neutral" press="{!c.closeWindow}" label="Close"/> 
+                </div>
+			</div>
+        </div>
+    </div>
+</aura:component>

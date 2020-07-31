@@ -1,0 +1,331 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="LevyAssessmentTabController">
+    
+    <aura:attribute name="assessmentObj" type="Assessment__c" default="[]" access="public"/>
+    <aura:attribute name="assessmentCase" type="Case" default="[]" access="public"/>
+    
+    <aura:attribute name="hadTSP" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="hadBSP" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="PrivacyDeclaration" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="supportingDocumentsUploadStatus" type="Boolean" default="false" access="public"/>
+    
+    <aura:attribute name="objectionReasonOption" type="String" default="" />
+    
+    <aura:attribute name="objectionDate" type="Date" />
+    
+    <aura:attribute name="hasApprovedRebateBeforeLevyEndPeriod" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:registerEvent name="closeObjectionModal" type="c:LevyRaiseObjectionCancellationEvent"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-show"/>
+    
+    <div class="slds-card__body" id="levyObjectionComponent">
+        
+        <div class="slds-form--stacked" style="padding: 20px">
+            
+            <label class="slds-form-element__label" style="font-size:16px;">{!$Label.c.Levy_Objection_To_Assessment}</label>
+            <p>
+                <aura:unescapedHtml value="{!$Label.c.Levy_Objection_Description_Line_1}"></aura:unescapedHtml>
+            </p>
+            <br/>
+            <p>
+                <aura:unescapedHtml value="{!$Label.c.Levy_Objection_Description_Line_2}"></aura:unescapedHtml>
+            </p>
+            <br/>
+            <label class="slds-form-element__label" style="font-size:16px;">{!$Label.c.Levy_Objection_Application_Details}</label>
+            
+            <div class="slds-grid">
+                
+                <div class="slds-col">
+                    <label class="slds-form-element__label" style="font-weight: normal;">
+                        {!$Label.c.Levy_Date_Of_Objection}
+                    </label>
+                </div>
+                
+                <div class="slds-col">
+                    <label class="slds-form-element__label" style="font-weight: normal;">
+                     <ui:outputDate aura:id="Objection-Date" value="{!v.objectionDate}" format="dd-MMM-yyyy"/>
+                    </label>
+                </div>
+                
+            </div>
+            
+            <div class="slds-grid">
+                
+                <div class="slds-col">
+                    <label class="slds-form-element__label" style="font-weight: normal;">
+                        {!$Label.c.Levy_Objection_Service_Provider_Name}
+                    </label>
+                </div>
+                
+                <div class="slds-col">
+                    <label class="slds-form-element__label" style="font-weight: normal;"> 
+                     <ui:outputText aura:id="Service-Provider-Name" value="{!v.assessmentObj.Account__r.Name}"/>
+                    </label>
+                </div>
+                
+            </div>
+            
+            <aura:if isTrue="{!v.hadBSP}">
+                <div class="slds-grid">
+                    
+                    <div class="slds-col">
+                        <label class="slds-form-element__label" style="font-weight: normal;">
+                            {!$Label.c.Levy_Objection_BSP_Number}
+                        </label>
+                    </div>
+                    
+                    <div class="slds-col">
+                       <label class="slds-form-element__label" style="font-weight: normal;"> 
+                        <ui:outputText aura:id="BSP-Name" value="{!v.assessmentObj.Taxpayer_Registration__r.Booking_Service_Provider_Number__r.Name}"/>
+                       </label> 
+                    </div>
+                    
+                </div>
+            </aura:if>
+            
+            <aura:if isTrue="{!v.hadTSP}">
+                <div class="slds-grid">
+                    
+                    <div class="slds-col">
+                        <label class="slds-form-element__label" style="font-weight: normal;">
+                            {!$Label.c.Levy_Objection_TSP_Number}
+                        </label>
+                    </div>
+                    
+                    <div class="slds-col">
+                       <label class="slds-form-element__label" style="font-weight: normal;"> 
+                        <ui:outputText aura:id="TSP-Name" value="{!v.assessmentObj.Taxpayer_Registration__r.Taxi_Service_Provider_Number__r.Name}"/>
+                       </label>
+                    </div>
+                    
+                </div>
+            </aura:if>
+            
+            <div class="slds-grid">
+                
+                <div class="slds-col">
+                    <label class="slds-form-element__label" style="font-weight: normal;">
+                        {!$Label.c.Levy_Objection_Assessment_Period}
+                    </label>
+                </div>
+                
+                <div class="slds-col">
+                   <label class="slds-form-element__label" style="font-weight: normal;"> 
+                    <ui:outputText aura:id="Assessment-Period" value="{!v.assessmentObj.Levy_Assessment_Period__c}"/>
+                   </label> 
+                </div>
+                
+            </div>
+            
+            <div class="slds-grid">
+                
+                <div class="slds-col">
+                    <label class="slds-form-element__label" style="font-weight: normal;">
+                        {!$Label.c.Levy_Objection_Assessed_Levy}
+                    </label>
+                </div>
+                
+                <div class="slds-col">
+                   <label class="slds-form-element__label" style="font-weight: normal;"> 
+                    <ui:outputCurrency currencySymbol="$" value="{!v.assessmentObj.Total_Levy_Amount__c}"/>
+                   </label>  
+                </div>
+                
+            </div>
+            
+            <br/><br/>
+            <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                <span style="color: #ffffff;">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                </span>
+                <br/><br/>
+            </div>
+            
+            <label class="slds-form-element__label">{!$Label.c.Levy_Objection_Reason}&nbsp;<span class="requiredField">*</span></label>
+            <div class="slds-form-element">
+                <p>
+                    <span class="slds-checkbox">  
+                        <input type="radio" name="objectionReasonOptions" id="radio-A" onclick='{!c.setObjectionReason}'/> 
+                        <div style="display: inline-flex;width:90%;margin-left:5px;">
+                            <label class="slds-checkbox__label" for="radio-A">
+                                <span>{!$Label.c.Levy_Objection_Reason_Option_1_Label}
+                                </span>
+                            </label>
+                        </div>
+                    </span>
+                </p>
+                &nbsp;
+                <p>
+                    <span class="slds-checkbox">  
+                        <input type="radio" name="objectionReasonOptions" id="radio-B" onclick='{!c.setObjectionReason}'/> 
+                        <div style="display: inline-flex;width:90%;margin-left:5px;">
+                            <label class="slds-checkbox__label" for="radio-B">
+                                <span>{!$Label.c.Levy_Objection_Reason_Option_2_Label}
+                                </span>
+                            </label>
+                        </div>
+                    </span>
+                </p>
+                &nbsp;
+                <p>
+                    <span class="slds-checkbox">  
+                        <input type="radio" name="objectionReasonOptions" id="radio-C" onclick='{!c.setObjectionReason}'/> 
+                        <div style="display: inline-flex;width:90%;margin-left:5px;">
+                            <label class="slds-checkbox__label" for="radio-C">
+                                <span>{!$Label.c.Levy_Objection_Reason_Option_3_Label}
+                                </span>
+                            </label>
+                        </div>
+                    </span>
+                </p>
+                &nbsp;
+                <p>
+                    <span class="slds-checkbox">  
+                        <input type="radio" name="objectionReasonOptions" id="radio-D" onclick='{!c.setObjectionReason}'/> 
+                        <div style="display: inline-flex;width:90%;margin-left:5px;">
+                            <label class="slds-checkbox__label" for="radio-D">
+                                <span>{!$Label.c.Levy_Objection_Reason_Option_4_Label}
+                                </span>
+                            </label>
+                        </div>
+                    </span>
+                </p>
+                &nbsp;
+                <span id="objectionReasonError" class="customErrorMsg"></span>
+            </div>
+            
+            <br/><br/>
+            <div class="slds-grid" style="width:100%;">
+                <div style="width: 80% !important;">
+                    <legend class="slds-form-element__label">{!$Label.c.Levy_Why_Raising_Objection}&nbsp;<span class="requiredField">*</span></legend>
+                    <ui:inputTextarea aura:id="objectionReason" maxlength="2000" 
+                                      value="{!v.assessmentCase.Reason_for_Objection__c}"/>
+                </div>
+                <div style="width: 20% !important;margin-left: 10px;">
+                </div>
+            </div>
+            
+            <aura:if isTrue="{!or(v.objectionReasonOption == 'radio-A', v.objectionReasonOption == 'radio-B')}">
+                <br/><br/>
+                <label class="slds-form-element__label">{!$Label.c.Levy_Objection_Grounds_For_Objection}</label>
+                <p>
+                    <aura:unescapedHtml value="{!$Label.c.Levy_Objection_Grounds_For_Objection_Description}"></aura:unescapedHtml>
+                </p>
+                
+                <br/>
+                <aura:if isTrue="{!or(v.hadTSP, v.hadBSP)}"> 
+                    <div class="slds-grid">
+                        
+                        <aura:if isTrue="{!v.hadBSP}"> 
+                            <div class="slds-col" style="padding-left: 0%;">
+                                <label class="slds-form-element__label">{!$Label.c.Levy_Return_Booked_Services}&nbsp;{!v.assessmentObj.Taxpayer_Registration__r.Booking_Service_Provider_Number__r.Name}&nbsp;<span class="requiredField">*</span></label>
+                                <ui:inputNumber aura:id="bspCount" value="{!v.assessmentCase.Taxpayer_s_Requested_BSP_Count__c}" class="slds-input"/>
+                            </div>
+                        </aura:if> 
+                        
+                        <aura:if isTrue="{!v.hadTSP}">
+                            <div class="slds-col" style="padding-left: 0%;">
+                                <label class="slds-form-element__label">{!$Label.c.Levy_Return_Taxi_Services}&nbsp;{!v.assessmentObj.Taxpayer_Registration__r.Taxi_Service_Provider_Number__r.Name}&nbsp;<span class="requiredField">*</span></label>
+                                <ui:inputNumber aura:id="tspCount" value="{!v.assessmentCase.Taxpayer_s_Requested_TSP_Count__c}" class="slds-input"/>
+                            </div>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!not(and(v.hadBSP, v.hadTSP))}"> 
+                            <div class="slds-col" style="padding-left: 0%;">
+                            </div>
+                        </aura:if>
+                        
+                    </div>
+                    <br/>
+                </aura:if>
+            </aura:if>
+            
+            <aura:if isTrue="{!or(v.objectionReasonOption == 'radio-C', v.objectionReasonOption == 'radio-D')}">
+                <br/><br/>
+                <label class="slds-form-element__label">{!$Label.c.Levy_Objection_Grounds_For_Objection}</label>
+                <br/>
+                <div class="slds-grid" style="width:100%;">
+                    <div style="width: 80% !important;">
+                        <legend class="slds-form-element__label">{!$Label.c.Levy_Objection_Third_Party_Details}&nbsp;<span class="requiredField">*</span></legend>
+                        <ui:inputTextarea aura:id="thirdPartyDetails" maxlength="2000" 
+                                          value="{!v.assessmentCase.Details_of_3rd_party__c}"/>
+                    </div>
+                    <div style="width: 20% !important;margin-left: 10px;">
+                    </div>
+                </div>
+                
+                <div class="slds-grid" style="width:100%;">
+                    <div style="width: 80% !important;">
+                        <legend class="slds-form-element__label">{!$Label.c.Levy_Objection_Third_Party_Payment}&nbsp;<span class="requiredField">*</span></legend>
+                        <ui:inputTextarea aura:id="thirdPartyAgreementDetails" maxlength="2000" 
+                                          value="{!v.assessmentCase.Details_of_agreement__c}"/>
+                    </div>
+                    <div style="width: 20% !important;margin-left: 10px;">
+                    </div>
+                </div>
+            </aura:if>
+            
+            <br/><br/>
+            <div class="slds-grid">
+                <div class="slds-col" style="padding-bottom: 0%">
+                    <c:P2POTAttachment isRequired="true" category="LevyObjection" uploadStatus="{!v.supportingDocumentsUploadStatus}" uniqueIdentifier="supporting-documents-objection" FileUploadChecked="" FileCheckLabel="Supporting Documents" aura:id="Supporting-Documents-Upload-Objection" ParentRecordId="{!v.assessmentObj.Id}" acceptedFileTypes=".pdf"  AllowMultiple="true" section="Assessment Objection" index="1" />
+                </div>
+            </div>
+            
+            <label class="slds-form-element__label">Privacy Statement</label>
+            <br/>
+            <aura:unescapedHtml value="{!$Label.c.Levy_Objection_Privacy_Statement_Paragraph_1}"/>
+            <br/><br/>
+            <aura:unescapedHtml value="{!$Label.c.Levy_Objection_Privacy_Statement_Paragraph_2}"/>
+            <br/><br/>
+            <aura:unescapedHtml value="{!$Label.c.Levy_Objection_Privacy_Statement_Paragraph_3}"/>
+            
+            <br/><br/>
+            <div class="slds-grid">
+                
+                <div class="slds-col" style="padding-top: 0%">
+                    <p>
+                        <legend class="slds-form-element__label">Declaration</legend> 
+                    </p>
+                    <p style="font-weight:bold;">
+                        <aura:unescapedHtml value="{!$Label.c.Levy_Objection_Declaration_Message}"></aura:unescapedHtml>
+                    </p>
+                    <br/>
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            
+                            <ui:inputCheckbox aura:id="objectionCheckbox" label="" value="{!v.PrivacyDeclaration}" class="declarationCheckBox"/>
+                            <aura:unescapedHtml value="{!$Label.c.Levy_Objection_Declaration}"></aura:unescapedHtml>
+                            <span id="declarationAcceptanceError" class="customErrorMsg"></span>
+                            
+                            <!--
+                            <aura:if isTrue="{!v.hasApprovedRebateBeforeLevyEndPeriod}">  
+                                <aura:unescapedHtml value="{!$Label.c.Levy_Return_Rebate_Declaration}"></aura:unescapedHtml>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!not(v.hasApprovedRebateBeforeLevyEndPeriod)}">  
+                                <aura:unescapedHtml value="{!$Label.c.Levy_Return_Over_600_Declaration}"></aura:unescapedHtml>
+                            </aura:if>
+                            -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slds-card__footer">
+                
+                <ui:button class="slds-button slds-button--neutral" press="{!c.closeObjection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Close
+                </ui:button>
+                &nbsp;&nbsp;
+                <ui:button class="slds-button slds-button--neutral" press="{!c.submitObjection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true" ></i>&nbsp;&nbsp;Submit
+                </ui:button>
+                
+            </div>
+        </div>
+    </div>
+</aura:component>

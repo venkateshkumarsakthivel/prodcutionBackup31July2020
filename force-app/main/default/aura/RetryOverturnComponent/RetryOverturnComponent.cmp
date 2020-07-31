@@ -1,0 +1,10 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" access="global" controller="RetryOverturnController">
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-show"/>
+
+	 <p style="font-weight: bold;">
+    
+        <a href="" onclick="{!c.doInit}">Click here to Retry.</a>
+    </p>
+</aura:component>

@@ -1,0 +1,38 @@
+.THIS .privacyCheckBox{
+    display: inline-block;
+    margin-right: 11px;
+}
+.THIS .requiredField {
+    
+    color: red;
+    font-weight: bold;
+}
+.THIS .customErrorMsg {
+    
+    color: rgb(194, 57, 52);
+    font-weight:bold;
+    font-size: .875rem;
+}
+
+.THIS .slds-icon_container{
+    border-radius: 0.25rem;
+   	background-color: #34becd;
+}
+.THIS hr { 
+    display: block;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: -25px;
+    margin-right: -25px;
+    border-style: inset;
+    border-width: 0px;
+    border-top: 1px solid #d4d4d4;
+}
+.THIS .slds-card__footer{
+    border-top : none;
+    text-align: right;
+}
+
+.THIS input[type=checkbox][disabled]:checked {
+    background-color: rgb(21, 137, 238) !important;
+}

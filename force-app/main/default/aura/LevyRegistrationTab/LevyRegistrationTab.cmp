@@ -1,0 +1,385 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="LevyRegistrationTabController">
+    
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:attribute name="acc" type="Account" />
+    <aura:attribute name="tax_Payer_Reg" type="Tax_Payer_Registration__c" default="[]" access="public"/> 	
+    <aura:attribute name="con" type="Contact" access="public"/>
+    <aura:attribute name="authorisations" type="Authorisation__c[]" access="public"/>
+    <aura:attribute name="bankDetails" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="contactEdit" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="newContact" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="readOnly" type="Boolean" default="true" access="public"/>
+    
+    <aura:dependency resource="markup://c:BSBNumberComponentHelper"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-show"/>
+    
+    <article class="slds-card" id="accountComponent">
+        <div class="slds-page-header">
+            
+            <div class="slds-grid">
+                <div class="slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                       svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="account">
+                            </c:svgIcon>
+                        </div>
+                        <div class="slds-media__body"> 
+                            <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.ASP_ACCT_MGMT_Header} - {!v.acc.Customer_Number__c}</p>
+                            <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Customer name">{!v.acc.Name}</h2>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            
+            <aura:if isTrue="{!v.bankDetails == false}">
+                <aura:if isTrue="{!v.tax_Payer_Reg == null}">
+                    <p class="notRegister">
+                        <aura:unescapedHtml value="{!$Label.c.Levy_No_Registration_Landing_Content}"></aura:unescapedHtml>
+                        <aura:unescapedHtml value="{!$Label.c.Levy_No_Registration_Landing_Content_2}"></aura:unescapedHtml>
+                    </p>
+                    <div class="slds-card__footer">
+                        <aura:if isTrue="{!v.authorisations.length != 0}">
+                            <br/>
+                            <ui:button class="slds-button slds-button--neutral" press="{!c.registerLevy}"> 
+                                <i style="color:#54698d !important;" class="fa fa-file-text" aria-hidden="true"></i>&nbsp;&nbsp;Register Now
+                            </ui:button>
+                        </aura:if>
+                    </div>
+                </aura:if>
+                
+                <!-- Registration Details Section Start From Here -->
+                <aura:if isTrue="{!v.tax_Payer_Reg != null}">
+                    <label class="slds-form-element__legend">{!$Label.c.Levy_Registration_Details}</label>
+                    <div class="box">
+                        
+                        <div class="slds-form--stacked" style="padding: 20px">
+                            
+                            <aura:if isTrue="{!v.authorisations.length != 0}">
+                                <div>
+                                    <label class="slds-form-element__legend" >{!$Label.c.Levy_Service_Provider_Details}</label>
+                                </div>
+                                <div class="slds-grid">
+                                    
+                                    <div class="slds-col">
+                                        <table style="width:60%;">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">
+                                                        <div class="slds-truncate" title="Authorisation">
+                                                            <b><u>Authorisation</u></b>
+                                                        </div>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <div class="slds-truncate" title="Number">
+                                                            <b><u>Number</u></b>
+                                                        </div>
+                                                    </th>
+                                                    <th scope="col">
+                                                        <div class="slds-truncate" title="Expiry Date">
+                                                            <b><u>Expiry Date</u></b>
+                                                        </div>
+                                                    </th>
+                                                </tr>
+                                                <br></br>
+                                            </thead>
+                                            <tbody>
+                                                <aura:iteration items="{!v.authorisations}" var="authorisation">
+                                                    <tr>
+                                                        <td>
+                                                            <div class="slds-truncate" title="{!authorisation.Authorisation_Name__c}">
+                                                                {!authorisation.Authorisation_Type__c}
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="slds-truncate" title="{!authorisation.Authorisation_Number__c}">
+                                                                {!authorisation.Name}
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="slds-truncate" title="{!authorisation.End_Date__c}">
+                                                                <ui:outputDate value="{!authorisation.End_Date__c}" format="DD-MMM-YYYY"></ui:outputDate>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </aura:iteration>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <br/>
+                            </aura:if>
+                            
+                            <label class="slds-form-element__legend">{!$Label.c.Levy_ABN_Details}</label>
+                            <div class="slds-grid">
+                                <div class="slds-col" >
+                                    <label class="slds-form-element__label" >{!$Label.c.Levy_ABN}</label>
+                                    <ui:inputText disabled="true" value="{!v.tax_Payer_Reg.ABN__c}" class="slds-output slds-input"/>
+                                </div>
+                                <div class="slds-col" >
+                                    <label class="slds-form-element__label" > {!$Label.c.Levy_Registered_Business_Name}</label>
+                                    <ui:inputText disabled="true" value="{!v.tax_Payer_Reg.Registered_Business_Name__c}" class="slds-output slds-input"/>
+                                </div>
+                            </div>
+                            
+                            <p style="padding-top:30px;color: #000000;font-size: 15px;">
+                                The number of Passenger Service Transactions you estimate that
+                                you will provide over the next 12 months.
+                            </p>
+                            
+                            <div class="slds-grid">
+                                <div class="slds-col" >
+                                    <label class="slds-form-element__label" >{!$Label.c.Levy_Annual_Trip_Estimates}</label>
+                                    <ui:inputSelect aura:id="Annual-Trip" value="{!v.tax_Payer_Reg.Annual_Trip_Estimate__c}"  disabled="true">
+                                        <ui:inputSelectOption text="" label="Please Select"/>
+                                        <ui:inputSelectOption text="{!$Label.c.Levy_Trip_Estimate_Less_Than_150_Value}" label="{!$Label.c.Levy_Trip_Estimate_Less_Than_150_Value}"/>
+                                        <ui:inputSelectOption text="151 to 400" label="151 to 400"/>
+                                        <ui:inputSelectOption text="401 to 600" label="401 to 600"/>
+                                        <ui:inputSelectOption text="Over 600" label="Over 600"/>
+                                    </ui:inputSelect>
+                                </div>
+                                <div class="slds-col" >
+                                    <label class="slds-form-element__label">{!$Label.c.Levy_Postal_Notification_Address}</label>
+                                    <c:AddressInputComponent aura:id="Postal-Address-Input" 
+                                                             isReadOnly="true"
+                                                             street="{!v.tax_Payer_Reg.Levy_Notification_Address_Street__c}" 
+                                                             city="{!v.tax_Payer_Reg.Levy_Notification_Address_City__c}" 
+                                                             state="{!v.tax_Payer_Reg.Levy_Notification_Address_State__c}" 
+                                                             postalcode="{!v.tax_Payer_Reg.Levy_Notification_Address_Postal_Code__c}" 
+                                                             fullStreet="{!v.tax_Payer_Reg.Levy_Notification_Address_Street__c}"/>
+                                </div>
+                            </div>
+                            
+                            <aura:if isTrue="{!v.tax_Payer_Reg.Annual_Trip_Estimate__c == 'Over 600'}">
+                                <div class="slds-grid">
+                                    <div class="slds-col">
+                                        <label class="slds-form-element__label" > {!$Label.c.Levy_Estimated_BSP_Transactions}</label>
+                                        <ui:inputText disabled="true" value="{!v.tax_Payer_Reg.Estimated_BSP_Transactions__c}" class="slds-output slds-input"/>
+                                    </div>
+                                    
+                                    <div class="slds-col">
+                                        <label class="slds-form-element__label" > {!$Label.c.Levy_Estimated_TSP_Transactions}</label>
+                                        <ui:inputText disabled="true" value="{!v.tax_Payer_Reg.Estimated_TSP_Transactions__c}" class="slds-output slds-input"/>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            
+                            <div class="slds-grid">
+                                <div class="slds-col">
+                                    <aura:if isTrue="{!and(v.tax_Payer_Reg.Applied_For_Rebate__c,v.tax_Payer_Reg.Rebate_Reason__c)}">
+                                        <label class="slds-form-element__label">{!$Label.c.Levy_Rebate_Reason}</label>
+                                        <ui:inputText disabled="true" value="{!v.tax_Payer_Reg.Rebate_Reason__c}" class="slds-output slds-input"/>
+                                    </aura:if>
+                                </div>
+                                <div class="slds-col">
+                                    <aura:if isTrue="{!and(v.tax_Payer_Reg.Applied_For_Exemption__c,v.tax_Payer_Reg.Exemption_Reason__c != NULL)}">
+                                        
+                                        <label class="slds-form-element__label" >{!$Label.c.Levy_Exemption_reason}</label>
+                                        <ui:inputText disabled="true" value="{!v.tax_Payer_Reg.Exemption_Reason__c}" class="slds-output slds-input"/>
+                                        
+                                    </aura:if>
+                                    
+                                </div>
+                                
+                            </div> 
+                            <div class="slds-card__footer">
+                                <aura:if isTrue="{!v.authorisations.length != 0}">
+                                    <ui:button class="slds-button slds-button--neutral" press="{!c.updateLevy}"> 
+                                        <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Update
+                                    </ui:button>
+                                </aura:if>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <!-- Registration Details Section Ends Here -->
+                    
+                    <!-- Contact Details section start from here  -->
+                    <div class="lds-form--stacked" style="padding-top:30px;">
+                        <label class="slds-form-element__legend" >{!$Label.c.Levy_Passenger_Levy_Contact}</label></div>
+                    <div class="box">
+                        <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                            <span style="color: #ffffff;">
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                                &nbsp;{!$Label.c.ASP_ACCT_MGMT_Error_Msg}
+                            </span>
+                        </div>	
+                        <div class="slds-form--stacked" style="padding:20px;">
+                            
+                            <!-- UPDATE SECTION Starts from Here -->
+                            <aura:if isTrue="{!v.contactEdit==true}">
+                                <div class="slds-grid">
+                                    <div class="slds-col">
+                                        <div style="display:inline;">
+                                            <legend class="slds-form-element__label">{!$Label.c.Levy_Add_Contact}&nbsp;<span class="requiredField">*</span></legend>
+                                            <div class="radiobuttonClass1">
+                                                <ui:inputRadio disabled="{!v.readOnly}" aura:id="r0" change="{!c.toggleAddNewContact}" name="addNewLevyContact" label="" value="false"/> Yes &nbsp;&nbsp;&nbsp;
+                                                <ui:inputRadio disabled="{!v.readOnly}" aura:id="r1" change="{!c.toggleAddNewContact}" name="addNewLevyContact" label="" value="true"/> No
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col">
+                                    </div>
+                                </div>
+                                
+                                <aura:if isTrue="{!v.newContact == false}">
+                                    <div class="slds-grid">
+                                        <div class="slds-col">
+                                            <label class="slds-form-element__label">{!$Label.c.Levy_Select_Contact}&nbsp; <span class="requiredField">*</span></label>
+                                            <ui:inputSelect disabled="false"  required="true"
+                                                            aura:id="Select-Contact-Input"
+                                                            value="{!v.tax_Payer_Reg.Levy_Contact__c}"
+                                                            change="{!c.onContactChange}">
+                                            </ui:inputSelect>
+                                        </div>
+                                        <div class="slds-col">
+                                        </div>
+                                    </div>
+                                </aura:if>
+                            </aura:if>
+                            <!-- UPDATE SECTION End Here -->
+                            
+                            <aura:if isTrue="{!or(v.contactEdit==false,v.newContact == true)}">
+                                <div class="slds-grid">
+                                    <div class="slds-col" >
+                                        <label class="slds-form-element__label">{!$Label.c.Levy_First_Name}&nbsp;<span class="requiredField">*</span></label>
+                                        <ui:inputText maxlength="40" aura:id="First-Name" disabled="{!v.readOnly}" value="{!v.tax_Payer_Reg.Levy_Contact_First_Name__c}" class="CamelCaseInput"/>
+                                    </div>
+                                    <div class="slds-col" >
+                                        <label class="slds-form-element__label">{!$Label.c.Levy_Last_Name}&nbsp;<span class="requiredField">*</span></label>
+                                        <ui:inputText maxlength="50" aura:id="Last-Name"  disabled="{!v.readOnly}" value="{!v.tax_Payer_Reg.Levy_Contact_Last_Name__c}" class="upperCaseInput"/>
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="slds-grid">
+                                    <div class="slds-col" >
+                                        <c:EmailAddressComponent isReadOnly="{!v.readOnly}" aura:id="Email-Input" 
+                                                                 uniqueIdentifier="Email-Input" fieldLabel="{!$Label.c.Levy_Email}" 
+                                                                 isRequired="true" email="{!v.tax_Payer_Reg.Levy_Contact_Email__c}"/>
+                                    </div>
+                                    
+                                    <div class="slds-col" >
+                                        
+                                        <c:PhoneComponent isReadOnly="{!v.readOnly}" 
+                                                          aura:id="Daytime-Phone-Input" 
+                                                          uniqueIdentifier="Daytime-Phone-Input"
+                                                          fieldLabel="{!$Label.c.Levy_Daytime_Phone_Number}"
+                                                          isRequired="true" 
+                                                          phoneNumber="{!v.tax_Payer_Reg.Levy_Contact_Phone__c}" />
+                                    </div>
+                                    
+                                </div>
+                            </aura:if>
+                            <div class="slds-grid">
+                                <div class="slds-col" >
+                                    <div style="display:inline;">
+                                        <label class="slds-form-element__label">{!$Label.c.Levy_Return}&nbsp;<span class="requiredField">*</span></label>
+                                        <div class="radiobuttonClass1">
+                                            <ui:inputRadio disabled="{!v.readOnly}" aura:id="ret1" change="{!c.toggleUpdateReturnsForLevy}" name="returnsForLevy" label="" value="{!v.tax_Payer_Reg.Person_Enters_Returns_for_Levy__c == 'Yes' ? true : false}"/> Yes &nbsp;&nbsp;&nbsp;
+                                            <ui:inputRadio disabled="{!v.readOnly}" aura:id="ret2" change="{!c.toggleUpdateReturnsForLevy}" name="returnsForLevy" label="" value="{!v.tax_Payer_Reg.Person_Enters_Returns_for_Levy__c == 'No' ? true : false}"/> No
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-col" >
+                                    
+                                </div>
+                            </div>
+                            
+                            <div class="slds-card__footer">
+                                
+                                <aura:if isTrue="{!v.contactEdit == false}">
+                                    <aura:if isTrue="{!v.authorisations.length != 0}">
+                                        <ui:button class="slds-button slds-button--neutral" press="{!c.updateContact}"> 
+                                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true" ></i>&nbsp;&nbsp;Update
+                                        </ui:button>
+                                    </aura:if>
+                                </aura:if>
+                                
+                                <aura:if isTrue="{!v.contactEdit == true}">
+                                    
+                                    <ui:button class="slds-button slds-button--neutral" press="{!c.restoreDetails}"> 
+                                        <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true" ></i>&nbsp;&nbsp;Cancel
+                                    </ui:button>
+                                    <ui:button class="slds-button slds-button--neutral" press="{!c.addContact}"> 
+                                        <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                                    </ui:button>
+                                    
+                                </aura:if>
+                                
+                            </div>
+                        </div> 
+                    </div>
+                    <!-- Contact Details and update Sectoin Ends here -->
+                    <aura:if isTrue="{!or(v.tax_Payer_Reg.Applied_For_Exemption__c != 'Yes', v.tax_Payer_Reg.Annual_Trip_Estimate__c == 'Over 600')}">	  
+                        <div class="lds-form--stacked" style="padding-top:30px;">
+                            <label class="slds-form-element__legend" >{!$Label.c.Levy_Financial_Details}</label></div>
+                        <div class="box">
+                            <div class="slds-form--stacked" style="padding:20px;">
+                                
+                                
+                                <div class="slds-grid">
+                                    <div class="slds-col" >
+                                        <label class="slds-form-element__label">{!$Label.c.Levy_Account_Name} </label>
+                                        <ui:inputText disabled="true" value="{!v.tax_Payer_Reg.Bank_Account_Holder_s_Name__c}" class="slds-output slds-input"/>
+                                    </div>
+                                    <div class="slds-col" >
+                                        
+                                        <label class="slds-form-element__label">{!$Label.c.Levy_Bank} </label>
+                                        <ui:inputText disabled="true" value="{!v.tax_Payer_Reg.Financial_Institution_Name__c}" class="slds-output slds-input"/>
+                                        
+                                    </div>
+                                </div> 
+                                
+                                <div class="slds-grid">
+                                    <div class="slds-col" >
+                                        <label class="slds-form-element__label">{!$Label.c.Levy_BSB_Number} </label>
+                                        <ui:inputText disabled="true" value="{!v.tax_Payer_Reg.BSB__c}" class="slds-output slds-input"/>
+                                        
+                                    </div>
+                                    <div class="slds-col" >
+                                        <label class="slds-form-element__label">{!$Label.c.Levy_Account_Number} </label>
+                                        <ui:inputText disabled="true" value="{!v.tax_Payer_Reg.Bank_Account_Number__c}" class="slds-output slds-input"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="slds-grid">
+                                    <div class="slds-col" >
+                                        
+                                    </div>
+                                    <div class="slds-col" >
+                                        <div class="slds-card__footer">
+                                            <aura:if isTrue="{!v.authorisations.length != 0}">
+                                                <ui:button class="slds-button slds-button--neutral" press="{!c.updateBankDetails}"> 
+                                                    <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Update
+                                                </ui:button>
+                                            </aura:if>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                            </div>
+                        </div>
+                    </aura:if>
+                </aura:if>
+            </aura:if>
+            
+            
+            <aura:if isTrue="{!v.bankDetails == true}">		
+                <div class="box">  
+                    <c:LevyBankingDetails registrationRecord="{!v.tax_Payer_Reg}" invocationContext="RegistrationTab"></c:LevyBankingDetails>
+                </div>
+            </aura:if>
+        </div>
+        
+    </article>
+</aura:component>

@@ -1,0 +1,4 @@
+<aura:component >
+    <aura:attribute name="dob" type="Date" />
+	 <ui:inputDate aura:id="dob" label="Date of Birth" value="{!v.dob}" displayDatePicker="false" keyup="{!c.onKeyUp}" class="slds-input"/>
+</aura:component>

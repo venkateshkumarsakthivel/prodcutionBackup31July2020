@@ -1,0 +1,149 @@
+.THIS .sectionTitleNote {   
+    color: black;
+    float:right;
+}
+
+.THIS .dashboard_icon{ 
+    fill:#54698d !important;
+    width:15px;
+}
+
+.THIS .slds-col{
+    padding:2%;
+    width:50%;
+}
+
+.THIS .slds-form-element__legend {
+    color: #000000;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.THIS .spinnerWrapper {
+    display:none;
+}
+
+.THIS.toggle {
+    display: none;
+}
+
+.THIS .labelclass{
+    line-height:2.0;
+    font-weight: bold;
+}
+
+.THIS .inlineCheckboxes{
+    padding-right: 40%;
+}
+
+.THIS .customCheckBox{
+    display: inline-block;
+    float: left;    
+}
+
+.THIS .uiLabel{ 
+    color: #000000;
+    font-size: 15px;
+    margin-top: .25rem;
+    padding-left: 5px;
+}
+
+.THIS .slds-form-element__label {
+    
+    color: #000000;
+    font-weight: bold;
+    font-size: 15px;
+    margin-top: .25rem;
+}
+
+.THIS .requiredField {
+    
+    color: red;
+    font-weight: bold;
+}
+
+.THIS .customErrorMsg {
+    
+    color: rgb(194, 57, 52);
+    font-weight:bold;
+    font-size: .875rem;
+}
+
+.THIS .form-element__help {
+    
+    color: rgb(194, 57, 52);
+    font-weight:bold;
+    font-size: .875rem;
+}
+
+.THIS select.has-error {
+    
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgb(194, 57, 52) 0px 0px 0px 1px inset;
+    background-clip: padding-box;
+    border-color: rgb(194, 57, 52);
+}
+
+.THIS input.has-error {
+    
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgb(194, 57, 52) 0px 0px 0px 1px inset;
+    background-clip: padding-box;
+    border-color: rgb(194, 57, 52);
+}
+
+.THIS .radiobuttonClass{
+    display: inline-block;
+    float: left;
+}
+.THIS .same_as_business_address{
+    display: inline-block;
+    margin-left: 85px;
+}
+@media all and (max-width: 800px), only screen and (-webkit-min-device-pixel-ratio: 2) and (max-width: 1024px), only screen and (min--moz-device-pixel-ratio: 2) and (max-width: 1024px), only screen and (-o-min-device-pixel-ratio: 2/1) and (max-width: 1024px), only screen and (min-device-pixel-ratio: 2) and (max-width: 1024px), only screen and (min-resolution: 192dpi) and (max-width: 1024px), only screen and (min-resolution: 2dppx) and (max-width: 1024px) {
+    .THIS .same_as_business_address{   
+        margin-left: 0px;
+    }
+}
+.THIS input.uiInput--checkbox[type=checkbox][disabled] {
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+
+.THIS input[type=checkbox][disabled]:checked {
+    background-color: rgb(21, 137, 238) !important;
+}
+
+.THIS .slds-input[type=checkbox][disabled]{
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+
+.THIS .slds-input[type=textarea][disabled]{
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+
+.THIS .uiInput--textarea.textarea[disabled] {
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+
+.THIS .uiInput--checkbox input[type=checkbox][disabled] {
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+.THIS .slds-icon-standard-contact{
+    background-color: #34becd;
+}
+.THIS .slds-icon-standard-document{
+    background-color: #34becd;
+}
+.THIS .slds-input[disabled] {
+    background-color: #f3f3f3!important;
+    border-color: rgb(208, 208, 208)!important;
+}
+.THIS select[disabled]{
+    background-color: #f3f3f3!important;
+    border-color: rgb(208, 208, 208)!important;
+}

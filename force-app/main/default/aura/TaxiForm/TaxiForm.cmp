@@ -1,0 +1,55 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.TaxiLicenceActionStyle}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}"/>
+    
+    <aura:attribute name="caseId" type="String"/>
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="entityType" type="String"/>
+    
+    <aura:attribute name="applicationType" type="String" default="New"/>
+    
+    <aura:attribute name="sectionNameToRender" type="String" default="sectionA"/>
+    
+    <aura:handler name="loadSection" event="c:ASPFormSectionEvent" action="{!c.updateSectionHandlers}"/>
+    <aura:handler name="closeApplication" event="c:TaxiFormModalClosureEvent" action="{!c.closeApplication}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <br/>
+    
+    <div id="taxiFormContainer">
+        <aura:If isTrue="{!v.sectionNameToRender == 'sectionA'}">
+            <c:TaxiFormTenderDetails aura:id="tenderDetails" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}" disabledInput="true"></c:TaxiFormTenderDetails>
+        </aura:If>
+        
+        <aura:If isTrue="{!v.sectionNameToRender == 'sectionB'}">
+            <c:TaxiFormIndividual caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:TaxiFormIndividual>
+        </aura:If>
+        
+        <aura:If isTrue="{!v.sectionNameToRender == 'sectionC'}">
+            <c:TaxiFormCorporation caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:TaxiFormCorporation>
+        </aura:If>
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'sectionC-P'}">
+            <c:TaxiFormCorporatePartnership caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:TaxiFormCorporatePartnership>
+        </aura:if>
+        
+        <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Company Partner')}">
+            <c:TaxiFormIndividualPartnership caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="true"></c:TaxiFormIndividualPartnership>
+        </aura:if>
+        
+        <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Individual Partner')}">
+            <c:TaxiFormIndividualPartnership caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="false"></c:TaxiFormIndividualPartnership>
+        </aura:if>
+        
+        <aura:If isTrue="{!v.sectionNameToRender == 'sectionD'}">
+            <c:TaxiFormNominatedDirector caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:TaxiFormNominatedDirector>
+        </aura:If>
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'review'}">
+            <c:TaxiFormReview accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormReview>
+        </aura:if>
+    </div>
+</aura:component>

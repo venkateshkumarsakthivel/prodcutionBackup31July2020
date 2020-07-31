@@ -1,0 +1,5 @@
+<aura:component implements="lightning:availableForFlowScreens,force:hasRecordId,flexipage:availableForRecordHome" access="global">
+    <aura:attribute name="recordtype" type="String" access="public" description="recordtype"/>
+    <c:LegislationSearch recordtype="{!v.recordtype}"/>
+    <c:CaseLegislationReference caseId="{!v.recordId}"/>
+</aura:component>

@@ -1,0 +1,9 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" 
+                access="global" controller="RegisterPaymentController" >
+	
+        
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="paymentRef" type="String"/>
+    <aura:attribute name="recId" type="String"/>
+
+</aura:component>

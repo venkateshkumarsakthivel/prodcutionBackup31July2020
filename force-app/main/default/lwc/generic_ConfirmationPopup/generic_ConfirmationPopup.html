@@ -1,0 +1,29 @@
+<template>
+    <lightning-card title="Confirmation Popup" icon-name="standard:account"></lightning-card>
+    <div class="slds-theme_default">
+        <template if:true={openmodel}>
+        <div class="demo-only">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-modal_prompt slds-fade-in-open">
+                <div class="popupmodal slds-modal__container"> 
+                    <div class="slds-modal__content slds-theme--warning slds-theme_alert-texture slds-p-around_medium"
+                     id="modal-content-id-1"
+                     style="border-top-right-radius:0.3rem; border-top-left-radius: 0.3rem;">
+                        <center>                            
+                            <h1 class="slds-text-heading_medium slds-hyphenate">{title}</h1>
+                        </center>
+                    </div>
+                    <div class="slds-modal__content slds-p-around_medium" >
+                        <center>{confirmationMessage}</center>
+                    </div>
+                
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Close" variant="brand"></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="backdrop slds-backdrop slds-backdrop_open"></div>
+        </div>
+        </template>
+<lightning-button onclick={showWarning} label="Show Warning"></lightning-button>
+</div>
+</template>

@@ -1,0 +1,56 @@
+.THIS .anchor:hover + .message{
+    display:block !important;
+    z-index:10;
+}
+.THIS .message{
+    display: none;
+    position: absolute;
+    top: -33px;
+    align-content: center;
+    text-align: center;
+    width: 97px;
+    border-style: solid;
+    border-width: 1px;
+    background-color: #32a9c3;
+    color: white;
+
+}
+.THIS .show {
+    
+    display:block;
+    /* opacity:1;
+    transition:opacity 1s linear;*/
+}
+.THIS .hide{
+    display:none;
+    /* opacity:1;
+    transition:opacity 1s linear;*/
+}
+.THIS .display{
+    display:block;
+}
+.THIS .nodisplay{
+    display:none;
+}
+.THIS .search{
+    background-color: white;
+    border: white;
+}
+
+.THIS .open-search{
+    display: inline;
+    height: 33px;
+    min-height: 33px;
+    float: right;
+    padding-top: 45px;
+}
+.THIS .LogoAndSearchP2PTransport{
+    display:inline;
+}
+
+.THIS .LogoAndSearchP2PTransport img{
+    margin: 15px 0;
+}
+.THIS .cssmenu:hover{
+    text-decoration:underline;
+}

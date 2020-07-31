@@ -1,0 +1,20 @@
+.THIS.slds-card.cP2POTAttachments {
+	
+    padding: 15px 5px;
+}
+.THIS .slds-table th[scope="row"],  .THIS .slds-table td[role="gridcell"] {
+    font-size: 12px;
+}
+
+.THIS .slds-table th[scope="row"]>.slds-truncate {
+    max-width: 100%;
+    overflow: auto;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.THIS .slds-table--fixed-layout{
+    table-layout:inherit;
+}
+.THIS tbody tr:nth-child(odd) {background: #FFFFFF}
+.THIS tbody tr:nth-child(even) {background: #F3F3F3}

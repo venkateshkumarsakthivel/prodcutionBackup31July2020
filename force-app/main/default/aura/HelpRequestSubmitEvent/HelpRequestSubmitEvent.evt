@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Propagate Submit Event from Popup component to Parent">
+    <aura:attribute type="String" name="CaseNumber"/>
+</aura:event>

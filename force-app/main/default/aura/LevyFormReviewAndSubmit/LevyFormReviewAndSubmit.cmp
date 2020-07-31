@@ -1,0 +1,45 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable,lightning:isUrlAddressable" access="global" controller="LevyFormSectionDataController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="registrationId" type="String" default=""/>
+    <aura:attribute name="accountId" type="String" default=""/>
+    
+    <aura:attribute name="isUpdateRegistration" type="Boolean" default="false" access="public"/>
+    
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    
+    <aura:attribute name="registrationRecord" type="Tax_Payer_Registration__c" default=""/>
+    
+    <aura:registerEvent name="loadSection" type="c:LevyFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <aura:handler name="confirmApplicationSubmission" event="c:ConfirmApplicationSubmission" action="{!c.submitRegistration}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+   <aura:attribute name="isConsoleUser" type="Boolean" default="false" />
+    <aura:if isTrue="{!not(v.readOnly)}">
+        <c:LevyFormSectionProgressIndicator currentSection="{!$Label.c.Levy_Review_and_Submit}"/>
+        <br/>
+    </aura:if>
+    
+    <c:LevyFormGeneralDetails readOnly="true" isSectionExpanded="true" registrationRecord="{!v.registrationRecord}" accountId="{!v.accountId}" haveProcessedURL="true" isUpdateRegistration="{!v.isUpdateRegistration}"></c:LevyFormGeneralDetails>
+    
+    <c:LevyExemptionOrRebateDetails readOnly="true" registrationRecord="{!v.registrationRecord}"></c:LevyExemptionOrRebateDetails>
+    
+    <c:LevyBankingDetails readOnly="true" displayreadOnly="true" registrationRecord="{!v.registrationRecord}"></c:LevyBankingDetails>
+    
+    <c:P2POTAttachments parent="{!v.registrationRecord.Service_Provider_Name__c}" />
+    
+    <c:LevyPrivacyStatementAndDeclaration readOnly="true" registrationRecord="{!v.registrationRecord}"></c:LevyPrivacyStatementAndDeclaration>
+    
+    <div class="slds-card__footer">
+        
+        <lightning:button class="slds-button slds-button--neutral" onclick="{!c.confirmRegistrationSubmission}"> 
+            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Submit
+        </lightning:button>
+        
+    </div>
+    <p>{!v.body}</p>
+</aura:component>

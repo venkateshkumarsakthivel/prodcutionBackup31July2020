@@ -1,0 +1,4 @@
+<design:component>
+	<design:attribute name="caseRecord" label="caseRecord" Description="Case Record from which the Flow is initiated"/>
+    <design:attribute name="noticeRecordId" label="noticeRecordId" Description="Store the generated Notice Record Id"/>
+</design:component>

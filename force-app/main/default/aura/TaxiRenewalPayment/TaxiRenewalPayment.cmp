@@ -1,0 +1,185 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiRenewalPaymentController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="caseId" type="String" default="" access="public"/>
+	<aura:attribute name="lineItems" type="OrderItem[]"/>
+	<aura:attribute name="payment" type="Order" />
+    <aura:attribute name="orderStatus" type="String" default=""/>
+    <aura:attribute name="orderReceiptNumber" type="String" />
+    <aura:attribute name="paymentError" type="Boolean" default="false" />
+    <aura:attribute name="entityType" type="String" default="" access="public"/>
+    <aura:attribute name="profileName" type="String" default=""/>
+    <aura:attribute name="cssStyle" type="String"/>
+    
+    <aura:attribute name="icrnNumber" type="String" default="" />
+    <aura:attribute name="selectedPaymentMethod" type="String" default="" />
+    <aura:attribute name="otherPaymentMethod" type="String" default="" />
+    
+    <aura:attribute name="isInitiatedFromManageAccount" type="Boolean" default="false" access="public"/> 
+	<aura:attribute name="isInitiatedByInternalUser" type="Boolean" default="false" />
+    
+    <style>
+        /* css style added dynamically to hack style of global header*/
+        {!v.cssStyle}
+    </style>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <aura:handler name="confirmApplicationSubmission" event="c:ConfirmApplicationSubmission" action="{!c.submitApplication}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:if isTrue="{!not(v.isInitiatedFromManageAccount)}">
+        <c:LicenceRenewalProgressIndicator currentSection="Payment" />
+        <br/>        
+    </aura:if>
+    
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon class="head" svgPath="{!$Resource.slds221+'/assets/icons/utility-sprite/svg/symbols.svg#moneybag'}"
+                               category="utility" size="large" name="Continue"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2>       
+                        Payment Details
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                
+            </div>
+        </div>
+        <hr style="margin: 0 auto;"/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                <fieldset>
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <table class="feeTable" style="width:60%">
+                                <tr class="feetableHeader">
+                                    <th>Description</th>
+                                    <th style="text-align:center;">Amount</th>
+                                </tr>
+                                <aura:iteration items="{!v.lineItems}" var="lineItem" indexVar="index">
+									<tr>
+										<td>{!lineItem.Description}</td>
+										<td style="text-align:center;">
+											<ui:outputCurrency value="{!lineItem.TotalPrice}"/>
+										</td>
+									</tr>									
+								</aura:iteration>
+								<tr style="font-weight: bold;">
+                                    <td>Total</td>
+                                    <td style="text-align:center;">
+                                        <ui:outputCurrency value="{!v.payment.TotalAmount}"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            <br/><br/>
+                            <aura:if isTrue="{!v.payment.TotalAmount > 0}">
+                                <p>
+                                    Please select the payment method and proceed with payment.
+                                    <br/>
+                                    The amount due now is <b>${!v.payment.TotalAmount}</b>
+                                </p>
+                            <aura:set attribute="else">
+                            	<p>
+                                    Please click the lodge button to complete your renewal application.
+                                    <br/>
+                                </p>
+                            </aura:set>
+                            </aura:if>
+                                                        
+                            <br/>
+                        </div>
+                    </div>
+                    
+                    <div id="generalErrorMsgDivButton" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                                <span style="color: #ffffff;">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    &nbsp;Payment Order has already been paid. Payment can only be reattempted once rejected.
+                                </span>
+                        </div>
+                    <aura:if isTrue="{!v.payment.TotalAmount > 0}">
+                         
+                        <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                            <span style="color: #ffffff;">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                &nbsp;Please specifiy a payment method.
+                            </span>
+                        </div>
+                        <div class="slds-grid">
+                            <div class="slds-col">
+                                <ui:inputRadio value="" aura:id="Credit-Card" name="Payment-Method" label="" change="{!c.setPaymentMethod}"/>&nbsp;Credit/Debit Card (Note: Surcharge applies)
+                            </div>
+                        </div>
+                        <aura:if isTrue="{!v.isInitiatedByInternalUser == false}">
+                            <div class="slds-grid">
+                                <div class="slds-col">
+                                    <ui:inputRadio value="" aura:id="Direct-Debit" name="Payment-Method" label="" change="{!c.setPaymentMethod}"/>&nbsp;Direct Debit (Note: Up to four business days applies before funds are cleared)
+                                </div>
+                            </div>
+                            <div class="slds-grid">
+                                <div class="slds-col">
+                                    <ui:inputRadio value="" aura:id="BPay" name="Payment-Method" label="" change="{!c.setPaymentMethod}"/>&nbsp;BPay
+                                </div>
+                            </div>
+                            <div class="slds-grid">
+                                <div class="slds-col">
+                                    <ui:inputRadio value="" aura:id="Other" name="Payment-Method" label="" change="{!c.setPaymentMethod}"/>&nbsp;Other
+                                </div>
+                            </div>
+                            <aura:if isTrue="{!v.selectedPaymentMethod == 'Other'}">
+                                <div class="slds-col othertypes">
+                                    <ui:inputRadio value="" aura:id="Cheque" name="Other-Payment" label="" change="{!c.setOtherPaymentMethod}"/>&nbsp;Bank Cheque
+                                </div>
+                                <div class="slds-col othertypes">
+                                    <ui:inputRadio value="" aura:id="Money-Order" name="Other-Payment" label="" change="{!c.setOtherPaymentMethod}"/>&nbsp;Money Order
+                                </div>
+                                <div class="slds-col othertypes">
+                                    <ui:inputRadio value="" aura:id="Contact-P2P-Commission" name="Other-Payment" label="" change="{!c.setOtherPaymentMethod}"/>&nbsp;Contact P2P Commission
+                                </div>                                    
+                            </aura:if>
+                        </aura:if>
+                        <br/>
+                        This payment is non-refundable.   
+                    </aura:if>
+                    
+                </fieldset>
+            </div>
+        </div>
+        <div class="slds-card__footer">
+            
+            <aura:if isTrue="{!not(v.isInitiatedFromManageAccount)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.navigateToLicenceRenewalDetails}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+                </ui:button>
+                
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmApplicationSubmission}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Lodge
+                </ui:button>
+            </aura:if>
+            
+            <aura:if isTrue="{!v.isInitiatedFromManageAccount}">
+            	<aura:if isTrue="{!v.isInitiatedByInternalUser == false}">
+	                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelApplicationForm}"> 
+	                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+	                </ui:button>
+                </aura:if>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmApplicationSubmission}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Pay
+                </ui:button>
+            </aura:if>
+            
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

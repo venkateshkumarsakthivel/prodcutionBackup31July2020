@@ -1,0 +1,88 @@
+<aura:component implements="lightning:availableForFlowScreens,flexipage:availableForRecordHome,force:hasRecordId" controller="NoticeLegislationController">
+    <aura:attribute name="noticeId" type="String" access="public" description="Notice Id"/>
+    <aura:attribute name="recordtype" type="String" access="public" description="recordtype"/>
+    <aura:attribute name="notice" type="object" default="" access="public" description="notice"/>
+    <aura:attribute name="selectedRow" type="object" default="" access="public" description="Selected Row of Delete or Remove"/>
+    <aura:attribute name="existingNoticeLegislation" type="object[]" default="" access="public" description="existing List of Legislature Records related to Case"/>
+    <aura:attribute name="data" type="object[]" default="" access="public" description="List of Legislature Records to show in case Legislation table"/>
+    <aura:attribute name="draftData" type="object[]" default="" access="public" description="List of new Legislature Records to add to case"/>
+    <aura:attribute name="columns" type="List" default="" access="private" description="Legislature Record Columns"/>
+    <aura:attribute name="picvalue" type="List"/>
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="availableActions" type="String[]" />
+    
+    <aura:handler name="init" value="{! this }" action="{!c.doInit }"/>
+    <aura:handler event="c:AddLegislationEvent" action="{!c.addLegislationEventHandler}"/>
+    <aura:handler name="render" value="{!this}" action="{!c.onRender}"/>
+    <aura:attribute name="loaded" type="Boolean" default="false" />
+    <aura:registerEvent name="existLegislation" type="c:existLegislationEvent"/>
+    <aura:registerEvent name="cancelChanges" type="c:cancelChangesEvent"/>
+    <aura:registerEvent name="saveChanges" type="c:saveChangesEvent"/>
+    <aura:registerEvent name="refreshCardsEvent" type="c:refreshCardsEvent"/>
+    <aura:registerEvent name="navigateFlowEvent" type="c:navigateFlowEvent"/>
+            
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem>
+        	<p class="slds-text-title_bold slds-p-bottom_small slds-p-top_small">Related Notice Legislations:</p>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="12">
+            <aura:if isTrue="{! v.loaded }">
+                <lightning:spinner alternativeText="Loading" size="medium" variant="brand"/>
+            </aura:if>
+            <div style="height:220px;max-height:250px">
+                <lightning:datatable
+                                     columns="{!v.columns}"
+                                     data="{!v.data}"
+                                     draftValues="{!v.draftData}"
+                                     keyField="Legislation__c"
+                                     onrowaction="{!c.handleRowAction}"
+                                     onrowselection = "{!c.rowSelected}"
+                                     hideCheckboxColumn="true"
+                                     oncancel="{!c.cancelChangesHandler}"
+                                     onsave="{!c.saveLegislationHandler}"
+                                     />
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+    
+    <!--Reason for change modal UI-->
+    <div class="slds-m-around_xx-large">
+        <!--Use aura:if tag to display/hide popup based on isModalOpen value-->  
+        <aura:if isTrue="{!v.isModalOpen}">            
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"
+                                              size="large"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Confirm to delete</h2>
+                    </header>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="Cancel"
+                                          title="Cancel"
+                                          onclick="{! c.closeModel }"/>
+                        <lightning:button variant="brand"
+                                          label="Delete"
+                                          title="Delete"
+                                          onclick="{!c.deleleLegislationHandler}"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    </div>
+    <div class="slds-border_top">
+    </div>
+    <!-- Finish button to close flow screen-->
+    <div class="slds-float_right slds-m-top_small">
+        <lightning:button aura:id="FINISH" label="Finish" variant="brand" onclick="{!c.onButtonPressed}" />
+    </div>
+</aura:component>

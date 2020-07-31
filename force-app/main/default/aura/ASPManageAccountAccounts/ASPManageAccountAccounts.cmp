@@ -1,0 +1,205 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPManageAccountAccount">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="acc" type="Account" />
+    <aura:attribute name="baseUrl" type="String" default="$A.get('$Label.c.Community_Base_Url')" />
+   <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="businessEmailInput" type="Boolean" default="false"/>
+    <aura:attribute name="businessPhoneNumberInput" type="Boolean" default="false"/>
+    <aura:attribute name="businessWebsiteInput" type="Boolean" default="false"/>
+    <aura:attribute name="businessSocialMediaInput" type="Boolean" default="false"/>
+    <aura:attribute name="businessOtherInput" type="Boolean" default="false"/>
+    
+     <aura:attribute name="renderAddress" type="Boolean" default="false"/>
+     <aura:handler name="RenderAddressInput" event="c:RenderAddressInput" action="{!c.handlerenderAddressInputEvent}"/> 
+    
+    <lightning:spinner aura:id="spinner" variant="brand"  size="large" ></lightning:spinner>
+    
+    <article class="slds-card" id="accountComponent">
+        <div class="slds-page-header">
+            <div class="slds-grid">
+                <div class="slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                       svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="account">
+                            </c:svgIcon>
+                        </div>
+                        <div class="slds-media__body"> 
+                            <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.ASP_ACCT_MGMT_Header} - {!v.acc.Customer_Number__c}</p>
+                            <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Customer name">{!v.acc.Name}</h2>
+                        </div>
+                        <a href="{!baseUrl + 'asp-applications?src=accountMenu&amp;applicationSource=ASP'}" target="_blank">
+                            <ui:button class="slds-button slds-button--neutral headerButtons" > 
+                                <i style="color:#54698d !important;" class="fa fa-file-text" aria-hidden="true"></i>&nbsp;&nbsp;{!$Label.c.ASP_ACCT_MGMT_New_Application_Btn}
+                            </ui:button>
+                        </a>
+                        <!--
+                        <a href="http://www.pointtopoint.nsw.gov.au/how-become-authorised" target="_blank">
+                              <ui:button class="slds-button slds-button- -neutral headerButtons"> 
+                                  <i style="color:#54698d !important;" class="fa fa-file-text" aria-hidden="true"></i>&nbsp;&nbsp;Request Internal Review
+                              </ui:button>
+                        </a>
+                        -->
+                        <!--
+                         <ui:button class="slds-button slds-button- -neutral headerButtons"  press="" >
+                          <i style="color:#54698d !important;" class="fa fa-external-link-square" aria-hidden="true"></i>&nbsp;&nbsp;{!$Label.c.ASP_ACCT_MGMT_Register_for_Levy_Btn}</ui:button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+       
+        <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+            <span style="color: #ffffff;">
+                <i class="fa fa-check" aria-hidden="true"></i>
+                &nbsp;{!$Label.c.ASP_ACCT_MGMT_Error_Msg}
+            </span>
+        </div>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <div class="slds-grid">
+                    <div class="slds-col" >
+                        <label class="slds-form-element__label">{!$Label.c.ASP_ACCT_MGMT_Customer_Number} </label>
+                        <ui:inputText disabled="true" value="{!v.acc.Customer_Number__c}" class="slds-output slds-input"/>
+                    </div>
+                    <div class="slds-col" >
+                        <label class="slds-form-element__label">{!$Label.c.	ASP_ACCT_MGMT_Entity_Type}</label>
+                        <ui:inputText disabled="true" value="{!v.acc.RecordType.Name}" class="slds-output slds-input"/>
+                    </div>
+                </div>
+                <!--
+                <div class="slds-grid">
+                    <div class="slds-col" style="width:50%;">
+                        <c:ACNComponent isReadOnly="true" aura:id="ACN-Input" uniqueIdentifier="ACN-Input" 
+                                        fieldLabel="{!$Label.c.ASP_ACCT_MGMT_ACN}"
+                                        isRequired="true" acn="{!v.acc.ACN__c}"/>
+                    </div>
+                    <div class="slds-col" style="width:50%;">
+                        <c:ABNComponent isReadOnly="false" aura:id="ABN-Input" uniqueIdentifier="ABN-Input" businessName="{!v.acc.Registered_Business_Name__c}"
+                                        fieldLabel="{!$Label.c.ASP_ACCT_MGMT_ABN}" isRequired="true" abn="{!v.acc.ABN__c}"/>
+                    </div>
+                </div>
+                -->
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-col" style="width:50%">
+                        <c:EmailAddressComponent isReadOnly="{!v.readOnly}" aura:id="Email-Input" uniqueIdentifier="Email-Input" fieldLabel="{!$Label.c.ASP_ACCT_MGMT_Email}" isRequired="true" email="{!v.acc.Email__c}"/>
+                    </div>
+                    
+                   <div class="slds-col" style="width:50%">
+                        <c:PhoneComponent isReadOnly="false" aura:id="Daytime-Phone-Input" uniqueIdentifier="Daytime-Phone-Input" fieldLabel="{!$Label.c.ASP_ACCT_MGMT_Daytime_Phone_Number}" isRequired="true" phoneNumber="{!v.acc.Phone}" />
+                    </div>
+                </div>
+                
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-col" style="width:50%">
+                        <label class="slds-form-element__label">{!$Label.c.ASP_ACCT_MGMT_Shipping_Address}&nbsp;<span class="requiredField">*</span></label>
+                        <c:AddressInputComponent aura:id="Shipping-Address" street="{!v.acc.ShippingStreet}" city="{!v.acc.ShippingCity}"
+                                                 state="{!v.acc.ShippingState}" postalcode="{!v.acc.ShippingPostalCode}"
+                                                 fullStreet="{!v.acc.ShippingStreet}"/> 
+                    </div>
+                    <div class="slds-col" style="width:50%;">
+                        <label class="slds-form-element__label">{!$Label.c.ASP_ACCT_MGMT_Business_Address}&nbsp;<span class="requiredField">*</span></label>
+                        <c:AddressInputComponent aura:id="Billing-Address" street="{!v.acc.BillingStreet}" city="{!v.acc.BillingCity}"
+                                                 state="{!v.acc.BillingState}" postalcode="{!v.acc.BillingPostalCode}"
+                                                 fullStreet="{!v.acc.BillingStreet}"/>
+						
+                    </div>
+                    
+                </div>
+                
+                <div class="slds-grid">
+                    <div class="slds-col" style="width:50%">
+                        <div class="subcontainer">
+                            <label class="slds-form-element__label">{!$Label.c.ASP_ACCT_MGMT_PREFERRED_COMM_MODE}&nbsp;<span class="requiredField">*</span></label>
+                            <ui:inputSelect aura:id="Delivery-Preference" value="{!v.acc.Document_Delivery_Preference__c}" change="{!c.onChangeDocumentDeliveryPreference}">
+                                <ui:inputSelectOption text="" label="Please Select"/>
+                                <ui:inputSelectOption text="Email" label="Email"/>
+                                <ui:inputSelectOption text="Letter" label="Letter"/>
+                            </ui:inputSelect>
+                        </div>
+                        <div class="subcontainer">
+                            <c:EmailAddressComponent isReadOnly="{!v.readOnly}" aura:id="Notice-Email-Input" uniqueIdentifier="NoticeEmail-Input" fieldLabel="{!$Label.c.ASP_ACCT_MGMT_NOTICE_EMAIL}" isRequired="{!v.acc.Document_Delivery_Preference__c == 'Email'}" email="{!v.acc.Notice_Email__c}"/>
+                            
+                        </div>
+                        <div class="subcontainer">
+                            <label class="slds-form-element__label">{!$Label.c.ASP_ACCT_MGMT_Notice_Address}&nbsp;<span id="Notice-Address-Label-Span" class="requiredField">{!v.acc.Document_Delivery_Preference__c == 'Letter' ? '*' : ''}</span></label>
+                            <c:AddressInputComponent aura:id="Notice-Address" street="{!v.acc.Notice_Address_Street__c}" city="{!v.acc.Notice_Address_City__c}"
+                                                     state="{!v.acc.Notice_Address_State__c}" postalcode="{!v.acc.Notice_Address_Postal_Code__c}" latitude="{!v.acc.Notice__Latitude__s}" longitude="{!v.acc.Notice__Longitude__s}"
+                                                     fullStreet="{!v.acc.Notice_Address_Street__c}" renderAddressInput="{!v.renderAddress}" />
+                            
+                        </div>                        
+                    </div>
+                    
+                    <div class="slds-col" style="width:50%;background-color: #E8E8E8;">
+                        
+                        <legend class="slds-form-element__label">
+                            {!$Label.c.All_Applicant_Public_Contact_Details}
+                        </legend>
+                        <p style="font-size: 14px;">
+                            {!$Label.c.All_Applicant_Public_Contact_Details_Description}
+                        </p>
+                        
+                        <legend class="slds-form-element__label">{!$Label.c.All_Applicant_Business_Name}&nbsp;<span class="requiredField">*</span></legend>
+                        <ui:inputText maxlength="255" disabled="{!v.readOnly}" aura:id="Business-Name-Input" class="CamelCaseInput slds-input" value="{!v.acc.Business_Name_For_Customer_Contact__c}"/>
+                        <br/><br/>
+                        
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <ui:inputCheckbox class="customCheckBox" disabled="{!v.readOnly}" aura:id="b0" label="" value="{!v.businessEmailInput}" change="{!c.businessEmailChange}"/>&nbsp;Email
+                            </div>
+                            <aura:if isTrue="{!v.businessEmailInput}">
+                                <c:EmailAddressComponent isReadOnly="{!v.readOnly}" aura:id="Business-Email-Input" uniqueIdentifier="Business-Email-Input" 
+                                                         fieldLabel="" isRequired="true" email="{!v.acc.Email_For_Customer_Contact__c}"/>
+                            </aura:if>
+                        </div>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <ui:inputCheckbox disabled="{!v.readOnly}" class="customCheckBox" aura:id="b1" label="" value="{!v.businessWebsiteInput}" change="{!c.businessWebsiteChange}"/>&nbsp;Website
+                            </div>
+                            <aura:if isTrue="{!v.businessWebsiteInput}">
+                                <ui:inputText maxlength="255" disabled="{!v.readOnly}" aura:id="Business-Website" value="{!v.acc.Website_For_Customer_Contact__c}"/>
+                            </aura:if>
+                        </div>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <ui:inputCheckbox disabled="{!v.readOnly}" class="customCheckBox" aura:id="b2" label="" value="{!v.businessPhoneNumberInput}" change="{!c.businessPhoneChange}"/>&nbsp;Daytime phone&nbsp;<i class="fa fa-question-circle" aria-hidden="true" title="Mobile or Landline."></i>
+                            </div>
+                            <aura:if isTrue="{!v.businessPhoneNumberInput}">
+                                <c:PhoneComponent isReadOnly="{!v.readOnly}" aura:id="Business-Daytime-Phone-Input" uniqueIdentifier="Business-Daytime-Phone-Input" fieldLabel="" isRequired="true" phoneNumber="{!v.acc.Daytime_Phone_No_For_Customer_Contact__c}" />
+                            </aura:if>
+                            <span id="publicContactDetailsError" class="customErrorMsg"></span>
+                        </div>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <ui:inputCheckbox disabled="{!v.readOnly}" class="customCheckBox" aura:id="b3" label="" value="{!v.businessSocialMediaInput}" change="{!c.businessSocialMediaChange}"/>&nbsp;Social media or application
+                            </div>
+                            <aura:if isTrue="{!v.businessSocialMediaInput}">
+                                <ui:inputText maxlength="255" disabled="{!v.readOnly}" aura:id="Business-SocialMedia" value="{!v.acc.Social_Media_For_Customer_Contact__c}"/>
+                            </aura:if>
+                        </div>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <ui:inputCheckbox disabled="{!v.readOnly}" class="customCheckBox" aura:id="b4" label="" value="{!v.businessOtherInput}" change="{!c.businessOtherChange}"/>&nbsp;Other
+                            </div>
+                            <aura:if isTrue="{!v.businessOtherInput}">
+                                <ui:inputText maxlength="255" disabled="{!v.readOnly}" aura:id="Business-Other" value="{!v.acc.Other_Details_For_Customer_Contact__c}"/>
+                            </aura:if>
+                        </div>
+                        <span id="publicContactDetailsError" class="customErrorMsg"></span>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="slds-card__footer">
+            <ui:button class="slds-button slds-button--neutral" press="{!c.saveAccountDetail}"> 
+                <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;{!$Label.c.ASP_ACCT_MGMT_Save_Btn}
+            </ui:button>
+        </div>
+    </article>
+</aura:component>

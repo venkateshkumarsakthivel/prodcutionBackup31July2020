@@ -1,0 +1,41 @@
+.THIS .slds-form-element__label{
+	float: left; 
+}
+.THIS .lastName {
+    text-transform:uppercase;
+}
+.THIS.error{
+    color:red;
+}
+.THIS .slds-form-acn{
+     width: 50%;
+    padding-bottom: 5px;
+}
+.THIS .requiredField{
+    color:red;
+}
+.THIS .slds-form-element{
+
+    width: 60%;
+    padding-bottom: 5px;
+}
+.THIS .slds-card__footer{
+    padding-right: 45%;
+}
+
+.THIS .errorMsg{
+    text-align:start;
+}
+.THIS .slds-card__header {
+    padding-left:21%;
+}
+.THIS .uiInput{
+    height: 2.20rem !important;
+}
+.THIS.temp.cRegisterApplicant{
+   padding-left: 44px;
+}
+.THIS .cRegisterApplicant .slds-grid{
+      width: 100% !important;
+    padding-left: 0% !important;
+}

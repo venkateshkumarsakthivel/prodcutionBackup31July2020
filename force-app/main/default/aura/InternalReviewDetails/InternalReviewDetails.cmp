@@ -1,0 +1,57 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="InternalReviewAppFormController">
+    
+    <!-- Attributes -->
+    <aura:attribute name="record_Id" type="String"/>
+    <aura:attribute name="hasDocuments" type="String" default="No"/>
+    <aura:attribute name="reviewFormWrpObj" type="InternalReviewAppFormController.InternalReviewAppWrapper"/>
+    <aura:attribute name="portalContextName" type="String" description="Indicate the current context of the portal whether its Taxi or ASP"/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="isConsole" type="Boolean"/>
+    
+    <!-- Modal Event Registration -->
+    <aura:registerEvent name="closeInternalReviewModal" type="c:InternalReviewCloseEvent" />
+    <aura:registerEvent name="loadSection" type="c:InternalReviewAppFormSectionEvent"/>
+    
+    <!-- confirmation modal box -->
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:dependency resource="markup://force:navigateToSObject" type="EVENT"/>
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.loadData}"/>
+    <aura:handler name="confirmApplicationSubmission" event="c:ConfirmApplicationSubmission" action="{!c.submitApplication}"/>  
+    
+    <aura:if isTrue="{!v.reviewFormWrpObj.csObj.Status == 'Lodged'}">
+        <div class="slds-is-relative">
+            <div class="closeButton"> 
+                <ui:button class="closeButton" press="{!c.cancelForm}"> 
+                    <lightning:icon iconName="utility:close" size="xx-small" alternativeText="Close"/>
+                </ui:button>
+            </div>
+        </div>
+    </aura:if>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+
+	<c:InternalReviewAppSectionProgress currentSection="Review Details"/>
+    <br/>
+	           
+    <c:InternalReviewApplicationDetails reviewFormWrpObj="{!v.reviewFormWrpObj}" readOnly="true" record_Id="{!v.record_Id}"/>
+    <article class="slds-box"><c:P2POTAttachments parent="{!v.reviewFormWrpObj.csObj.Id}"/></article>
+    <c:InternalReviewPrivacyStatement reviewFormWrpObj="{!v.reviewFormWrpObj}" readOnly="true"/>                
+    <p>{!v.body}</p>
+
+    <span>
+        <aura:if isTrue="{!v.reviewFormWrpObj.csObj.Status == 'Draft'}">
+            <div class="slds-card__footer">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+                </ui:button>    
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmApplicationSubmission}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Submit Application
+                </ui:button>
+            </div>
+        </aura:if>
+    </span>    
+            
+</aura:component>

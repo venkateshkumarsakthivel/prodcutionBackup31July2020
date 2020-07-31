@@ -1,0 +1,35 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    <aura:attribute name="currentGrid" type="String"/>
+	<aura:handler event="c:TaxiAgentNavigationEvent" action="{!c.renderComponentHandler}"/>
+    
+    
+    <div class="slds-col slds-p-around_small container" >
+		
+        <aura:if isTrue="{!v.currentGrid == 'Activities'}">
+            <p>
+                <c:TaxiAgentActivitiesTab/>
+            </p>
+		</aura:if>
+        
+        <aura:if isTrue="{!v.currentGrid == 'Agent Account'}">
+            <p>
+                <c:TaxiManageAccountAccounts hideDeliveryDocPreference="true"/>
+            </p>
+		</aura:if>
+        
+        <aura:if isTrue="{!v.currentGrid == 'Agent Contacts'}">
+            <p>
+                <c:TaxiManageAccountContacts hideAccessLevels="true"/>
+            </p>
+		</aura:if>
+        
+        <aura:if isTrue="{!v.currentGrid == 'Client Accounts'}">
+			<p>
+                <c:TaxiAgentClientAccountsTab/>
+            </p>
+		</aura:if>
+        
+    </div>
+</aura:component>

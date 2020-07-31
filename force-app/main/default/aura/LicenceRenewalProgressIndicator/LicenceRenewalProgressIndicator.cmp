@@ -1,0 +1,39 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:attribute name="isReviewOnly" type="Boolean" default="false" />
+    <aura:attribute name="currentSection" type="String" default="{!$Label.c.Licence_Details_Header}"/>
+    
+    <div class="slds-grid" >
+        <div class="slds-tabs--path" role="application">
+            <ul class="slds-tabs--path__nav" role="tablist">
+                
+                <li title="{!$Label.c.Licence_Details_Header}" class="{!v.currentSection != $Label.c.Licence_Details_Header ? 'slds-tabs--path__item  slds-is-current' : 'slds-tabs--path__item  slds-is-customcomplete'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-96" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Licence_Details_Header}</span>
+                    </a>
+                </li>
+                <li title="{!$Label.c.Privacy_Statement_Header}" class="{!v.currentSection == $Label.c.Licence_Details_Header
+                             ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.Privacy_Statement_Header ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Privacy_Statement_Header}</span>
+                    </a>
+                </li>
+				<li title="Review Details" class="{!v.currentSection == $Label.c.Privacy_Statement_Header
+                            || v.currentSection == $Label.c.Licence_Details_Header
+                            ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == 'review' ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">Review Details</span>
+                    </a>
+                </li>
+                <aura:if isTrue="{!not(v.isReviewOnly)}">
+                <li title="Payment" class="{!v.currentSection == $Label.c.Licence_Details_Header 
+                            || v.currentSection == $Label.c.Privacy_Statement_Header || v.currentSection == 'review'
+                             ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == 'Payment' ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">Payment</span>
+                    </a>
+                </li>
+                </aura:if>
+            </ul>
+        </div>
+    </div>
+</aura:component>

@@ -1,0 +1,127 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="SubmitPaymentQueryController">
+
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    
+    <aura:attribute name="caseId" type="String"/>
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="true" />
+    <aura:attribute name="paymentRecordID" type="String"/>
+    <aura:attribute name="submitPaymentWrpObj" type="SubmitPaymentQueryController.SubmitPaymentWrapper" default="null"/>
+    
+    <!-- Event Registration -->
+    <aura:registerEvent name="closeSubmitQueryModal" type="c:SubmitPaymentQueryCloseEvent" />
+    <aura:registerEvent name="loadSection" type="c:SubmitPaymentQueryLoadSectionEvent"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    <c:SubmitPaymentQuerySectionProgress currentSection="Customer Enquiry Details"/>
+    <br/>
+    
+	<div class="slds-box">
+	<article class="slds-card" id="submitqueryPayment">
+	    <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#account'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>                
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">                         
+                        {!$Label.c.Submit_Payment_Query_Chevron_Title_1}                   
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+            </div>
+        </div>
+                
+        <hr/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+           <div class="slds-form--stacked">
+                <div class="slds-section slds-is-open" aura:id="sectiontitle">
+                    <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Click to expand or collapse">
+                        <button class="slds-button slds-section__title-action" onclick="{!c.toggleSectionContent}" style="background-color: #003577;color: #ffffff;">
+                            <aura:if isTrue="{!v.isSectionExpanded}">
+                                <i class="fa fa-minus" style="font-size: 0.875rem;color:#ffffff !important" aria-hidden="true"></i>
+                                <aura:set attribute="else">
+                                    <i class="fa fa-plus" style="font-size: 0.875rem;color:#ffffff !important" aria-hidden="true"></i>
+                                </aura:set>
+                            </aura:if>
+                            &nbsp;&nbsp;Disclaimer
+                        </button>
+                    </h5>
+                    <div class="slds-section__content" style="border-width: 1px;border-style: solid;border-color: rgb(208, 208, 208);border-top: 0;">
+                        
+                            <p class="slds-form- -stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+                                <p>
+                                    This form is to be used if you wish to lodge a query of the authorisation fees you are liable.
+                                </p>
+                                <br/>
+                                <p>
+                                    You can lodge a query if:
+                                </p>                            
+                                <br/>
+                                    <ul>
+                                      <li>&bull;&nbsp;You need more information regarding the authorisation fee liable.</li>
+                                      <li>&bull;&nbsp;You believe the trip count used for the authorisation fee is incorrect.</li>  
+                                    </ul>
+                                <br/>
+                                <p>
+                                    You must continue to pay any outstanding authorisation fee while your query is being considered.
+                                </p>
+                                <br/>
+                                <p>
+                                    Please attach any relevant records supporting your query such as trip data reports or financial statements.
+                                </p>
+                                <br/>
+                                <p>
+                                    If you have any questions about lodging a query, you can contact us by calling the Point to Point Industry Contact Centre on 131 727 or through the website at <a href="https://www.pointtopoint.nsw.gov.au" target="_blank"><u>www.pointtopoint.nsw.gov.au</u></a>.
+                                </p>
+                                <br/>
+                            </p>
+                    	</div>
+                </div>
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div> 
+                
+                <!-- Section 1 for Review Details -->
+                
+                <div class="slds-grid">                    
+                    <div class="slds-col sectionHeader">                            
+                       <h2>Details</h2>
+                    </div>
+                </div>
+                
+                <div class="slds-grid slds-gutters">   
+                    <div class="slds-size_1-of-4" style="text-align:right">
+                        <label class="slds-form-element__label">Query Description:&nbsp;<span class="requiredField">*</span>&nbsp;</label>
+                    </div>
+                    
+                    <div class="slds-size_2-of-4">
+                        <ui:inputTextArea aura:id="case-Decision" disabled="{!v.readOnly}" value="{!v.submitPaymentWrpObj.csObj.Description}" rows="5"/>
+                    </div>
+                    
+                    <div class="slds-size_1-of-4">                        
+                    </div>
+                </div>
+                         
+            </div>
+		</div>        
+        
+        <div class="slds-card__footer">     
+            <ui:button class="slds-button slds-button--neutral" press="{!c.processCancel}"> 
+                <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+            </ui:button>
+            <ui:button aura:id="submitButton" class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+            </ui:button>
+        </div>                   	
+	</article>
+	</div>
+</aura:component>

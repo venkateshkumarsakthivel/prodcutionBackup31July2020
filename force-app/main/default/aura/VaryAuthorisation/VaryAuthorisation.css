@@ -1,0 +1,13 @@
+/*toggleCss.css*/
+.THIS.toggle {
+    
+    display: none !important;
+}
+.THIS .requiredField {
+    
+    color:red;
+}
+.THIS .slds-form-element__label {
+    
+    font-weight: bold;
+}

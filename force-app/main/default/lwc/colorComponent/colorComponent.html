@@ -1,0 +1,60 @@
+<template>
+    <div class="slds-grid slds-gutters">
+        <div class="slds-col">
+          <lightning-combobox 
+                            data-id="selectedField"
+                            name="Select Field"
+                            label="Select Field"
+                            value={selectedField}
+                            options={fields}
+                            onchange={checkEnteredValue}
+                            ></lightning-combobox>
+        </div>
+        <div class="slds-col">
+          <lightning-combobox 
+          data-id="selectedCondition"
+          name="Select Condition"
+          options={conditions}
+          label="Select Condition"
+          value={selectedCondition}
+
+          ></lightning-combobox>
+        </div>
+        <div class="slds-col">
+        
+        <template if:true={isDateField}>
+          <lightning-input   
+                              data-id="enteredValue"
+                              type="date" 
+                              formatter="mm-dd-yyyy"
+                              label="Enter Value"
+                              value={enteredValue}
+                              ></lightning-input>
+      </template>
+      <template if:false={isTextField}>
+          <lightning-input data-id="enteredValue" 
+                           label="Enter Value"
+                           name="Enter Value"
+                           value={enteredValue}
+                           ></lightning-input>
+      </template>
+      <template if:true={isPicklistField}>
+          <lightning-combobox 
+      data-id="enteredValue"
+      name="Enter Value"
+      options={picklist}
+      label="Enter Value"
+      value={enteredValue}
+      ></lightning-combobox>
+      </template>
+     </div>   
+        <div class="slds-col">
+          <lightning-input data-id="selectedColor"
+          type="color"
+          label="Color"
+          value={selectedColor}
+        >
+</lightning-input>
+        </div>
+      </div>
+</template>

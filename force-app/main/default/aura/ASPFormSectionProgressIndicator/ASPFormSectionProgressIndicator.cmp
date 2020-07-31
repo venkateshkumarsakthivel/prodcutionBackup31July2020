@@ -1,0 +1,124 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <aura:attribute name="currentSection" type="String" default="{!$Label.c.All_Applicant_Header}"/>
+    <aura:attribute name="entityType" type="String" default="Individual"/>
+    
+    <div class="slds-grid" >
+        <div class="slds-tabs--path" role="application">
+            <ul class="slds-tabs--path__nav" role="tablist">
+                
+                <aura:if isTrue="{!or(v.entityType == 'Individual', v.entityType == 'Company')}">
+                <li title="{!$Label.c.Business_Details_Header}" class="{!v.currentSection != $Label.c.Business_Details_Header ? 'slds-tabs--path__item  slds-is-current' : 'slds-tabs--path__item  slds-is-customcomplete'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-96" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Business_Details_Header}</span>
+                    </a>
+                </li>
+                </aura:if>
+                <aura:if isTrue="{!or(v.entityType == 'Individual Partner', v.entityType == 'Company Partner')}">
+                <li title="{!$Label.c.Partnership_Account_Details}" class="{!v.currentSection != $Label.c.Partnership_Account_Details ? 'slds-tabs--path__item  slds-is-current' : 'slds-tabs--path__item  slds-is-customcomplete'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-96" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Partnership_Account_Details}</span>
+                    </a>
+                </li>
+                </aura:if>
+                <aura:if isTrue="{!v.entityType == 'Individual'}">
+                    <li title="{!$Label.c.All_Applicant_Header}" class="{!v.currentSection == $Label.c.Business_Details_Header ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.All_Applicant_Header ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                        <a class="slds-tabs--path__link" id="tabs-path-97" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                            <span class="slds-tabs--path__title">{!$Label.c.All_Applicant_Header}</span>
+                        </a>
+                    </li>
+                </aura:if>
+                <aura:if isTrue="{!v.entityType == 'Company'}">
+                    <li title="{!$Label.c.Corporation_Header}" class="{!v.currentSection == $Label.c.Business_Details_Header ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.Corporation_Header ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                        <a class="slds-tabs--path__link" id="tabs-path-98" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                            <span class="slds-tabs--path__title">{!$Label.c.Corporation_Header}</span>
+                        </a>
+                    </li>
+                </aura:if>
+                <aura:if isTrue="{!v.entityType == 'Company Partner'}">
+                    <li title="{!$Label.c.Corporate_Partnership_Header}" class="{!v.currentSection == $Label.c.Partnership_Account_Details ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.Corporate_Partnership_Header ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                        <a class="slds-tabs--path__link" id="tabs-path-98" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                            <span class="slds-tabs--path__title">{!$Label.c.Corporate_Partnership_Header}</span>
+                        </a>
+                    </li>
+                </aura:if>
+                <aura:if isTrue="{!or(v.entityType == 'Individual Partner', v.entityType == 'Company Partner')}">
+                    <li title="{!$Label.c.Individual_Partnership_Header}" class="{!or(v.currentSection == $Label.c.Partnership_Account_Details, v.currentSection == $Label.c.Corporate_Partnership_Header) ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.Individual_Partnership_Header ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                        <a class="slds-tabs--path__link" id="tabs-path-98" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                            <span class="slds-tabs--path__title">{!$Label.c.Individual_Partnership_Header}</span>
+                        </a>
+                    </li>
+                </aura:if>
+                <aura:if isTrue="{!v.entityType == 'Individual'}">
+                 <li title="{!$Label.c.Additional_Information_Header}" class="{!v.currentSection == $Label.c.Business_Details_Header 
+                            || v.currentSection == $Label.c.All_Applicant_Header
+                            || v.currentSection == $Label.c.Corporation_Header 
+                            || v.currentSection == $Label.c.Individual_Partnership_Header 
+                            || v.currentSection == $Label.c.Corporate_Partnership_Header 
+                            || v.currentSection == $Label.c.Nominated_Director_Header ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.Additional_Information_Header ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Additional_Information_Header}</span>
+                    </a>
+                 </li>
+                </aura:if>
+                <li title="{!$Label.c.DVD_Access_Header}" class="{!v.currentSection == $Label.c.Business_Details_Header 
+                            || v.currentSection == $Label.c.All_Applicant_Header
+                            || v.currentSection == $Label.c.Partnership_Account_Details 
+                            || v.currentSection == $Label.c.Corporation_Header 
+                            || v.currentSection == $Label.c.Individual_Partnership_Header 
+                            || v.currentSection == $Label.c.Corporate_Partnership_Header 
+                            || v.currentSection == $Label.c.Nominated_Director_Header 
+                            || v.currentSection == $Label.c.Additional_Information_Header ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.DVD_Access_Header ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.DVD_Access_Header}</span>
+                    </a>
+                </li>
+                <li title="{!$Label.c.Privacy_Statement_Header}" class="{!v.currentSection == $Label.c.Business_Details_Header
+                            || v.currentSection == $Label.c.All_Applicant_Header
+                            || v.currentSection == $Label.c.Partnership_Account_Details 
+                            || v.currentSection == $Label.c.Corporation_Header 
+                            || v.currentSection == $Label.c.Individual_Partnership_Header 
+                            || v.currentSection == $Label.c.Corporate_Partnership_Header 
+                            || v.currentSection == $Label.c.Close_Associate_Header
+                            || v.currentSection == $Label.c.Nominated_Director_Header 
+                            || v.currentSection == $Label.c.Additional_Information_Header 
+                            || v.currentSection == $Label.c.DVD_Access_Header ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.Privacy_Statement_Header ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Privacy_Statement_Header}</span>
+                    </a>
+                </li>
+                <li title="Review Details" class="{!v.currentSection == $Label.c.Business_Details_Header
+                            || v.currentSection == $Label.c.All_Applicant_Header
+                            || v.currentSection == $Label.c.Partnership_Account_Details 
+                            || v.currentSection == $Label.c.Corporation_Header 
+                            || v.currentSection == $Label.c.Individual_Partnership_Header 
+                            || v.currentSection == $Label.c.Corporate_Partnership_Header                      
+                            || v.currentSection == $Label.c.Close_Associate_Header
+                            || v.currentSection == $Label.c.Nominated_Director_Header
+                            || v.currentSection == $Label.c.Additional_Information_Header
+                            || v.currentSection == $Label.c.DVD_Access_Header
+                            || v.currentSection == $Label.c.Privacy_Statement_Header ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == 'review' ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">Review Details</span>
+                    </a>
+                </li>
+                <li title="Payment" class="{!v.currentSection == $Label.c.Business_Details_Header 
+                            || v.currentSection == $Label.c.All_Applicant_Header
+                            || v.currentSection == $Label.c.Partnership_Account_Details 
+                            || v.currentSection == $Label.c.Corporation_Header
+                            || v.currentSection == $Label.c.Individual_Partnership_Header 
+                            || v.currentSection == $Label.c.Corporate_Partnership_Header
+                            || v.currentSection == $Label.c.Close_Associate_Header
+                            || v.currentSection == $Label.c.Nominated_Director_Header
+                            || v.currentSection == $Label.c.Additional_Information_Header
+                            || v.currentSection == $Label.c.DVD_Access_Header
+                            || v.currentSection == $Label.c.Privacy_Statement_Header
+                            || v.currentSection == 'review' ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == 'Payment' ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">Payment</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</aura:component>

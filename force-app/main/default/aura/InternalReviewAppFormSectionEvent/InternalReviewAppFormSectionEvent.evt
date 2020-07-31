@@ -1,0 +1,6 @@
+<aura:event type="COMPONENT" description="Event template">
+    <aura:attribute name="sectionNameToRender" type="String" access="global"/>
+    <aura:attribute name="reviewFormWrpObj" type="InternalReviewAppFormController.InternalReviewAppWrapper" access="global"/>
+    <aura:attribute name="modalHeightInPercent" type="String" access="global"/>
+    <aura:attribute name="isConsole" type="Boolean" default="false"/>
+</aura:event>

@@ -1,0 +1,44 @@
+.THIS .slds-icon-standard-user {
+    background-color: #828788 !important;
+    border-radius: 1.25rem  !important;
+    
+}
+.THIS .triggerDownArrow {
+    border-top: 5px solid;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    display: inline-block;
+    margin-left: 4px;
+    margin-bottom: 3px;
+    vertical-align: middle;
+    color:black;
+    margin-left:8px;
+    cursor:pointer;
+}
+.THIS .profileName{
+    color: black;
+    margin-left: 10px;
+}
+.THIS .logOut{
+     display: inline;
+    margin-left: 20px;
+}   
+.THIS .trigger-link{
+     display: inline;
+    margin-right: 20px;
+   
+}
+.THIS .actionMenu{
+  border: 1px solid rgb(255, 255, 255) !important;
+}
+.THIS .uiMenuItem a{
+    display:inline-block;
+    line-height: 2.1em !important;
+    width: 120px;
+    height: inherit  !important;
+}
+.THIS .uiMenu {
+    position: relative;
+    display: inline-block;
+    text-transform: lowercase !important;
+}

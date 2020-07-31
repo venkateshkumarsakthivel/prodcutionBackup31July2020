@@ -1,0 +1,68 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,forceCommunity:profileMenuInterface" access="global" controller="LoggedInUserController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}" afterScriptsLoaded="{!c.setupMenu}"/>
+  
+    <aura:attribute name="renderASPMenu" type="boolean" default="true"/>
+    <aura:attribute name="renderGuestMenu" type="boolean" default="false"/>
+    <aura:attribute name="userName" type="String" default=""/>
+    <aura:attribute name="aspCommunityMenu" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:renderIf isTrue="{!v.renderGuestMenu}">
+        <div style="margin:0 auto;max-width:1024px;">
+            <div class="custom-Header" style="background: white;width: 100%;">
+                <div class="LogoAndSearchP2PTransport" style="display:inline; position:relative;">
+                    <a href="/industryportal/s/secure-portal-home"> 
+                        <img src="{!$Resource.P2P_PortalLogo}" style="width:312px;"/>
+                    </a>
+                </div>
+                <div class="open-search" style="display:inline;">
+                    <div id='cssmenu' style="margin-right: -42px;">
+                        <a href=''  onclick='{!c.gotoHelpPage}' ><span>Help</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:renderIf>
+   
+    <aura:renderIf isTrue="{!v.renderASPMenu}">
+        <div style="margin:0 auto;max-width:1024px;">
+            <div class="custom-Header" style="background: white;width: 100%;">
+                <div class="LogoAndSearchP2PTransport" style="display:inline; position:relative;">
+                    <a href="/industryportal/s/secure-portal-home"> 
+                        <img src="{!$Resource.P2P_PortalLogo}" style="width:312px;"/>
+                    </a>
+                </div>
+                <div class="open-search" style="display:inline;">
+                    <div id='cssmenu' style="margin-right: -42px;">
+                        <ul>
+                            <li aura:id="homeMenu"><a href='/industryportal/s/secure-portal-home?src=homeMenu'><span>Home</span></a></li>
+                            <li aura:id="accountMenu"><a href='/industryportal/s/manage-profile?src=accountMenu'><span>Account</span></a></li>
+                            <li aura:id="dvdMenu"><a href='/industryportal/s/dvddashboard?src=dvdMenu'><span>DVD</span></a></li>
+                            <li aura:id="levyMenu"><a class="anchor" title="Coming Soon"><span>Levy</span></a></li>
+                            <li aura:id="helpMenu"><a href="{!'/industryportal/s/topic/'+$Label.c.Topic_Name+'/service-provider?src=helpMenu'}"><span>Help</span></a></li>
+                            <aura:if isTrue="{!v.aspCommunityMenu}">
+                            	<li aura:id="aspCommunityMenu"><a href=''><span>ASP Community</span></a></li>
+                            </aura:if>
+                            <li aura:id="loginMenu" class='last' style="display: none;"><a href='/industryportal/s/login'><span>Login</span></a></li>
+                            <li aura:id="nameMenu" class='has-sub last truncateName' style="display:none;">
+                                <a href='#' class="slds-truncate" title="{!v.userName}">
+                                    <span id="ASPuserName">
+                                        {!v.userName}
+                                    </span>
+                                </a>
+                                <ul style="z-index:1;">
+                                    <li><a href='/industryportal/s/manage-profile'><span>My Profile</span></a></li>
+                                    <li class='last'><a href='/industryportal/secur/logout.jsp'><span>Logout</span></a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </aura:renderIf>
+    
+</aura:component>

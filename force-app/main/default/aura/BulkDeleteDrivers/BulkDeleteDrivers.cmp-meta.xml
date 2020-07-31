@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AuraDefinitionBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>46.0</apiVersion>
+    <description>P2PSUPPORT-210 :
+DVD - ability for ASP to do bulk removal of drivers
+Used in the DVD screen on the communities to bulk upload and delete drivers</description>
+</AuraDefinitionBundle>

@@ -1,0 +1,116 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="AddressValidator">
+    
+    <aura:attribute name="transactionId" type="String"/>
+    <aura:attribute name="searchString" type="String"/>
+    <aura:attribute name="searchList" type="List"/>
+    <aura:attribute name="street" type="String"/>
+    <aura:attribute name="city" type="String" />
+    <aura:attribute name="state" type="String" />
+    <aura:attribute name="country" type="String" />
+    <aura:attribute name="postalcode" type="String" />
+    <aura:attribute name="internationalAddress" type="String" />
+    <aura:attribute name="addressType" type="String" />
+    <aura:attribute name="renderAddressInput" type="Boolean" default="false"/>
+    <aura:attribute name="unitType" type="String" />
+    
+    <aura:attribute name="fullStreet" type="String"/>
+    
+    <aura:attribute name="latitude" type="String" />
+    <aura:attribute name="longitude" type="String" />
+    
+    <aura:attribute name="isInternationalAddress" type="Boolean" default="false"/>
+    <aura:attribute name="isAustraliaAddress" type="Boolean" default="true"/>
+    <aura:attribute name="isReadOnly" type="Boolean" default="false" />
+    <aura:attribute name="isValidAddress" type="Boolean" default="true" />
+    <aura:attribute name="hasFocus" type="Boolean" default="false" />
+    
+    <aura:attribute name="reviewReadOnly" type="Boolean" default="false" />
+    
+    <aura:attribute name="concatenationDone" type="Boolean" default="false" access="PRIVATE"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="aura:doneRendering" action="{!c.constructSearchString}" /> 
+    
+    <aura:registerEvent name="notifyBussinessAddressType" type="c:BussinessAddressTypeEvent"/>
+    <aura:registerEvent name="RenderAddressInput" type="c:RenderAddressInput"/>
+   
+    <aura:method name="validateAddress" action="{!c.validateAddressFields}" access="PUBLIC"/>
+    <aura:method name="copySearchStringAddress" action="{!c.copySearchString}" access="PUBLIC"/>
+    <aura:method name="addFocusToAddressField" action="{!c.addFocus}" access="PUBLIC"/>
+    
+    <aura:if isTrue="{!v.addressType == 'NominatedDirector_Residential_Address'
+                     || v.addressType == 'director2_NominatedDirector_Residential_Address'
+                     || v.addressType == 'director3_NominatedDirector_Residential_Address'
+                     || v.addressType == 'CloseAssociate_Residential_Address'
+                     || v.addressType == 'associate2_CloseAssociate_Residential_Address'
+                     || v.addressType == 'associate3_CloseAssociate_Residential_Address'
+                     || v.addressType == 'Record_Keeping_Address'
+                     || v.addressType == 'Notice_Address'}">
+        
+        <aura:set attribute="else">
+            <div class="radiobuttonClass">
+                <ui:inputRadio disabled="{!v.reviewReadOnly}" aura:id="r0" name="{!v.addressType}" label="" change="{!c.addressRadioButton}" value="{!v.isAustraliaAddress}"/> Australian Address &nbsp;&nbsp;&nbsp;
+                <ui:inputRadio disabled="{!v.reviewReadOnly}" aura:id="r1" name="{!v.addressType}" label="" change="{!c.addressRadioButton}" value="{!v.isInternationalAddress}"/> International Address
+            </div>
+            <br/>
+        </aura:set>
+    </aura:if>
+    <aura:if isTrue="{!v.isInternationalAddress}">
+        <ui:inputTextArea maxlength="255" aura:id="internationalAddress" value="{!v.internationalAddress}" label="" disabled="{!v.isReadOnly || v.reviewReadOnly}" />
+        <aura:set attribute="else">
+            <span>
+                <aura:if isTrue="{!v.renderAddressInput}">
+                    
+                    <a href="javascript:void(0);" style="{!if(v.isReadOnly || v.reviewReadOnly,'display:none','')}" class="slds-float--right" onclick="{!c.renderAddressInputagain}">Find my address</a>
+                    <br/>
+                    <ui:inputTextArea maxlength="255" aura:id="street" label="Street" value="{!v.street}" rows="2" disabled="{!v.isReadOnly || v.reviewReadOnly}" />
+                    <br/>
+                    <ui:inputText maxlength="255" aura:id="city" label="City/Suburb" value="{!v.city}" class="upperCaseInput" disabled="{!v.isReadOnly || v.reviewReadOnly}" />
+                    <br/>
+                    <div class="slds-inputselect">
+                        <ui:inputSelect aura:id="state" label="State/Territory" value="{!v.state}" class="slds-inputselect" disabled="{!v.isReadOnly || v.reviewReadOnly}" >
+                            <ui:inputSelectOption text="" label="Please Select"/>
+                            <ui:inputSelectOption text="NSW"/>
+                            <ui:inputSelectOption text="ACT"/>
+                            <ui:inputSelectOption text="VIC"/>
+                            <ui:inputSelectOption text="QLD"/>
+                            <ui:inputSelectOption text="SA"/>
+                            <ui:inputSelectOption text="NT"/>
+                            <ui:inputSelectOption text="TAS"/>
+                            <ui:inputSelectOption text="WA"/>
+                        </ui:inputSelect>
+                    </div>
+                    <br/>
+                    
+                    <c:PostcodeComponent isReadOnly="{!v.isReadOnly || v.reviewReadOnly}" aura:id="postalcode" uniqueIdentifier="{!V.addressType + 'postalcode-Identifier'}" fieldLabel="Postcode" isRequired="true" postCode="{!v.postalcode}" />
+                    
+                    <aura:set attribute="else">
+                        <div aura:id="res" class="slds-form-element slds-lookup" data-select="single">
+                            
+                            <a href="javascript:void(0);" style="{!if(v.isReadOnly || v.reviewReadOnly,'display:none','')}" class="slds-float--right" onclick="{!c.renderAddressInput}">Can't find address</a>
+                            <br/>
+                            <div class="slds-form-element__control">
+                               <div aura:id="lookupField" class="slds-show">
+                                   <ui:inputText disabled="{!v.isReadOnly || v.reviewReadOnly}" updateOn="keyup" class="slds-lookup__search-input slds-input" aura:id="autoInput" value="{!v.searchString}" keyup="{!c.addressSearch}" />
+                                   <aura:if isTrue="{!and(not(v.isReadOnly), not(v.reviewReadOnly))}">  
+                                    <span style="font-size: 12px;font-weight: bold;">Enter your street address starting with the street number and name, suburb and state.</span>
+                                   </aura:if> 
+                               </div>   
+                            </div>
+                        </div>
+                        
+                        <div class="slds-is-close searchresults" aura:id="searchRes">
+                            <ul class="slds-lookup__list" role="listbox">
+                                <aura:iteration items="{!v.searchList}" var="cus">
+                                    <li role="presentation" class="slds-listbox__item" onclick="{!c.getAddressDetails}" data-id="{!cus.eid}">
+                                        {!cus.fullAddress}<br/><br/>
+                                    </li>
+                                </aura:iteration>
+                            </ul>
+                        </div>
+                    </aura:set>
+                </aura:if>
+            </span>
+        </aura:set>
+    </aura:if>
+</aura:component>

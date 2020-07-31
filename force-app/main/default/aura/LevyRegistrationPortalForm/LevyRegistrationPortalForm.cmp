@@ -1,0 +1,45 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+	
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="registrationRecord" type="Tax_Payer_Registration__c" default="" access="public"/>
+    
+    <aura:attribute name="sectionNameToRender" type="String" default="sectionA" access="public"/>
+    
+    <aura:attribute name="reviewEdit" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="haveProcessedURL" type="Boolean" default="false" access="public"/>
+    
+    <aura:handler name="loadSection" event="c:LevyFormSectionEvent" action="{!c.updateSectionHandlers}"/>
+    
+    <!--
+    <br/>
+    <h2 style="width: 100%;margin: 0;padding: 0;text-align: center;font-size: 26px;">
+        <hr style="display: inline-block;margin: 0 20px 8px 0;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr> 
+          {!$Label.c.Levy_Registration_Application_Title}
+         <hr style="display: inline-block;margin: 0 0 8px 20px;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr>
+    </h2>
+    <br/>
+    -->
+    
+    <aura:If isTrue="{!v.sectionNameToRender == 'sectionA'}">
+        <c:LevyFormGeneralDetails isUpdateRegistration="false" registrationRecord="{!v.registrationRecord}" reviewEdit="{!v.reviewEdit}" haveProcessedURL="{!v.haveProcessedURL}"></c:LevyFormGeneralDetails>
+    </aura:If>
+    
+    <aura:If isTrue="{!v.sectionNameToRender == 'sectionB'}">
+        <c:LevyExemptionOrRebateDetails registrationRecord="{!v.registrationRecord}" reviewEdit="{!v.reviewEdit}"></c:LevyExemptionOrRebateDetails>
+    </aura:If>
+    
+    <aura:If isTrue="{!v.sectionNameToRender == 'sectionC'}">
+        <c:LevyBankingDetails registrationRecord="{!v.registrationRecord}" reviewEdit="{!v.reviewEdit}"></c:LevyBankingDetails>
+    </aura:If>
+    
+    <aura:If isTrue="{!v.sectionNameToRender == 'sectionD'}">
+        <c:LevyPrivacyStatementAndDeclaration registrationRecord="{!v.registrationRecord}" reviewEdit="{!v.reviewEdit}"></c:LevyPrivacyStatementAndDeclaration>
+    </aura:If>
+    
+    <aura:If isTrue="{!v.sectionNameToRender == 'sectionE'}">
+        <c:LevyFormReviewAndSubmit isUpdateRegistration="false" registrationRecord="{!v.registrationRecord}"></c:LevyFormReviewAndSubmit>
+    </aura:If>
+    
+</aura:component>

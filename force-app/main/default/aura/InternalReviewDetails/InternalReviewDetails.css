@@ -1,0 +1,30 @@
+.THIS .privacyCheckBox{
+    display: inline-block;
+    margin-right: 11px;
+}
+.THIS .requiredField {
+    
+    color: red;
+    font-weight: bold;
+}
+.THIS .customErrorMsg {
+    
+    color: rgb(194, 57, 52);
+    font-weight:bold;
+    font-size: .875rem;
+}
+
+.THIS .slds-table thead th{
+	background-color:#ffffff;
+}
+
+.THIS .closeButton{
+    position: relative;
+    top: -30px;
+    left: 48%;
+}
+
+.THIS .slds-card__footer{
+    border-top : none;
+    text-align : right;
+}

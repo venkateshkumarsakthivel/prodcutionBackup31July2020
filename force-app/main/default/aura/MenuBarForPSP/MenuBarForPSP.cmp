@@ -1,0 +1,36 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,forceCommunity:profileMenuInterface" access="global" controller="LoggedInUserController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div style="margin:0 auto;max-width:1024px;">
+        <div class="custom-Header" style="background: white;width: 100%;">
+            <div class="LogoAndSearchP2PTransport" style="display:inline; position:relative;">
+                <a href="/industryportal/s/secure-portal-home"  title="Point to Point Transport Commissioner"> 
+                 <img src="{!$Resource.P2P_PortalLogo}" style="width:312px;"/>
+                </a>
+            </div>
+            <div class="open-search" style="display:inline;">
+                <div id='cssmenu' style="margin-right: -42px;">
+                    <ul>
+                        <li class="active" aura:id="homeMenu"><a href='/industryportal/s/secure-portal-home?src=homeMenu' title="Home"><span>Home</span></a></li>
+                        <li aura:id="myProfileMenu"><a href='/industryportal/s/manage-profile?src=nameMenu' title="My Profile"><span>My Profile</span></a></li>
+                        <li aura:id="myApplicationMenu"><a href='/industryportal/s/case/Case/00B6F00000AzGqy?src=nameMenu' title="My Application"><span>My Application</span></a></li>
+                        <li aura:id="helpMenu"><a href='/industryportal/s/help?src=helpMenu' title="Help"><span>Help</span></a></li>
+                        <li aura:id="loginMenu" class='last' style="display: none;"><a href='/industryportal/s/login' title="Login"><span>Login</span></a></li>
+                        <li aura:id="nameMenu" class='has-sub last' style="display: none;">
+                            <a href='#' title="Username">
+                                <span id="userName">
+                                   
+                                </span>
+                            </a>
+                            <ul style="z-index:1;">
+                                <li class='last'><a href='/industryportal/secur/logout.jsp' title="Logout"><span>Logout</span></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

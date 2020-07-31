@@ -1,0 +1,36 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.TaxiLicenceActionStyle}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+	
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="isSelectAll" type="boolean" default="false"/>
+    <aura:attribute name="options" type="String[]" access="public"/>
+    <aura:attribute name="serviceProvider" type="String" access="public"/>
+    <aura:attribute name="caseNumber" type="String" access="public"/>
+    <aura:attribute name="caseId" type="String" access="public"/>
+    <aura:attribute name="newCaseId" type="String" access="public"/>
+    <aura:attribute name="relatedContactList" type="Related_Contact__c[]" access="public"/>
+    <aura:attribute name="authorisationAgentList" type="Authorisation_Agent__c[]" access="public"/>
+    <aura:attribute name="accountId" type="String" default="" access="public"/>
+    <aura:attribute name="uliUploadStatus" type="Boolean" access="public" default="false"/>
+    <aura:attribute name="identityCheck" type="boolean" access="public" default="false"/>
+    
+    <aura:attribute name="sectionName" type="String" default="" access="public"/>
+    
+    <aura:handler name="loadSection" event="c:TaxiLicenceAgreementRevokeEvent" action="{!c.updateSectionHandlers}"/>
+    
+    <aura:If isTrue="{!v.sectionName == 'TaxiLicenceAgreementRevoke'}">
+        <c:TaxiLicenceAgreementRevoke isSelectAll="{!v.isSelectAll}" options="{!v.options}" serviceProvider="{!v.serviceProvider}" caseNumber="{!v.caseNumber}" caseId="{!v.caseId}" newCaseId="{!v.newCaseId}" relatedContactList="{!v.relatedContactList}" authorisationAgentList="{!v.authorisationAgentList}" accountId="{!v.accountId}" uliUploadStatus="{!v.uliUploadStatus}" identityCheck="{!v.identityCheck}"></c:TaxiLicenceAgreementRevoke>
+    </aura:If>
+    
+    <aura:If isTrue="{!v.sectionName == 'TaxiLicenceAgreementRevokeB'}">
+        <c:TaxiLicenceAgreementRevokeB isSelectAll="{!v.isSelectAll}" options="{!v.options}" serviceProvider="{!v.serviceProvider}" caseNumber="{!v.caseNumber}" caseId="{!v.caseId}" newCaseId="{!v.newCaseId}" relatedContactList="{!v.relatedContactList}" authorisationAgentList="{!v.authorisationAgentList}" accountId="{!v.accountId}" uliUploadStatus="{!v.uliUploadStatus}" identityCheck="{!v.identityCheck}"></c:TaxiLicenceAgreementRevokeB>
+    </aura:If>
+    
+</aura:component>

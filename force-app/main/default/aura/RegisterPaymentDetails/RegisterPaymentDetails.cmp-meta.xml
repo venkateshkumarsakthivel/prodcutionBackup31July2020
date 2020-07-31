@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AuraDefinitionBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>34.0</apiVersion>
+    <description>This component will invoke Quick Vault registration process to register a payment method (Credit Card OR Direct Debit). The QV token returned will be stored on Authorisation for future payments.</description>
+</AuraDefinitionBundle>

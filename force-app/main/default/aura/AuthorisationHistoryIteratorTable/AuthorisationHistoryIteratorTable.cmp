@@ -1,0 +1,22 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="getAuthorisationHistoryDetails">
+    
+     <!-- attributes -->
+    <aura:attribute name="AuthorisationHistory" type="Authorisation__History[]"/>
+    <aura:attribute name="RelatedAuthID" type="ID"/>
+    <aura:attribute name="columns" type="List"/>
+
+    <!-- handlers-->
+  	<aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+  
+     <!-- the container element determine the height of the datatable -->
+    <div style="height: 220px">
+        <lightning:datatable
+                keyField="id"
+                data="{!v.AuthorisationHistory}"
+                columns="{!v.columns}"
+                hideCheckboxColumn="true"/>
+    </div>
+    
+    
+</aura:component>

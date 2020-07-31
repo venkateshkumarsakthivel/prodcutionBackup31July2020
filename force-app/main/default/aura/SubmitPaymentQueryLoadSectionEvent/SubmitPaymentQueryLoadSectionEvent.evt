@@ -1,0 +1,5 @@
+<aura:event type="COMPONENT" description="Event template">
+    <aura:attribute name="sectionNameToRender" type="String" access="global"/>
+    <aura:attribute name="submitPaymentWrpObj" type="SubmitPaymentQueryController.SubmitPaymentWrapper" access="global"/>
+	<aura:attribute name="readOnly" type="String" access="global"/>
+</aura:event>

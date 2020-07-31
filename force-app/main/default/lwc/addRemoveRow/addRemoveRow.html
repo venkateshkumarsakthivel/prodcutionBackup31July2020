@@ -1,0 +1,40 @@
+<template>
+    <template if:true={isMobile}>
+        <div class={removeRowClass}>
+            <lightning-button-icon 
+                                    icon-name="utility:dash"
+                                    onclick={removeRow}
+                                    disabled={isDisabled}
+                                    alternative-text="remove">
+            </lightning-button-icon>
+        </div>
+
+        <div class={addRowClass}>
+            <lightning-button-icon icon-name="utility:add" 
+                                    variant="brand"
+                                    onclick={addRow}
+                                    disabled={isDisabled}
+                                    alternative-text="add">
+            </lightning-button-icon>
+        </div>
+    
+    </template>
+
+    <template if:false={isMobile}>
+        <lightning-button-icon  class={removeRowClass}
+                                icon-name="utility:dash"
+                                onclick={removeRow}
+                                disabled={isDisabled}
+                                alternative-text="remove">
+                        </lightning-button-icon> 
+            <lightning-button-icon  class={addRowClass}
+                                    icon-name="utility:add" 
+                                    variant="brand"
+                                    onclick={addRow}
+                                    disabled={isDisabled}
+                                    alternative-text="add">
+            </lightning-button-icon>
+   
+    </template>
+
+</template>

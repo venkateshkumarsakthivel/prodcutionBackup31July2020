@@ -1,0 +1,55 @@
+.THIS .slds-is-customcomplete {
+    
+    background-color: #32a9c3 !important;
+}
+
+.THIS .slds-is-current {
+    
+    background-color: #003577 !important;
+}
+
+.THIS .slds-tabs_path__item + .slds-is-customcomplete::before,
+.THIS .slds-tabs--path__item + .slds-is-customcomplete::before,
+.THIS .slds-tabs_path__item + .slds-is-current::before, 
+.THIS .slds-tabs--path__item + .slds-is-current::before {
+    
+    background-color: #003577;
+}
+
+.THIS a.slds-tabs--path__link {
+    
+    pointer-events: none;  
+}
+
+.THIS .slds-tabs--path__item+.slds-is-current:hover {
+    
+    background-color: #003577;
+}
+
+.THIS .slds-tabs--path__item+.slds-is-customcomplete:hover {
+    
+    background-color: #32a9c3;
+}
+
+.THIS .slds-tabs--path__item+.slds-is-incomplete:hover {
+    
+    background-color: rgb(224, 229, 238);
+}
+
+.THIS .slds-is-current a,
+.THIS .slds-is-customcomplete a {
+    
+    color: #ffffff !important;
+}
+
+.THIS .slds-tabs_path .slds-is-current + .slds-is-incomplete::before, 
+.THIS .slds-tabs--path .slds-is-current + .slds-is-incomplete::before {
+    
+    background-color: #003577;
+}
+
+.THIS .slds-tabs_path .slds-is-customcomplete + .slds-is-incomplete::before, 
+.THIS .slds-tabs--path .slds-is-customcomplete + .slds-is-incomplete::before {
+    
+    background-color: #32a9c3;
+}

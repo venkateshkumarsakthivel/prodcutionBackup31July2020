@@ -1,0 +1,5 @@
+<aura:event type="COMPONENT" description="Event for Fleet Entity Creation">
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="fleetRecordType" type="String"/>
+    <aura:attribute name="status" type="String"/>
+</aura:event>

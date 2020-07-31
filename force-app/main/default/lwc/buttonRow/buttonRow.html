@@ -1,0 +1,58 @@
+<template>    
+    <div class="slds-grid">
+        <div class="slds-col slds-p-around_small slds-size_1-of-6">
+            <lightning-input type="text"
+                            name="Label" 
+                            label="Label"
+                            value={labelName}
+                            variant={variant}
+                            onblur={setValue}>
+                </lightning-input>
+        </div>
+        <div class="slds-col slds-p-around_small slds-size_1-of-6">
+            <lightning-combobox
+                            name="action"
+                            label="Action"
+                            variant={variant}
+                            value={action}
+                            options={actions}
+                            onchange={setValue} >
+                </lightning-combobox>
+        </div>
+        <div class="slds-col slds-p-around_small slds-size_1-of-6">
+            <lightning-input type="text" 
+                            name="actionVariable"
+                            label="Action Variable"
+                            variant={variant}
+                            value={actionVariable}
+                            onchange={setValue}>
+                </lightning-input>
+        </div>
+        <div class="slds-col slds-p-around_small slds-size_1-of-6">
+            <lightning-combobox
+                            name="buttonVariant"
+                            label="Button Variant"
+                            variant={variant}
+                            value={buttonVariant}
+                            options={variants}
+                            onchange={setValue} >
+                </lightning-combobox>
+        </div>
+        <div class="slds-col slds-p-around_small slds-size_1-of-6">
+        <lightning-input type="text" 
+                            name="buttonIcon"
+                            label="Button Icon"
+                            variant={variant}
+                            value={buttonIcon}
+                            onchange={setValue}>
+                </lightning-input>
+        </div>
+        <div class="slds-col
+         slds-size_1-of-6 slds-align_absolute-center">
+            <c-add-remove-row index={index}
+                              onrowaction={addRemoveRow}
+                              >
+                            </c-add-remove-row>
+        </div>
+    </div>
+</template>

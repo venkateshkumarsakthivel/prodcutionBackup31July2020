@@ -1,0 +1,56 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId" access="global" controller="InitiateCancelSuspendAuthorisation">
+    
+    <ltng:require styles="{!$Resource.AddConditionStyles}" />
+    
+    <aura:attribute name="decisionReason" type="String" />
+    <aura:attribute name="selectedOption" type="String" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    
+    <div class="slds-fade-in-open maindiv toggle" aura:id="cancelSuspendSuccess">    
+        <h1>Initiate Cancel/Suspend Authorisation</h1>        
+        
+        <form>
+            <div class="slds-grid">
+                <div class="slds-col" style="margin-right:40px;">
+                    <label class="slds-form-element__label">Authorisation Status&nbsp;<span class="requiredField">*</span></label>
+                    <ui:inputSelect aura:id="InputSelect" value="{!v.selectedOption}" change="{!c.validateInputSelect}">
+                        <ui:inputSelectOption label="Select"/>
+                        <ui:inputSelectOption text="Cancel" value="Cancel"/>
+                        <ui:inputSelectOption text="Suspend" value="Suspend"/>
+                    </ui:inputSelect>
+                </div>
+                <div class="slds-col">
+                    <label class="slds-form-element__label">Decision Reason&nbsp;<span class="requiredField">*</span></label>
+                    <ui:inputTextArea aura:id="DecisionReason" value="{!v.decisionReason}" cols="5" rows="3" required="true" change="{!c.validateDecisionReason}"/>
+                </div>
+            </div> 
+        </form>
+        
+        <div class="slds-card__footer">
+            <ui:button class="slds-button slds-button--neutral" press="{!c.closeModal}">
+                <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+            </ui:button>        
+            <ui:button class="slds-button slds-button--neutral marginleft" press="{!c.suspendOrCancel}">
+                <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+            </ui:button>
+        </div>
+    </div>
+    
+    <div aura:id="cancelSuspendError" class="slds-notify slds-notify--alert slds-theme_error slds-theme--alert-texture toggle" role="alert">
+        <span style="color: #ffffff;font-weight: bold;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            &nbsp;Cancel/Suspend can be requested for only granted or suspended authorisations.
+        </span>
+    </div>
+    
+    <div aura:id="systemError" class="slds-notify slds-notify--alert slds-theme_error slds-theme--alert-texture toggle" role="alert">
+        <span style="color: #ffffff;font-weight: bold;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            &nbsp;Something went wrong, please contact system administrator for more details.
+        </span>
+    </div>
+    
+    <div class="slds-backdrop--open"></div>
+</aura:component>

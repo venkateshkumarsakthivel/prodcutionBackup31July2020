@@ -1,0 +1,70 @@
+<aura:component controller="ASPApplicationListController" implements="flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    <aura:attribute name="caseList" access="private" type="Case[]" default="[]"/>
+    <aura:attribute name="isClosed" access="private" type="Boolean" />
+    <aura:attribute name="isWithdrawnVisible" access="public" type="Boolean" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="confirmWithdrawApplication" event="c:ConfirmWithdrawApplicationEvent" action="{!c.confirmWithdrawApplicaion}"/>
+    <aura:handler name="refreshApplicationList" event="c:RefreshApplicationListEvent" action="{!c.doInit}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <div class="Container" >
+        <div class="slds-container--large">
+            <ui:button class="slds-button slds-button--neutral" press="{!c.createNewApplication}"> 
+                New Application
+            </ui:button>
+        </div>
+        <div class="slds-container--large">
+            <table aura:id="searchTable" class="slds-table slds-table--bordered slds-table--cell-buffer">
+                <!--<thead style="{!v.casesList.length >= 12 ? 'display:block; width: calc(100% - 17px);background: #003577;' : 'background: #003577;'}"> -->
+                <thead style="{display:block; width: calc(100% - 17px);background: #003577;}"> 
+                    <tr class="slds-text-title--caps customTableHeader">
+                        <th scope="col">#</th>
+                        <th scope="col">Application Type</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Payment Status</th>
+                        <th scope="col">Created By</th>
+                        <th scope="col">Date Lodged</th>
+                        <th scope="col" class="slds-align--absolute-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.caseList}" var="application">
+                        <tr >
+                            <td class="cell" ><a href="javascript:void(0);" data-RecId="{!application.Id}" data-Status="{!application.Status}" data-PaymentStatus="{!application.Payment__r.Status}" data-Substatus="{!application.Sub_Status__c}" data-isClosed="{!application.IsClosed}" onclick="{!c.navigateToApplication}">{!application.CaseNumber}</a></td>
+                            <td class="cell" ><ui:outputText value="{!application.RecordType.Name}" /></td>
+                            <td class="cell" ><ui:outputText value="{!application.Service_Type__c}" /></td>
+                            <td class="cell" ><ui:outputText value="{!application.Status}" /></td>
+                            <td class="cell" ><ui:outputText value="{!application.Payment__r.Status}" /></td>
+                            <td class="cell" ><ui:outputText value="{!application.CreatedBy.Name}" /></td>
+                            <td class="cell" ><ui:outputDate value="{!application.Date_Submitted__c}" format="DD/MM/YYYY" /></td>
+                            <td class="cell" > 
+                                <aura:if isTrue="{!application.Status == 'Lodged'}">
+                                    <a href="javascript:void(0);" class="cell" title='Withdraw' data-RecId="{!application.Id}" data-Status="{!application.Status}" onclick="{!c.withdrawApplication}" aura:id="withdrawLink">
+                                        Withdraw
+                                    </a>
+                                </aura:if>
+                                <aura:if isTrue="{!application.Status == 'Draft'}">
+                                    <a href="javascript:void(0);" class="cell" data-RecId="{!application.Id}" onclick="{!c.deleteApplication}" aura:id="deleteLink">
+                                        Cancel
+                                    </a>
+                                </aura:if> 
+                                
+                            </td>
+                        </tr>
+                        
+                    </aura:iteration>
+                    <aura:renderIf isTrue="{!v.caseList.length == 0}">
+                        <tr ><td colspan="6" style="text-align:center">No records found</td>
+                        </tr>
+                    </aura:renderIf>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p>{!v.body}</p>
+</aura:component>

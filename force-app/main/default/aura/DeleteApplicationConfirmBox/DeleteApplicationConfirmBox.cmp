@@ -1,0 +1,32 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPManageAccountCases">
+
+	<aura:attribute name="message" type="String" default="sample message"/>
+	<aura:attribute name="recordId" type="String" />
+    <aura:attribute name="title" type="String" access="public" default="Confirmation"/>
+
+	<aura:registerEvent name="refreshApplicationList" type="c:RefreshApplicationListEvent"/>
+	 
+	<div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aura:id = "messageBox">
+		<div class="slds-modal__container">
+			<div class="slds-modal__header">
+				<button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeMessageBox}">
+					<c:svgIcon class="dashboard_icon" svgPath="/resource/slds221/assets/icons/utility-sprite/svg/symbols.svg#close"
+						category="utility" size="x-small" name="close"></c:svgIcon>        
+						<span class="slds-assistive-text">Close</span>
+					</button>
+					<h2 id="header43" class="slds-text-heading--medium">{!v.title}</h2>
+				</div>        
+				<div class="slds-modal__content slds-p-around--medium">
+					<p class="confirmText">
+						<aura:unescapedHtml value="{!v.message}"></aura:unescapedHtml>          
+					</p>
+				</div>
+				<div class="slds-modal__footer">
+					<ui:button class="slds-button slds-button--neutral" press="{!c.closeMessageBox}" >Cancel</ui:button>
+					<ui:button class="slds-button slds-button--neutral" press="{!c.confirmAndClose}">Confirm</ui:button>
+				</div>
+			</div>
+		</div>
+		<div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+
+	</aura:component>

@@ -1,0 +1,272 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPManageAccountContacts">
+    
+    <aura:attribute name="hideAccessLevels" type="Boolean" default="false"/>
+    
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="loggedInUserContactId" type="String"/>
+    <aura:attribute name="readOnly" type="Boolean" default="true"/>
+    <aura:attribute name="existingContact" type="Contact"/>
+    
+    <aura:attribute name="previousDVDAccessLevel" type="Boolean" default="false"/>
+    <aura:attribute name="previousAccountAdminAccessLevel" type="Boolean" default="false"/>
+    <aura:attribute name="isSupportingDocumentRequired" type="Boolean" default="false" />
+    
+    <aura:attribute name="certifiedSupportingDocumentCheckUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="nominatedDirectorDeclarationCheckUploadStatus" type="Boolean" default="false" />
+    
+    <aura:attribute name="isAttachmentRequired" type="Boolean" default="false" access="private"/>
+    <aura:attribute name="attachmentPrefix" type="string" default="CPOI" />
+    
+    <aura:attribute name="identityCheck" type="Boolean" default="false"/> 
+    <aura:attribute name="poiUploadStatus" type="Boolean" default="false" />
+    
+    <aura:attribute name="residentialInternationalAddress" type="String"/>
+    <aura:attribute name="residentialIsInternational" type="Boolean" default="false"/>
+    <aura:attribute name="residentialIsAustralian" type="Boolean" default="true"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="confirmEditContact" event="c:EditContactEvent" action="{!c.updateExistingContact}"/>
+    
+    <aura:registerEvent name="refreshContactEvent" type="c:RefreshContactsEvent"/> 
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-modal--large slds-fade-in-open" aura:id="modalDiv" id="editContactForm">
+        <div class="slds-modal__container formbox">
+            <div class="slds-modal__header">
+                <h3 id="header43" class="slds-text-heading--medium">Edit Contact</h3>
+                <div class="slds-no-flex sectionTitleNote" style="float:right!important">
+                    Fields marked with <span class="requiredField">*</span> are mandatory.
+                </div>
+            </div>    
+            
+            <div class="slds-modal__content slds-p-around--medium">
+                <form class="slds-form" >
+                    <div class="slds-form--stacked">
+                        
+                        <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                            <span style="color: #ffffff;">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                            </span>
+                        </div>
+                        <br/>
+                        
+                        <div class="slds-grid">
+                            <div class="slds-col">
+                                <label class="slds-form-element__label">Contact Type&nbsp;<span class="requiredField">*</span></label>
+                                <ui:inputText aura:id="Contact-Type" class="slds-input" value="{!v.existingContact.Contact_Type__c}" required="true" disabled="{!v.readOnly}" /> 
+                                
+                                <!--<aura:if isTrue="{!v.existingContact.Contact_Type__c == 'Nominated Director/Manager'}">-->
+                                <div class="slds-form-element" style="padding-top: 9px;">
+                                    <div class="slds-form-element__control">
+                                        <label class="slds-form-element__label">Role&nbsp;
+                                            <aura:if isTrue="{!v.existingContact.Contact_Type__c == 'Nominated Director/Manager'}">
+                                                <span class="requiredField"> * </span>
+                                            </aura:if>
+                                        </label>
+                                        <ui:inputText aura:id="Contact-Role" class="slds-input" value="{!v.existingContact.Role__c}" required="true" disabled="{!v.readOnly}" /> 
+                                    </div>
+                                </div>
+                                <!--</aura:if>-->
+                            </div>
+                            <div class="slds-col">
+                                <label class="slds-form-element__label">Residential Address&nbsp;<span class="requiredField">*</span></label>
+                                <c:AddressInputComponent reviewReadOnly="false" aura:id="Residential-Address" 
+                                                         street="{!v.existingContact.MailingStreet}"
+                                                         city="{!v.existingContact.MailingCity}" 
+                                                         state="{!v.existingContact.MailingState}" 
+                                                         postalcode="{!v.existingContact.MailingPostalCode}" 
+                                                         country="{!v.existingContact.MailingCountry}"
+                                                         addressType="Residential_Address" 
+                                                         internationalAddress="{!v.residentialInternationalAddress}"
+                                                         isInternationalAddress="{!v.residentialIsInternational}"
+                                                         isAustraliaAddress="{!v.residentialIsAustralian}"
+                                                         fullStreet="{!v.existingContact.MailingStreet}"/> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid">
+                            <div class="slds-col">          
+                                <ui:inputCheckbox aura:id="primaryContact" 
+                                                  class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox checkbox customCheckBox" 
+                                                  value="{!v.existingContact.Primary_Contact__c}" />
+                                &nbsp; Primary Contact <a href ="javascript:void(0);" onclick = "{!c.navigateToArticle}">?</a>
+                            </div>
+                            <div class="slds-col">
+                                <c:PhoneComponent isReadOnly="false" isRequired="true" fieldLabel="Daytime Phone Number" 
+                                                  aura:id="DaytimePhoneInput" uniqueIdentifier="daytimePhoneInputIdentifier" 
+                                                  phoneNumber="{!v.existingContact.Phone}" />
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid">
+                            <div class="slds-col">   
+                                <label class="slds-form-element__label">First Given Name&nbsp;<span class="requiredField">*</span></label>
+                                <ui:inputText aura:id="FirstGivenName" class="slds-input" value="{!v.existingContact.FirstName}" required="true" disabled="true" />
+                            </div>
+                            <div class="slds-col">       
+                                <c:EmailAddressComponent isReadOnly="false" aura:id="Email-Input" uniqueIdentifier="Email-Input" 
+                                                         fieldLabel="Email" isRequired="true" email="{!v.existingContact.Email}" />
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid">
+                            <div class="slds-col">    
+                                <label class="slds-form-element__label">Family Name&nbsp;<span class="requiredField">*</span></label>
+                                <ui:inputText aura:id="FamilyName" class="slds-input" value="{!v.existingContact.LastName}" required="true" disabled="true" /> 
+                            </div>
+                            <div class="slds-col">       
+                                <c:DriverLicenceComponent isReadOnly="{!v.readOnly}" 
+                                                          aura:id="Driver-Licence-Number-Input" 
+                                                          uniqueIdentifier="Driver-Licence-Number-Input"
+                                                          fieldLabel="{!$Label.c.Individual_Australian_Driver_Licence_Number}"
+                                                          isRequired="false" 
+                                                          licence="{!v.existingContact.Australian_Driver_Licence_Number__c}"/>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid">
+                            <div class="slds-col">
+                                <label class="slds-form-element__label">{!$Label.c.Nominated_Director_Ever_been_known_by_another_name}</label>
+                                <br/>
+                                <input type="radio" 
+                                       checked="{!if(v.existingContact.Ever_been_known_by_another_name__c == 'No', true, false)}" 
+                                       aura:id="Contact-NoOtherName" id="Contact-NoOtherName" 
+                                       name="OtherNameGroup" class="nominatedDirectorHandler"
+                                       onchange="{!c.contactOtherNameChange}" /> &nbsp;No
+                                &nbsp;&nbsp;
+                                <input type="radio" 
+                                       checked="{!if(v.existingContact.Ever_been_known_by_another_name__c == 'Yes', true, false)}" 
+                                       aura:id="Contact-YesOtherName" id="Contact-YesOtherName" 
+                                       name="OtherNameGroup" class="nominatedDirectorHandler"
+                                       onchange="{!c.contactOtherNameChange}" /> &nbsp;Yes
+                                <br/>
+                                <span id="{!'OtherNameError' + index}" class="customErrorMsg"></span>
+                            </div>
+                            <div class="slds-col">
+                                <label class="slds-form-element__label">{!$Label.c.Individual_Australian_Driver_Licence_State}</label>
+                                <ui:inputSelect disabled="{!v.readOnly}" 
+                                                aura:id="Driver-Licence-Number-State-Input"
+                                                value="{!v.existingContact.State__c}">
+                                    <ui:inputSelectOption text="" label="Please Select"/>
+                                    <ui:inputSelectOption text="NSW"/>
+                                    <ui:inputSelectOption text="ACT"/>
+                                    <ui:inputSelectOption text="VIC"/>
+                                    <ui:inputSelectOption text="QLD"/>
+                                    <ui:inputSelectOption text="SA"/>
+                                    <ui:inputSelectOption text="NT"/>
+                                    <ui:inputSelectOption text="TAS"/>
+                                    <ui:inputSelectOption text="WA"/>
+                                </ui:inputSelect>
+                            </div>
+                        </div>
+                        <div class="slds-grid">
+                            <div class="slds-col">
+                                <ui:inputText aura:id="Contact-otherNameInputDetails" 
+                                              class="{!if(v.existingContact.Ever_been_known_by_another_name__c == 'Yes', '', 'toggleDisplay')}"
+                                              value="{!v.existingContact.Other_Name_Details__c}"/>
+                            </div>
+                            <div class="slds-col">
+                                <c:DateOfBirthComponent isReadOnly="true" fieldLabel="Date Of Birth" DOB="{!v.existingContact.Birthdate}" aura:id="dob" uniqueIdentifier="dob" isRequired="false" displayDatePicker="true"/>
+                            </div>
+                        </div>
+                        
+                        <aura:if isTrue="{!v.hideAccessLevels == false}">
+                            <hr />
+                            <h4 style="font-size: 1.5em;">      
+                                Access Level
+                            </h4>
+                            <br />
+                            <label class="slds-form-element__label">Select one more <a href="/industryportal/s/article/Authorised-Service-Provider-access-levels-on-the-Industry-Portal?src=helpMenu" target="_blank">access</a> requirements</label>
+                            <div class="slds-grid">
+                                <div class="slds-col">
+                                    <ui:inputCheckbox aura:id="accountAdminAccessLevelInput" 
+                                                      class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox checkbox customCheckBox" 
+                                                      value="{!v.existingContact.Is_Access_Level_Account_Administrator__c}" 
+                                                      click="{!c.accessLevelChange}"/>
+                                    &nbsp; {!$Label.c.Contact_Account_Admin_Access}
+                                </div>
+                                <div class="slds-col">
+                                    <ui:inputCheckbox aura:id="dvdAccessLevelInput" 
+                                                      class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox checkbox customCheckBox" 
+                                                      value="{!v.existingContact.Is_Access_Level_DVD_Administrator__c}" 
+                                                      click="{!c.accessLevelChange}"/>
+                                    &nbsp; {!$Label.c.Contact_Driver_Vehicle_Dashboard_Administrator}	
+                                </div>
+                            </div>
+                        </aura:if>
+                        
+                        <hr />
+                        <h4 style="font-size: 1.5em;">      
+                            Supporting Documentation
+                        </h4>
+                        <div class="slds-form-element">
+                            <div class="slds-form--stacked">
+                                <p>
+                                    <aura:unescapedHtml value="{!$Label.c.Supportitng_Document_Para_1}" />
+                                </p>
+                                <aura:if isTrue="{!v.hideAccessLevels == false}">
+                                 <br/>
+                                 <p>
+                                    <aura:unescapedHtml value="{!$Label.c.Supportitng_Document_Para_2}" />
+                                 </p>
+                                </aura:if>
+                            </div>
+                            <div class="slds-grid">
+                                <div  class="slds-col">
+                                    <c:P2POTAttachment category="{!v.attachmentPrefix +'-POI'}"
+                                                       uploadStatus="{!v.certifiedSupportingDocumentCheckUploadStatus}" 
+                                                       uniqueIdentifier="certified-supporting-document" 
+                                                       FileUploadChecked="{!v.certifiedSupportingDocumentCheck}" 
+                                                       FileCheckLabel="Certified Supporting Documentation" 
+                                                       aura:id="Certified-Supporting-Documentation-Upload" 
+                                                       ParentRecordId="{!v.recordId}" 
+                                                       displayAttachmentHeader="false" acceptedFileTypes=".pdf" 
+                                                       AllowMultiple="true" section="APPLICANT" index="1"
+                                                       isRequired="{!v.isSupportingDocumentRequired ? true : false}" />
+                                    
+                                </div>
+                                <div  class="slds-col">
+                                  
+                                  <aura:if isTrue="{!v.hideAccessLevels == false}">
+                                    <c:P2POTAttachment category="{!v.attachmentPrefix +'-POI'}"
+                                                       uploadStatus="{!v.nominatedDirectorDeclarationCheckUploadStatus}" 
+                                                       uniqueIdentifier="nominated-director-declaration-document" 
+                                                       FileUploadChecked="{!v.nominatedDirectorDeclarationCheck}" 
+                                                       FileCheckLabel="Nominated Manager or Director Declaration" 
+                                                       aura:id="Nominated-Director-Declaration-Documentation-Upload" 
+                                                       ParentRecordId="{!v.recordId}" 
+                                                       displayAttachmentHeader="false" acceptedFileTypes=".pdf" 
+                                                       AllowMultiple="true" section="APPLICANT" index="1" 
+                                                       isRequired="{!v.contactType == 'Nominated Director/Manager' ? true : false}" />
+                                  </aura:if>
+                                    
+                                </div>
+                            </div>
+                            <!--<div class="slds-grid">
+                                <div class="slds-col">
+                                    <c:P2POTAttachment category="{!v.attachmentPrefix +'-POI'}" uploadStatus="{!v.poiUploadStatus}" uniqueIdentifier="applicant-poi" FileUploadChecked="{!v.identityCheck}" FileCheckLabel="Proof of identity" aura:id="Identity-Document-Upload" ParentRecordId="{!v.recordId}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of your proof of identity document" AllowMultiple="true" section="APPLICANT" index="1" isRequired="{!v.isAttachmentRequired}"/>
+                                </div>    
+                            </div>-->
+                        </div>
+                        
+                    </div>
+                </form>
+            </div>
+            
+            <div class="slds-modal__footer">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.closemodal}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmUpdateContact}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Update
+                </ui:button>
+            </div>
+            
+        </div>
+    </div>
+    <div class="slds-backdrop slds-backdrop--open" aura:id="backdrop"></div>
+    <p>{!v.body}</p>
+</aura:component>

@@ -1,0 +1,14 @@
+<aura:event type="COMPONENT" description="Event template">
+    <aura:attribute name="isSelectAll" type="boolean" default="false"/>
+    <aura:attribute name="options" type="String[]" access="public"/>
+    <aura:attribute name="serviceProvider" type="String" access="public"/>
+    <aura:attribute name="caseNumber" type="String" access="public"/>
+    <aura:attribute name="caseId" type="String" access="public"/>
+    <aura:attribute name="newCaseId" type="String" access="public"/>
+    <aura:attribute name="relatedContactList" type="Related_Contact__c[]" access="public"/>
+    <aura:attribute name="authorisationAgentList" type="Authorisation_Agent__c[]" access="public"/>
+    <aura:attribute name="accountId" type="String" default="" access="public"/>
+    <aura:attribute name="sectionName" type="String" access="global"/>
+    <aura:attribute name="uliUploadStatus" type="Boolean" access="public" default="false"/>
+    <aura:attribute name="identityCheck" type="boolean" access="public" default="false"/>
+</aura:event>

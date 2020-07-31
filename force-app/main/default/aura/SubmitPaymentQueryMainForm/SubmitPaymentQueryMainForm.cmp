@@ -1,0 +1,36 @@
+<aura:component implements="flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="SubmitPaymentQueryController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />   
+    
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="record_Id" type="String"/>
+    <aura:attribute name="sectionNameToRender" type="String" default="Customer Enquiry Details"/>
+    <aura:attribute name="submitPaymentWrpObj" type="SubmitPaymentQueryController.SubmitPaymentWrapper"/>
+    
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+        
+    <!-- Event handler -->
+    <aura:handler name="loadSection" event="c:SubmitPaymentQueryLoadSectionEvent" action="{!c.loadSectionHandler}"/>
+    
+    <!--<div class="closeButton"> 
+        <ui:button class="closeButton" press="{!c.cancelForm}">
+             <lightning:icon iconName="utility:close" size="xx-small" alternativeText="Close"/>
+        </ui:button>
+    </div>-->
+    
+    <h2 style="width: 100%;margin: 0;padding: 0;text-align: center;">
+         <hr style="display: inline-block;margin: 0 20px 8px 0;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr>           
+          Customer Enquiry Form    
+        <hr style="display: inline-block;margin: 0 0 8px 20px;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr>
+    </h2>
+    <br/>
+    
+    <aura:If isTrue="{!v.sectionNameToRender == 'Customer Enquiry Details'}">
+       <c:SubmitPaymentQuery paymentRecordID="{!v.record_Id}" submitPaymentWrpObj="{!v.submitPaymentWrpObj}" readOnly="{!v.readOnly}"/>
+    </aura:If>
+    <aura:if isTrue="{!v.sectionNameToRender == 'Attachment'}">
+       <c:SubmitPaymentQueryAttachmentForm submitPaymentWrpObj="{!v.submitPaymentWrpObj}" readOnly="{!v.readOnly}"/>
+    </aura:if>
+
+</aura:component>

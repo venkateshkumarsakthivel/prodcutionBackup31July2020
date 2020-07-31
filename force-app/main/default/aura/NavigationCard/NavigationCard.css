@@ -1,0 +1,73 @@
+@font-face {
+    font-family: 'Gotham-Book';
+    src: url(/taxilicence/resource/GothamBookRegular);
+}
+.THIS .row{
+    padding-left:15px;
+    padding-right:15px;
+}
+
+.THIS .card {
+    position: relative;
+    margin: .5rem 0 1rem 0;
+    background-color: #fff;
+    transition: box-shadow .25s;
+    border-radius: 2px;
+    border: 1px solid #e0e0e0;
+    width: 360px;
+    min-height: 300px;
+}
+
+.THIS .card-content h2{
+	
+    font-size: 19px;
+    line-height: 1.2em;
+    margin: 0px 0 16px;
+    color: #002664;
+    font-weight: 700;    
+    font-family: "Gotham-Book";
+}
+
+.THIS .promo-tob-bottom-content-wrapper {
+    min-height: 200px;
+}
+.THIS .card-image{
+    position: relative;
+}
+
+.THIS .card-image img{
+    width: 100%;
+}
+
+.THIS .card .card-content {
+    padding: 20px 20px 10px 20px;
+    text-align:left;
+    border-radius: 0 0 2px 2px;
+    font-family: "Gotham-Book";
+    color: #525156;
+    margin-bottom: 0px;
+    font-size: 16px;
+    background-color: #F3F3F3;
+    height: 480px;
+}
+.THIS .btn-arrow{
+    background-color: #003577;
+    color: #ffffff;
+    padding: 15px;
+    position: relative;
+    outline: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    width: 200px;
+    display: inline-block;
+    text-align: left;    
+}
+.THIS .btn-arrow:after {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    right: 8px;
+    top: 0;
+    bottom: 0;
+    width: 28px;
+}

@@ -1,0 +1,4 @@
+<!-- c:cancelChangesEvent-->
+<aura:event type="APPLICATION" description="Cancel Changes done for Adding Legislation to Case or Notice Record" >
+
+</aura:event>

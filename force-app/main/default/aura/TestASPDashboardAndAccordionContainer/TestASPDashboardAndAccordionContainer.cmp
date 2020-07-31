@@ -1,0 +1,11 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+    <div class="container"> 
+        <div class="navigation" style="width:14%;Text-align:center;float:left;margin-top:0px;">
+            <c:AccordianNavigation />
+        </div>
+        <div class="dashboard" style="Text-align:right;Width:85%;float:right">
+            <c:TestASPDashboard />
+        </div>
+        
+    </div>
+</aura:component>

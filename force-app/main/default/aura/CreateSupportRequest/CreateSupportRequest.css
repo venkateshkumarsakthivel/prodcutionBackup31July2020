@@ -1,0 +1,52 @@
+.THIS .uiInput--default .form-element__label {
+    color: #696969;
+    line-height: 1.375;
+    margin-bottom: .25rem;
+    float: left; 
+    font-weight:bold;
+}
+
+.THIS .caps {
+    text-transform : uppercase;
+}
+
+.THIS .slds-form-element__label {
+    display: inline-block;
+    color: rgb(105, 105, 105);
+    font-size: 0.875rem;
+    line-height: 1.375;
+    margin-right: 0.75rem;
+    margin-bottom: 0.25rem;
+    
+    /*
+    white-space: normal;
+    font-size: 12px;
+    text-align: center;
+    color: rgb(105, 105, 105); */
+}
+
+.THIS .requiredField {
+    color: red;
+    font-weight: bold;
+}
+
+.THIS .formbox {
+    width:50%;
+    text-align: left;
+}
+
+.THIS .customCheckBox {
+    display: inline-block;
+    float: left;    
+}
+
+.THIS .customErrorMsg {
+    color: rgb(194, 57, 52);
+    font-weight:bold;
+    font-size: .875rem;
+}
+
+/*.THIS .slds-modal__container {
+    max-width: 70rem !important;
+    width:70% !important;
+}*/

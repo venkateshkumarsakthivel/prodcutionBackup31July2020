@@ -1,0 +1,48 @@
+.THIS {}
+.THIS .slds-form-element__label {
+    
+    color: #000000;
+    font-weight: bold;
+    font-size: 15px;
+}
+.THIS .slds-button__icon {
+    color:#54698d !important;
+}
+.THIS .file-delete-icon {
+    
+    color:#54698d !important;
+    font-size: 1em !important;
+    cursor:pointer;
+}
+
+.THIS.slds-upload-files-wrapper  {
+    padding: 10px 0;
+}
+
+.THIS.uiInputText.cFileUpload  {
+    width: 30%;
+    float: left;
+    padding: 10px;
+}
+.THIS.lightningInput.cFileUpload  {
+    float: left;
+}
+
+.THIS.attach_button {
+    margin: 30px 0 0 10px;
+    float: left;
+    color: white;
+}
+
+.THIS .requiredField {
+    
+    color: red;
+    font-weight: bold;
+}
+
+.THIS .customErrorMsg {
+    
+    color: rgb(194, 57, 52);
+    font-weight:bold;
+    font-size: .875rem;
+}

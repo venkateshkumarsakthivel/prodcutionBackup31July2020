@@ -1,0 +1,6 @@
+<aura:event type="COMPONENT" description="Event template">
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="redCount" type="Integer" />
+    <aura:attribute name="greenCount" type="Integer" />
+    <aura:attribute name="whiteCount" type="Integer" />
+</aura:event>

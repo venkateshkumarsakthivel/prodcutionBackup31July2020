@@ -1,0 +1,13 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="LoggedInUserController" >
+    
+    <div class="Container" >
+        <center>
+            <c:NavigationCard title="Passenger Services Levy" 
+                              description="{!$Label.c.ASP_Home_Passengers_Services_Levy_Description}"
+                              buttontext="Manage Levy"
+                              buttonhref="/industryportal/s/levy-management?src=levyMenu"
+                              image="{!$Resource.p2p300x200 + '/p2p300x200/TaxiRank-300x200.jpg'}"
+                              hovertext="Passenger Services Levy"/>
+        </center>
+    </div>
+</aura:component>

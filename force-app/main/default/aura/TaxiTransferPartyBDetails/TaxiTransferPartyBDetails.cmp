@@ -1,0 +1,267 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TransferPartyBDetailsController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <aura:attribute name="licenceTerm" type="String" access="private"/>
+    <aura:attribute name="licenceNumber" type="String" access="private"/>
+	<aura:attribute name="expiryDate" type="Date" access="private"/>
+    <aura:attribute name="operationArea" type="String" access="private"/>
+    <aura:attribute name="noticeCity" type="String" access="private"/>
+    <aura:attribute name="noticeState" type="String" default="NSW" access="private"/>
+    <aura:attribute name="noticePostcode" type="String" access="private"/>
+    <aura:attribute name="noticeStreet" type="String" access="private"/>
+    <aura:attribute name="noticeCountry" type="String" default="AUSTRALIA" access="private"/>
+    <aura:attribute name="noticeType" type="String" default="Email" access="private"/>
+    <aura:attribute name="noticeUnitType" type="String" default="" access="private"/>
+    <aura:attribute name="noticeEmail" type="String"  access="private"/>
+    
+    <aura:attribute name="transferLevyFeeDue" type="Integer" access="private"/>
+	<aura:attribute name="transferSaleAmt" type="Integer" access="private"/>
+    
+    <aura:attribute name="authorisationId" type="String" default=""/>
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="caseId" type="String" default=""/>
+    <aura:attribute name="entityType" type="String" default=""/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="aspCase" type="Case" />
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="true" />
+
+    <aura:attribute name="poiDocId" type="String" default=""/>
+    <aura:attribute name="poiDocCheck" type="Boolean" default="false" />
+    <aura:attribute name="buyerPOIUploadStatus" type="Boolean" default="false" />
+        
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:method name="fetchApplicationDetails" action="{!c.fetchApplicationDetails}" access="PUBLIC"/>
+    
+    <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">
+        <c:TaxiFormSectionProgressIndicator isTransferPartyB="true" currentSection="{!$Label.c.Transfer_PartyB_General_Details_Header}" entityType="{!v.entityType}"/>
+        <br/>
+    </aura:if>
+    
+    <article class="slds-card" id="formPartA">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#record'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">       
+                        {!$Label.c.Transfer_PartyB_General_Details_Title}
+                    </h2>
+                    <b>Note:</b>{!$Label.c.Transfer_PartyB_General_Details_Note}
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!and(v.readOnly, not(v.reviewEdit))}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                    <div style="float:right">
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                            <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                        </ui:button>
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <div class="slds-section slds-is-open" aura:id="sectiontitle">
+                    <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Click to expand or collapse">
+                        <button class="slds-button slds-section__title-action" onclick="{!c.toggleSectionContent}" style="background-color: #003577;color: #ffffff;">
+                            <aura:if isTrue="{!v.isSectionExpanded}">
+                                <i class="fa fa-minus" style="font-size: 0.875rem;" aria-hidden="true"></i>
+                                <aura:set attribute="else">
+                                    <i class="fa fa-plus" style="font-size: 0.875rem;" aria-hidden="true"></i>
+                                </aura:set>
+                            </aura:if>
+                            &nbsp;&nbsp;{!$Label.c.All_Applicant_Application_Checklist}
+                        </button>
+                    </h5>
+                    <div class="slds-section__content" style="border-width: 1px;border-style: solid;border-color: rgb(208, 208, 208);border-top: 0;">
+                        
+                        <p class="slds-form- -stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+                            
+                            <p>
+                                <aura:unescapedHtml value="{!$Label.c.Transfer_PartyB_Checklist_1}"/>
+                            </p>
+                            <br/>
+                            <p>
+                                <aura:unescapedHtml value="{!$Label.c.Transfer_PartyB_Checklist_2}"/>
+                            </p>
+                            <br/>
+                            <p>
+                                <aura:unescapedHtml value="{!$Label.c.Transfer_PartyB_Checklist_3}"/>
+                            </p>
+                        </p>
+                        
+                    </div>
+                </div>
+				
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>      
+                
+				<div class="slds-grid">
+					<div class="slds-col" style="padding-bottom:0%">
+					<h3 style="width: 100%;margin: 0;padding: 0;text-align: left;">
+						Licence Details:
+					</h3>
+					</div>
+				</div>
+                <div class="slds-grid">
+                    
+                    <div class="slds-col">
+                        <label class="slds-form-element__label">
+                            {!$Label.c.Transfer_PartyB_Licence_Number}&nbsp;
+                        </label>
+                        <ui:inputText maxlength="100" disabled="true" class="slds-input" aura:id="Licence-Number" value="{!v.licenceNumber}"/>
+                    </div>
+                                  
+                    <div class="slds-col">
+                        <label class="slds-form-element__label">
+                            {!$Label.c.Transfer_PartyB_Licence_Expiry_Date}&nbsp;
+                        </label>
+						<ui:inputDate format="dd/MM/yyyy" disabled="true"  value="{!v.expiryDate}" displayDatePicker="false"  class="slds-input"/>
+                    </div>
+                </div>
+                
+				<div class="slds-grid">
+                    <div class="slds-col">
+						<label class="slds-form-element__label">
+                            {!$Label.c.Taxi_Form_Operation_Area}
+                        </label>
+                        <ui:inputText class="slds-input" disabled="true" aura:id="Operation-Area-Input" value="{!v.operationArea}" />
+					</div>
+					<div class="slds-col">
+						<label class="slds-form-element__label">
+                            {!$Label.c.Taxi_Transfer_Licence_Term}
+                        </label>
+                        <ui:inputText disabled="true" class="slds-input" aura:id="Licence-Term-Input" value="{!v.licenceTerm}"/>
+					</div>
+				</div>
+				
+				<div class="slds-grid">
+					<div class="slds-col" style="padding-bottom:0%">
+					<h3 style="width: 100%;margin: 0;padding: 0;text-align: left;">
+						Transfer Details:
+					</h3>
+					</div>
+				</div>
+				<div class="slds-grid">
+					<div class="slds-col">
+                        <label class="slds-form-element__label">
+                            {!$Label.c.Transfer_PartyB_Levy_Amount}&nbsp;
+                        </label>
+                        <ui:inputNumber class="slds-input" format="0." disabled="true" aura:id="Transfer-Levy-Due" value="{!v.transferLevyFeeDue}"/>
+                    </div>
+					<div class="slds-col">
+                        <label class="slds-form-element__label">
+                            {!$Label.c.Taxi_Transfer_Price}&nbsp;
+                        </label>
+                        <ui:inputNumber class="slds-input" format="0." disabled="true" aura:id="Transfer-Licence-Fee" value="{!v.transferSaleAmt}"/>
+                    </div>
+				</div>
+				
+				<div class="slds-grid">
+					<div class="slds-col" style="padding-bottom:0%">
+					<h3 style="width: 100%;margin: 0;padding: 0;text-align: left;">
+						Transferee Details:
+					</h3>
+					</div>
+				</div>
+				<div class="slds-grid">
+					<div class="slds-col">
+                        <label class="slds-form-element__label">{!$Label.c.Taxi_Form_Entity_Type}</label>
+                        <br/>
+                        <input type="radio"  name="entityType" checked="{!v.entityType == 'Company'}" id="Company" disabled="disabled"/>&nbsp;Corporation
+                        &nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="entityType" checked="{!v.entityType == 'Individual'}" id="Individual" disabled="disabled"/>&nbsp;Individual
+                        &nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="entityType" checked="{!or(v.entityType == 'Company Partner', v.entityType == 'Individual Partner')}" id="Joint-Holders" disabled="disabled"/>&nbsp;Joint Holders
+                    </div>
+					<div class="slds-col">
+                        <div style="display:inline;">
+                            <legend class="slds-form-element__label">{!$Label.c.All_Applicant_Notice_Address}&nbsp;<span class="requiredField">*</span></legend>
+                            <div class="radiobuttonClass">
+                                <ui:inputRadio disabled="{!v.readOnly}" aura:id="r0" change="{!c.setNoticeAddressType}" name="noticeAddressType" label="" value="{!v.noticeType == 'Email' ? true : false}"/> Via Email &nbsp;&nbsp;&nbsp;
+                                <ui:inputRadio disabled="{!v.readOnly}" aura:id="r1" change="{!c.setNoticeAddressType}" name="noticeAddressType" label="" value="{!v.noticeType == 'Postal' ? true : false}"/> Via Post
+                                
+                            </div>
+                            
+                            <br/>
+                            <c:EmailAddressComponent isReadOnly="{!v.readOnly}" aura:id="Notice-Email" uniqueIdentifier="Notice-Email" 
+                                                     fieldLabel="Notice Email" isRequired="true" email="{!v.noticeEmail}"/>
+                            
+                            <br/>
+                            <legend class="slds-form-element__label">Notice Address<aura:if isTrue="{!v.noticeType == 'Postal' ? true : false}">&nbsp;<span class="requiredField">*</span></aura:if></legend>
+                            <c:AddressInputComponent reviewReadOnly="{!v.readOnly}" aura:id="Notice-Address" unitType="{!v.noticeUnitType}" street="{!v.noticeStreet}" city="{!v.noticeCity}" 
+                                                     state="{!v.noticeState}" postalcode="{!v.noticePostalCode}" addressType="Notice_Address"
+                                                     isAustraliaAddress="true" isInternationalAddress="false" isReadOnly="{!v.readOnly}"
+                                                     fullStreet="{!v.noticeStreet}"/>  
+                        </div>
+                    </div>
+					
+				</div>
+                
+                <aura:if isTrue="{!v.readOnly == false}">
+                    <fieldset>
+                        <div class="slds-grid">
+                            <div class="slds-col-left" style="width: 50% !important;">
+                                <c:P2POTAttachment category="POI" FileUploadChecked="{!v.poiDocCheck}" aura:id="buyer-poi-Upload" uploadStatus="{!v.buyerPOIUploadStatus}" attachId="{!v.poiDocId}" uniqueIdentifier="buyer-poi" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" AllowMultiple="true" section="AUTH" index="1" />
+                            </div>
+                        </div>
+                    </fieldset>
+				</aura:if>
+                
+				<aura:if isTrue="{!v.readOnly == true}">
+						<c:P2POTAttachments parent="{!v.caseId}" />
+				</aura:if>
+            </div>
+        </div>
+        <!-- Footer component-->
+        <div class="slds-card__footer">
+            
+            <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.closeApplication}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+            <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                </ui:button>
+            </aura:if>
+            
+        </div>
+    </article>
+</aura:component>

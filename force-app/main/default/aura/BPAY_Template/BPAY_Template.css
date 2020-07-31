@@ -1,0 +1,17 @@
+.THIS {
+}
+
+.THIS .color-blue {
+    color: rgb(1, 45, 107);
+}
+
+.THIS .table-border-blue {
+    border-color: rgb(1, 45, 107);
+    border-width: medium;
+    height: 100%;
+}
+
+.THIS.grid-center-50  {
+    width: 50%;
+    margin: auto;
+}

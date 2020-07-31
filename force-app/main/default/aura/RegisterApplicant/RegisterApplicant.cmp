@@ -1,0 +1,199 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="ApplicantRegisterController" >
+    
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <!-- This was previous implementation using static reCAPTCHA js -->
+    <!--<ltng:require scripts="{!$Resource.CaptchaApi}"/>-->
+    
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="iframeHeight" type="Integer" default="100" access="public"/>
+    <aura:attribute name="validationError" type="Boolean" required="false" default="false" access="public"/>
+    <aura:attribute name="isCaptchavalid" type="Boolean" required="false" default="false" access="public"/>
+    <aura:attribute name="firstnameLabel" type="String" required="false" default="" access="public"/>
+    <aura:attribute name="lastnameLabel" type="String" required="false" default="" access="public"/>
+    <aura:attribute name="emailLabel" type="String" required="false" default="" access="public"/>
+    <aura:attribute name="mobileLabel" type="integer" required="false" default="" access="public"/>
+    <aura:attribute name="acn" type="integer" required="false" default="" access="public"/>
+    
+    <aura:attribute name="CorporationACN" type="String" access="public"/>
+    <aura:attribute name="applicantMobileNumber" type="String" access="public"/>
+    <aura:attribute name="applicantEmail" type="String" access="public"/>
+    <aura:attribute name="registerFor" type="String" access="public"/>
+    <aura:attribute name="entityType" type="String" access="public"/>
+    
+    <aura:attribute name="partnershipName" type="String" required="false" default="" access="public"/>
+    <aura:attribute name="companyName" type="String" required="false" default="" access="public"/>
+    <aura:attribute name="submitButtonLabel" type="String" required="false" default="" access="public"/>
+    <aura:attribute name="renderCompanyandAcn" type="boolean" default="false" access="public"/>
+    <aura:attribute name="showError" type="Boolean" required="true" description="" default="false" access="public"/>
+    <aura:attribute name="errorMessage" type="String" required="false" description="" access="public"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="renderPartnershipNameInput" type="Boolean" />
+    
+    <aura:handler event="c:CompanyNameForACNEvent" action="{!c.getCompanyName}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <center>
+    </center>
+    
+    <div class="temp">
+        <div class="slds-section" aura:id="sectiontitle">
+            <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Click to expand or collapse">
+                <button class="slds-button slds-section__title-action" onclick="{!c.toggleSectionContent}" style="background-color: #003577;color: #ffffff;">
+                    <aura:if isTrue="{!v.isSectionExpanded}">
+                        <i class="fa fa-minus" style="font-size: 0.875rem;" aria-hidden="true"></i>
+                        <aura:set attribute="else">
+                            <i class="fa fa-plus" style="font-size: 0.875rem;" aria-hidden="true"></i>
+                        </aura:set>
+                    </aura:if>
+                    &nbsp;&nbsp;{!$Label.c.Registration_Guidelines_Heading}
+                </button>
+            </h5>
+            <div class="slds-section__content" style="border-width: 1px;border-style: solid;border-color: rgb(208, 208, 208);border-top: 0;">
+                
+                <center><b style="text-align:center"><span style = "color : #FF0000">If you are already an Authorised Service Provider or Taxi Licence holder and have a login to the portal you don’t need to Register</span> </b> <br> </br>
+                        <b style="text-align:center"><span style = "color : #FF0000">If you did not receive a login contact the industry contact centre on 131 727</span> </b> <br> </br></center>  
+                
+                <p class="slds-form- -stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+                    <li class="slds-item">
+                        <b>{!$Label.c.Registration_Guidelines_Heading}</b>
+                        <ul class="slds-list--dotted">
+                            <li class="slds-item"><b>Individual :</b><p> Select entity type as individual if registering as an Individual service provider/ taxi licence holder.</p></li>
+                            <li class="slds-item"><b>Corporate :</b><p> Select entity type as corporate if registering as a corporate service provider/taxi licence holder.</p></li>
+                            <li class="slds-item"><b>Individual Partnership/Joint Holders :</b><p>Select entity type as an Individual partnership if all the partners/joint holders are individual entity in the partnership.</p></li>
+                            <li class="slds-item"><b>Corporate Partnership/Joint Holders :</b> <p>Select entity type as corporate partnership if any one of the partner/joint holder is an corporate entity in the partnership.</p></li>
+                        </ul>
+                    </li>
+                </p>
+            </div>
+        </div>
+        
+        <article class="slds-card">
+            
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <i style="font-size: 2em;" class="fa fa-user-circle fa-2" aria-hidden="true"></i>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2>       
+                            {!$Label.c.Applicant_Registration_Header}
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <center>
+                <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+                    <div class="slds-form--stacked">
+                        
+                        <div class="slds-form-element" aura:id="firstNameContent">
+                            <label class="slds-form-element__label" for="firstName">{!$Label.c.Applicant_Registration_First_Given_Name}&nbsp;                                 
+                                <span class="requiredField">*</span>
+                            </label>
+                            <ui:inputText value="" required="true" maxlength="26" class="slds-input CamelCaseInput" aura:id="firstName" />
+                            <span aura:id="firstNameError" class="errorMsg slds-form-element__help"></span>
+                        </div>
+                        <div class="slds-form-element" aura:id="lastNameContent">
+                            <label class="slds-form-element__label" for="lastName">{!$Label.c.Applicant_Registration_Family_Name}&nbsp;                                 
+                                <span class="requiredField">*</span>
+                            </label>
+                            <ui:inputText value="" maxlength="26" class="slds-input upperCaseInput" aura:id="lastName"/>
+                            <span aura:id="lastNameError" class="errorMsg slds-form-element__help"></span>
+                        </div>
+                        <div class="slds-form-element" aura:id="mobileNumberContent">
+                            <div class="slds-form-acn" style="">
+                                <c:PhoneComponent isReadOnly="false" aura:id="Daytime-Phone-Input" uniqueIdentifier="Daytime-Phone-Input-Identifier" fieldLabel="{!$Label.c.Corporation_Daytime_phone_number}" isRequired="true" phoneNumber="{!v.applicantMobileNumber}" />
+                                <span aura:id="mobileNumberError" class="errorMsg slds-form-element__help"></span>
+                            </div>
+                        </div>
+                        <div class="slds-form-element" aura:id="emailAddressContent">
+                            <c:EmailAddressComponent isReadOnly="false" aura:id="Email-Input" uniqueIdentifier="Email-Input" 
+                                                     fieldLabel="Email Address" isRequired="true" email="{!v.applicantEmail}"/>
+                            <span aura:id="emailAddressError" class="errorMsg slds-form-element__help"></span>
+                        </div>
+                        <div class="slds-form-element" aura:id="InputSelectRegisterForContent">
+                            <label class="slds-form-element__label">{!$Label.c.Applicant_Registration_Register_For}&nbsp;                                 
+                                <span class="requiredField">*</span>
+                            </label>
+                            <ui:inputSelect class="InputSelectSingle" aura:id="InputSelectRegisterFor" value='{!v.registerFor}'>
+                                <ui:inputSelectOption text="" label="--Please Select--" value="true"/>
+                                <ui:inputSelectOption text="Service Provider"/>
+                                <ui:inputSelectOption text="Taxi Licence"/>
+                            </ui:inputSelect> 
+                            <span aura:id="InputSelectRegisterForError" class="errorMsg slds-form-element__help"></span>
+                        </div>
+                        <div class="slds-form-element" aura:id="InputSelectSingleContent">
+                            <label class="slds-form-element__label" for="InputSelectSingle">{!$Label.c.Applicant_Registration_Entity_Type}&nbsp;                                 
+                                <span class="requiredField">*</span>
+                            </label>
+                            <ui:inputSelect class="InputSelectSingle" aura:id="InputSelectSingle" change="{!c.onSingleSelectChange}" value="{!v.entityType}">
+                                <ui:inputSelectOption text="" label="--Please Select--" value="true"/>
+                                <ui:inputSelectOption text="Individual"/>
+                                <ui:inputSelectOption text="Corporation"/>
+                                <ui:inputSelectOption text="Individual Partnership/Joint Holders"/>
+                                <ui:inputSelectOption text="Corporate Partnership/Joint Holders"/>
+                            </ui:inputSelect> 
+                            <span aura:id="InputSelectSingleError" class="errorMsg slds-form-element__help"></span>
+                        </div>
+                        <aura:if isTrue="{!v.renderCompanyandAcn}">
+                            <div class="slds-form-element" aura:id="acnContent">
+                                <div class="slds-form-acn" style="">
+                                    <c:ACNComponent isReadOnly="{!v.readOnly}" aura:id="ACN-Input" uniqueIdentifier="ACN-Input" 
+                                                    fieldLabel="ACN or ARBN"
+                                                    isRequired="true" acn="{!v.CorporationACN}"/>
+                                    <span aura:id="acnError" class="errorMsg slds-form-element__help"></span>
+                                </div>
+                            </div>
+                            <div class="slds-form-element" aura:id="companyNameContent" style="margin-top: 0.05rem;">
+                                <label class="slds-form-element__label" for="companyName">
+                                    {!$Label.c.Applicant_Registration_Company_Name}
+                                    &nbsp;<span class="requiredField">*</span>
+                                </label>
+                                <ui:inputText value="{!v.companyName}" disabled="true" maxlength="26" class="slds-input" aura:id="companyName"/>
+                                <span aura:id="companyNameError" class="errorMsg slds-form-element__help"></span>
+                            </div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.renderPartnershipNameInput}">
+                            <div class="slds-form-element" aura:id="partnershipNameContent">
+                                <label class="slds-form-element__label" for="partnershipName">
+                                    {!$Label.c.Applicant_Registration_Partnership_Name}
+                                    &nbsp;<span class="requiredField">*</span>
+                                </label>                                
+                                <ui:inputText value="{!v.partnershipName}" maxlength="200" class="slds-input" aura:id="partnershipName"/>
+                                <span aura:id="partnershipNameError" class="errorMsg slds-form-element__help"></span>
+                            </div>
+                        </aura:if>
+                        
+                        <!-- This was previous code using static reCAPTCHA js -->
+                        <!--
+							<div class="slds-form-element slds-captcha" style="margin-top: 2.3rem;">
+                                <div class="g-recaptcha" data-sitekey="6LfOwCEUAAAAAL6AFMZ2H0WIHEHAGkcKznUalIm2"></div>
+                                <span aura:id="CaptchaError" class="errorMsg slds-form-captcha-hide">{!$Label.c.Applicant_Registration_Captcha_Error}</span>
+                                <span aura:id="CaptchaError" class="errorMsg slds-form-captcha-hide">{!$Label.c.Applicant_Registration_Captcha_Error}</span> 
+                            </div>
+                        -->
+                        
+                        <!-- reCAPTCHA implemenation to fix static js issue -->
+                        <div class="slds-form-element slds-captcha" style="margin-top: 2.3rem;">
+                            <iframe id="captchaContainer" aura:id="vfFrameRecaptcha" src="{!$Label.c.reCAPTCHA_Visual_Force_Url + '/captcha/apex/captcha'}" scrolling="auto"  frameborder="0" width="100%" height="{!v.iframeHeight + 'px'}" allowtransparency="true" />
+                            
+                            <span aura:id="CaptchaError" class="errorMsg slds-form-captcha-hide">{!$Label.c.Applicant_Registration_Captcha_Error}</span>
+                        </div>
+                        
+                        <div class="slds-card__footer">
+                            <ui:button class="slds-button slds-button-neutral" press="{!c.navigateToHome}"> 
+                                Cancel
+                            </ui:button>
+                            <ui:button class="slds-button slds-button-neutral" aura:id="submitButton" press="{!c.applicantRegister}"> 
+                                Register
+                            </ui:button>
+                        </div>  
+                        
+                    </div>   
+                </div>
+            </center>
+        </article>
+    </div>
+</aura:component>

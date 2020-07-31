@@ -1,0 +1,35 @@
+<aura:component implements="forceCommunity:profileMenuInterface,forceCommunity:availableForAllPageTypes" access="global">
+ 	<aura:attribute name="options" type="String[]" default="Home, My Profile, Logout "/>
+     <div class="loggedInUser">
+        <div class="trigger-link" aria-haspopup="true" aria-label="Test User">
+            <span class="Icon" ><c:svgIcon svgPath="/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#user" category="standard" size="medium" name="user" /></span>
+                <span class=" profileName" >Test User</span>
+            	<div class="open-search" style="display:inline-block;">
+               <ui:menu >
+                   <ui:menuTriggerLink aura:id="trigger" class="triggerDownArrow" />
+                   <ui:menuList class="actionMenu" aura:id="actionMenu">
+                       <aura:iteration items="{!v.options}" var="itemLabel">
+                           <ui:actionMenuItem label="{!itemLabel}" click="{!c.handleClick}"/>
+                       </aura:iteration>
+                   </ui:menuList>
+               </ui:menu>
+         </div>
+        </div>
+           <!--<div class="open-search" style="display:inline;">
+               <ui:menu >
+                   <ui:menuTriggerLink aura:id="trigger" class="triggerDownArrow" />
+                   <ui:menuList class="actionMenu" aura:id="actionMenu">
+                       <aura:iteration items="{!v.options}" var="itemLabel">
+                           <ui:actionMenuItem label="{!itemLabel}" click="{!c.handleClick}"/>
+                       </aura:iteration>
+                   </ui:menuList>
+               </ui:menu>
+         </div> -->
+     </div>
+    <div class="Login" style="display:none;">
+        <a class="loginLink" href="https://p2pdev1-p2pdev1.cs6.force.com/s/login">Log Out</a>
+    </div>
+    
+    
+      
+</aura:component>

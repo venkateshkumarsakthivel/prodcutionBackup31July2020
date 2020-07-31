@@ -1,0 +1,62 @@
+<!-- c:NoticeDetailModify-->
+<aura:component implements="lightning:availableForFlowScreens,force:lightningQuickAction,force:hasSObjectName,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="NoticeGeneratorController">
+    <aura:attribute name="recordId" type="String" access="public"/> 
+    <aura:attribute name="noticeRecord" type="Notice_Record__c" access="public"/>
+    <aura:attribute name="noticeName" type="String" access="public"/>
+    <aura:attribute name="noticeTypeVal" type="String" access="public"/>
+    <aura:attribute name="noticeSubTypeVal" type="String" access="public"/>
+    <aura:attribute name="showTypeSubType" type="boolean"  default="true"/>
+    <aura:attribute name="showFieldset" type="boolean"  default="true"/> 
+    <aura:attribute name="showSpinner" type="boolean"  default="false"/> 
+    <aura:attribute name="showBtns" type="boolean"  default="false"/> 
+    <aura:attribute name="noticeSetting" type="Map" access="public" description="Metatdata setting for 'Notice Records Config' "/>
+    
+    <aura:attribute name="fields" type="Object[]" access="private" />
+    <aura:attribute name="fieldSetName" type="String" description="The api name of the field set." default=''/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+    
+    <lightning:recordEditForm aura:id="noticeEditForm" 
+                              recordId="{!v.recordId}"
+                              recordTypeId="{!v.noticeRecord.RecordTypeId}"
+                              objectApiName="Notice_Record__c" 
+                              onload="{!c.onEditFormLoad}"
+                              onsubmit="{! c.onEditFormSubmit }">
+        <lightning:layout multipleRows="true">
+            <aura:if isTrue="{!v.showTypeSubType}">
+                <lightning:layoutItem padding="around-small" size="12">
+                    <lightning:card title="{! 'Update Notice : ' + v.noticeName}" iconName="custom:custom46"></lightning:card>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small" size="6"> 
+                    <lightning:inputField aura:id="noticeType" fieldName="Notice_Type__c" onchange="{!c.onNoticeTypeChange}" required="true" />
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small" size="6">
+                    <lightning:inputField aura:id="noticeSubType" fieldName="Notice_Sub_Type__c" onchange="{!c.onNoticeSubTypeChange}" required="true"/>
+                </lightning:layoutItem>
+            </aura:if>
+        </lightning:layout>
+        
+        <aura:if isTrue="{!v.showFieldset}">
+            <aura:if isTrue="{! v.showSpinner }">
+                <lightning:spinner alternativeText="Loading" size="medium" variant="brand"/>
+            </aura:if>
+            <lightning:layout multipleRows="true">  
+                <aura:iteration items="{! v.fields }" var="field">
+                    <lightning:layoutItem size="6" class="slds-p-left_small slds-p-right-small">
+                        <lightning:inputField fieldName="{! field.APIName }" class="slds-p-top_small slds-m-top_medium" />
+                    </lightning:layoutItem>
+                </aura:iteration> 
+            </lightning:layout>
+        </aura:if> 
+        <lightning:layout multipleRows="true">
+            <aura:if isTrue="{!v.showBtns}">
+                <lightning:layoutItem size="12" class="slds-align_absolute-center slds-m-top_medium" >
+                    <lightning:button class="slds-m-right_xx-small" label="Cancel" onclick="{!c.onEditFormCancel}"/>
+                    <lightning:button class="" type="submit" label="Save" variant="brand"/>
+                </lightning:layoutItem>
+            </aura:if>
+        </lightning:layout>
+    </lightning:recordEditForm>
+    
+</aura:component>

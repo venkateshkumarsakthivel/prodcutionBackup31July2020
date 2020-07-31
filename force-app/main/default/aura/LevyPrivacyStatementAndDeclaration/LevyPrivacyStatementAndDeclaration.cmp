@@ -1,0 +1,131 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+    
+    <aura:attribute name="registrationId" type="String" default="" access="public"/>
+    <aura:attribute name="accountId" type="String" default="" access="public"/>
+    
+    <aura:attribute name="registrationRecord" type="Tax_Payer_Registration__c" access="public"/>
+    
+    <aura:attribute name="readOnly" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false" access="public"/>
+    
+    <aura:registerEvent name="loadSection" type="c:LevyFormSectionEvent"/>
+    
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:if isTrue="{!not(v.readOnly)}">
+        <c:LevyFormSectionProgressIndicator currentSection="{!$Label.c.Levy_Privacy_Statement_and_Declaration}"/>
+        <br/>
+    </aura:if>
+    
+    <article class="slds-card" id="levyFormPrivacyDetails">
+        
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#work_order_item'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">   
+                        {!$Label.c.Levy_Privacy_Statement_and_Declaration}
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!v.readOnly}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        
+        <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+            <span style="color: #ffffff;">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+            </span>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <aura:if isTrue="{!or(v.registrationRecord.Applied_For_Exemption__c != 'Yes', v.registrationRecord.Annual_Trip_Estimate__c == 'Over 600')}">
+                    <p>
+                        <aura:unescapedHtml value="{!$Label.c.Levy_Privacy_Declaration_Paragraph_1}"></aura:unescapedHtml>
+                    </p>
+                    <br/>
+                    <p>
+                        <aura:unescapedHtml value="{!$Label.c.Levy_Privacy_Declaration_Paragraph_2}"></aura:unescapedHtml>
+                    </p>
+                    <br/>
+                </aura:if>
+                
+                <aura:if isTrue="{!v.registrationRecord.Applied_For_Exemption__c == 'Yes'}">
+                    <p>
+                        <aura:unescapedHtml value="{!$Label.c.Levy_Privacy_Declaration_Paragraph_5}"></aura:unescapedHtml>
+                    </p>
+                    <br/>
+                    <p>
+                        <aura:unescapedHtml value="{!$Label.c.Levy_Privacy_Declaration_Paragraph_6}"></aura:unescapedHtml>
+                    </p>
+                    <br/>
+                </aura:if>
+                
+                <p>
+                    <aura:unescapedHtml value="{!$Label.c.Levy_Privacy_Declaration_Paragraph_3}"></aura:unescapedHtml>
+                </p>
+                <br/>
+                <p>
+                    <legend class="slds-form-element__label">Declaration</legend>
+                </p>
+                <br/>
+                <p>
+                    <b><aura:unescapedHtml value="{!$Label.c.Levy_Privacy_Declaration_Paragraph_4}"></aura:unescapedHtml></b>
+                </p>
+                <br/>
+                
+                <aura:if isTrue="{!v.registrationRecord.Applied_For_Exemption__c == 'Yes'}">
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            
+                            <ui:inputCheckbox disabled="{!v.readOnly}" aura:id="declarationAcceptanceCheckbox" label="" value="{!v.registrationRecord.Privacy_Declaration__c}" class="declarationCheckBox"/><aura:unescapedHtml value="{!$Label.c.Levy_Privacy_Declaration_Checkbox_Text}"></aura:unescapedHtml>
+                            <span id="declarationAcceptanceError" class="customErrorMsg"></span>
+                        </div>
+                    </div>
+                </aura:if>
+                
+                <aura:if isTrue="{!or(v.registrationRecord.Applied_For_Exemption__c != 'Yes', v.registrationRecord.Annual_Trip_Estimate__c == 'Over 600')}">
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            
+                            <ui:inputCheckbox disabled="{!v.readOnly}" aura:id="declarationAcceptanceCheckbox" label="" value="{!v.registrationRecord.Privacy_Declaration__c}" class="declarationCheckBox"/><aura:unescapedHtml value="{!$Label.c.Levy_Privacy_Declaration_Checkbox_Text_No_Exemption}"></aura:unescapedHtml>
+                            <span id="declarationAcceptanceError" class="customErrorMsg"></span>
+                        </div>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        <div class="slds-card__footer">
+            
+            <aura:if isTrue="{!not(v.readOnly)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

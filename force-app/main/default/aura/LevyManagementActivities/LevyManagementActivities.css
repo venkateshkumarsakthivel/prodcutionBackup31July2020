@@ -1,0 +1,224 @@
+.THIS .Container{
+    
+    display: none;
+    padding-left: 324px;
+    height: 800px;
+    width: 800px;
+    margin: auto;
+     
+}
+.THIS .dashboard_icon{
+    fill:#54698d !important;
+}
+.THIS .tableheader {
+    
+    white-space:normal;
+    font-size:12px;
+    text-align: center;
+    color: #ffffff;
+}
+
+.THIS .scrollable{
+    min-height: 230px;
+    overflow-y:auto;
+}
+
+.THIS .row {
+    padding-left:15px;
+    padding-right:15px;
+}
+
+.THIS .top {
+   padding-left:20px;
+}
+
+.THIS .export {
+    padding-left:20px;
+    float:left;
+}
+
+.THIS .bottom {
+    padding-right:20px;
+}
+
+.THIS .p2pbutton {
+    background: #003577;    
+}
+.THIS .add {
+    float: left;
+}
+.THIS .slds-icon-action-approval{
+    background-color: green;
+}
+
+.THIS .list-actions{
+    float:left;
+    margin-left:20px;
+}
+
+.THIS .pagination-actions{
+    float:right;
+    margin-right:20px;
+}
+
+.THIS .cb{
+    clear:both;
+}
+
+.THIS .slds-table th[scope="row"],  .THIS .slds-table td[role="gridcell"] {
+    font-size: 12px;
+}
+
+.THIS .slds-table th[scope="row"]>.slds-truncate {
+    max-width: 100%;
+    overflow: auto;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.THIS .slds-table--fixed-layout{
+    table-layout:inherit;
+}
+
+.THIS .dvd-check-output > img{
+    max-width: 20%;
+}
+.THIS .vehicle-dvd-check-output > img{
+    max-width: 13%;
+}
+
+.THIS .slds-table--striped tbody tr:nth-of-type(even)>td, 
+.THIS .slds-table--striped tbody tr:nth-of-type(even)>th {
+    background-color: rgba(247, 249, 251, 1);
+}
+
+.THIS .slds-table--fixed-layout thead {
+    background-color: #eef1f6;
+}
+
+.THIS .questionmark .slds-icon{
+    fill:#000;
+}
+
+.THIS .slds-icon-action-close{
+    background-color: red;
+}
+
+.THIS .slds-icon-action-delete{
+    background-color: white;
+}
+
+.THIS .slds-icon_container--circle, .THIS .slds-icon__container--circle {
+    padding: 0.3rem;
+}
+
+.THIS .slds-icon-action-question_post_action{
+    border: 1px solid grey;
+    background-color: #fdfdfd;
+}
+
+.THIS .slds-icon_container{
+    border-radius: 1.25rem;
+}
+
+.THIS .slds-icon-action-edit {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.THIS .scrollable .slds-text-title--caps{
+    font-size: .775rem;
+}
+
+.THIS .scrollable caption, .THIS .scrollable th, .THIS .scrollable td{
+    text-align: center;
+}
+.THIS .slds-button{
+    padding-bottom: 0px;
+}
+
+/* Header Style */
+
+.THIS .result-cards {
+    display:inline-flex;
+}
+
+.THIS .slds-has-dividers--around-space>.slds-item{
+    height: 65px;
+}    
+
+.THIS .slds-has-dividers--around-space>.slds-item+.slds-item {
+    margin-top: 0;
+    margin-left: 20px;
+}
+
+.THIS .slds-has-dividers--around-space>.slds-item label{
+    float: left;
+}    
+
+.THIS .slds-has-dividers--around-space> .query-log{
+    width: 250px;
+}
+
+.THIS .slds-tree {
+    min-width: 7.5rem;
+    max-width: 25rem;
+    margin-top: 315px!important; 
+}
+
+.THIS .navigation {
+    min-width: 7.5rem;
+    max-width: 25rem;
+    margin-top: 315px!important; 
+}
+
+.THIS .slds-tabs--scoped__content{
+    padding:0.2rem;
+}
+.THIS .slds-truncate{
+    white-space:normal ;
+}
+.THIS .tabCol {
+    width: 10%;
+    font-weight: normal !important;
+}
+
+.THIS .tabColSort {
+    cursor: pointer;
+}
+
+.THIS .gridRowActionIcon {
+    height: 32px;
+}
+
+.THIS .toggleDisplay {
+    display: none;
+}
+
+.THIS .searchBox {
+    width:254px;
+    vertical-align: middle;
+}
+
+.THIS .slds-page-header{    
+    height: 80px;
+    border: 0px solid rgb(208, 208, 208);
+    border-bottom: 1px solid rgb(208, 208, 208);
+}
+
+.THIS tbody tr:nth-child(odd) {background: #FFFFFF}
+.THIS tbody tr:nth-child(even) {background: #F3F3F3}
+
+.THIS.slds-card{
+    border-width:0px !important;
+}
+.THIS .fa-disabled {
+    
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+}
+.THIS .slds-table thead th{
+	background-color: #003577;
+}
+.THIS .slds-button{
+    font-size: .875rem;
+}

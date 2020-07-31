@@ -1,0 +1,27 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+<div class="Container" >
+    
+      <c:NavigationCard title="Register to become a Taxi Holder" 
+                        description="(Release Planned) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus varius enim at neque volutpat convallis. Integer pulvinar elementum tortor a ornare. Nullam tellus justo, pellentesque vitae erat nec, lacinia congue purus."
+                        buttontext="Register"
+                        buttonhref="/taxilicence/s/taxi-registration"
+                        image="{!$Resource.p2p300x200 + '/p2p300x200/CityTraffic-300x200.jpg'}"
+                        hovertext="Register to become a Taxi Holder"/>
+
+      <c:NavigationCard title="Taxi Licence Portal" 
+                        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus varius enim at neque volutpat convallis. Integer pulvinar elementum tortor a ornare. Nullam tellus justo, pellentesque vitae erat nec, lacinia congue purus."
+                        buttontext="Login"
+                        buttonhref="/taxilicence/s/login/"
+                        image="{!$Resource.p2p300x200 + '/p2p300x200/PassingTaxi-300x200.jpg'}"
+                        hovertext="Taxi Licence Portal"/>
+
+      <c:NavigationCard title="Need Help? Contact Us." 
+                        description="(Release Planned) Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus varius enim at neque volutpat convallis. Integer pulvinar elementum tortor a ornare. Nullam tellus justo, pellentesque vitae erat nec, lacinia congue purus."
+                        buttontext="Contact Us"
+                        buttonhref=""
+                        image="{!$Resource.p2p300x200 + '/p2p300x200/TaxiRank-300x200.jpg'}"
+                        hovertext="Need Help? Contact Us."/>
+
+</div>
+	
+</aura:component>

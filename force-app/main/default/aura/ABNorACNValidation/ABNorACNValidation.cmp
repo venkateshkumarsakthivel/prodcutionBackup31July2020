@@ -1,0 +1,29 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ACNValidator" >
+    <aura:attribute name="isRequired" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="isReadOnly" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="isValid" type="Boolean" default="true" access="public"/>
+    <aura:attribute name="acn" type="String" default="" access="public" />
+    <aura:attribute name="companyName" type="String" default="" access="public" />
+    <aura:attribute name="fieldLabel" required="true" type="String" default="ACN" access="public"/>
+    <aura:attribute name="uniqueIdentifier" required="true" type="String" default="acn" access="public"/>
+    <aura:attribute name="isInitComplete" type="Boolean" default="false" access="private"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.validateAcn}"/>
+    <aura:method name="verifyAcn" action="{!c.validateAcnForSave}" />
+    
+    <div class="slds-grid slds-wrap">
+        <div class="{!v.uniqueIdentifier + 'Content slds-size--1-of-1 uiInput--default'}">
+            <aura:if isTrue="{!v.isRequired == false}">
+                <label class="slds-form-element__label" >{!v.fieldLabel}</label>
+            </aura:if>
+            <aura:if isTrue="{!v.isRequired == true}">
+                <label class="slds-form-element__label" >{!v.fieldLabel}&nbsp;<span class="requiredField">*</span></label>
+            </aura:if>
+            
+            <ui:inputText disabled="{!v.isReadOnly}"  value="{!v.acn}" blur="{!c.validateAcnForSave}" paste="{!c.validateAcn}" maxlength="11" class="slds-input"/>   	
+            <span class="{!v.uniqueIdentifier + 'Error slds-form-element__help' }"></span>
+        </div>
+    </div>
+    {!v.acn} <br/>
+    {!v.companyName}
+</aura:component>

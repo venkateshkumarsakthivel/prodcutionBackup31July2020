@@ -1,0 +1,66 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" controller="LegislationSearchController">
+    <aura:attribute name="recordtype" type="String" access="public" description="recordtype"/>
+    <aura:attribute name="placeholder" type="string" default="Search for Legislative Reference (min 3 char)..." access="public"/>
+    <aura:attribute name="placeholderSection" type="string" default="Search on Schedule/Section/Clause/Rule" access="public"/>
+    <aura:attribute name="searchString" type="string" default="" access="public" description="String to Search" />
+    <aura:attribute name="searchSection" type="string" default="" access="public" description="Section to Search" />
+    <aura:attribute name="searchStringLength" type="boolean" default="false" access="public" description="lenght of Search string is more than 2" />
+    <aura:attribute name="matchingLegislation" type="object[]" default="" access="public" description="Matching List of Legislation Records"/>
+    <aura:attribute name="addedLegislation" type="object[]"  access="public" description="List of Legislation Records that are added"/>
+    <aura:attribute name="existingLegislation" type="object[]"  access="public" description="List of Legislation Records that are added"/>
+    <aura:attribute name="addedLegislationCount" type="Integer" default="0" description="No of Legislation Selected"/>
+    <aura:attribute name="columns" type="List" default="" access="private" description="Legislation Record Columns"/>
+    <aura:attribute name="loaded" type="Boolean" default="false" />
+    
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }"/>
+    <aura:handler event="c:existLegislationEvent" action="{!c.existLegislationEventHandler}" />
+    <aura:handler event="c:cancelChangesEvent" action="{!c.cancelChangesEventHandler}" />
+    <aura:handler event="c:removeLegislationEvent" action="{!c.removeLegislationEventHandler}" />
+    <aura:registerEvent name="addLegislation" type="c:AddLegislationEvent"/>
+    
+    <div class="slds-form-element">
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem padding="around-small" size="6">
+                <div aura:id="lookupField">
+                    <lightning:input type="search" aura:id="inputLookup" id="combobox-id-1" role="textbox" class="inputBox" placeholder="{!v.placeholder}" onchange="{!c.searchRecords}" 
+                                     value="{!v.searchString}" aria-controls="listbox-id-1" autoComplete="off" variant="label-hidden">
+                    </lightning:input>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small" size="6">
+                <div aura:id="lookupField">
+                    <lightning:input type="search" aura:id="inputLookup" id="combobox-id-1" role="textbox" class="inputBox" placeholder="{!v.placeholderSection}" onchange="{!c.searchRecords}" 
+                                     value="{!v.searchSection}" aria-controls="listbox-id-1" autoComplete="off" variant="label-hidden">
+                    </lightning:input>
+                </div>
+            </lightning:layoutItem>
+            
+            <lightning:layoutItem padding="around-small" size="12">
+                <aura:if isTrue="{!v.searchStringLength}">
+                    <div>
+                        <p class="slds-p-bottom_small" style="text-align:left;">
+                            Searched Result
+                            <span class="slds-p-bottom_small" style="float:right;">
+                                Legislation added: {! v.addedLegislationCount}
+                            </span>
+                        </p>
+                        <div class="slds-p-around_x-small" style="height:220px; max-height:280">
+                            <aura:if isTrue="{! v.loaded }">
+                                <lightning:spinner alternativeText="Loading" size="medium" variant="brand"/>
+                            </aura:if>
+                            <lightning:datatable
+                                                 columns="{!v.columns}"
+                                                 data="{!v.matchingLegislation}"
+                                                 keyField="Id"
+                                                 onrowaction="{!c.handleRowAction}"
+                                                 onrowselection = "{!c.rowSelected}"
+                                                 hideCheckboxColumn = "true"
+                                                 enableInfiniteLoading="{! v.enableInfiniteLoading }"
+                                                 />
+                        </div>  
+                    </div>
+                </aura:if> 
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

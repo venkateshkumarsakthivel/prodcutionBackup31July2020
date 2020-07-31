@@ -1,0 +1,115 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" controller="TaxiManageAccountLicences">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.AddConditionStyles}" />
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="taxiLicence" type="Authorisation__c"/>
+    <aura:attribute name="taxiLicenceConfigMap" type="Map"/>
+    
+    <aura:attribute name="taxiLicenceApplicationId" type="String"/>
+    <aura:attribute name="taxiLicenceCPI" type="String" default="2"/>
+    <aura:attribute name="applicationFee" type="Decimal" default="0"/>
+    <aura:attribute name="licenceFee" type="Decimal" default="0"/>
+    <aura:attribute name="applicationPaymentFrequency" type="String" default="" />
+    <aura:attribute name="renewalAuthorisationName" type="String"/>
+    <aura:attribute name="renewalAuthorisationStartDate" type="Date"/>
+    <aura:attribute name="renewalAuthorisationEndDate" type="Date"/>
+    
+    <aura:attribute name="renderRenewalDetailsModal" type="Boolean" default="false"/>
+    <aura:attribute name="renderRenewalPaymentDetailsModal" type="Boolean" default="false"/>
+    <aura:attribute name="isPrivacyStatementAccepted" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:handler name="closeApplication" event="c:TaxiFormModalClosureEvent" action="{!c.navigateToPrivacyMessageBox}"/>
+    
+    <div id="renewalParent">
+        <div id="renewalDetails">
+            <aura:if isTrue="{!v.renderRenewalDetailsModal}">
+                
+                <div class="slds-grid">
+                    <div style="width: 50% !important;text-align:right;font-weight: bold;">
+                        Licence Holder Name:
+                    </div>
+                    <div style="width: 50% !important;margin-left: 10px;">
+                        <ui:outputText value="{!v.renewalAuthorisationName}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid">
+                    <div style="width: 50% !important;text-align:right;font-weight: bold;">
+                        Licence Start Date:
+                    </div>
+                    <div style="width: 50% !important;margin-left: 10px;">
+                        <ui:outputDate format="dd/MM/yyyy" value="{!v.renewalAuthorisationStartDate}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid">
+                    <div style="width: 50% !important;text-align:right;font-weight: bold;">
+                        Licence End Date:
+                    </div>
+                    <div style="width: 50% !important;margin-left: 10px;">
+                        <ui:outputDate format="dd/MM/yyyy" value="{!v.renewalAuthorisationEndDate}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid">
+                    <div style="width: 50% !important;text-align:right;font-weight: bold;">
+                        Application Fee:
+                    </div>
+                    <div style="width: 50% !important;margin-left: 10px;">
+                        <ui:outputCurrency value="{!v.applicationFee}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid">
+                    <div style="width: 50% !important;text-align:right;font-weight: bold;">
+                        Licence Fee:
+                    </div>
+                    <div style="width: 50% !important;margin-left: 10px;">
+                        <ui:outputCurrency value="{!v.licenceFee}"/>
+                    </div>
+                </div>
+                
+                <br/><br/>
+                <h4>{!$Label.c.Privacy_Statement_Header}</h4>
+                <div class="slds-form--stacked">
+                    <p>{!$Label.c.Privacy_Statement_Text_Content}</p><br/>
+                    <ul class="slds-is-nested slds-list--dotted">
+                        <li><a href="{!$Label.c.Privacy_statement_Link1}" target="_blank">
+                            {!$Label.c.Privacy_statement_Label1}
+                            </a></li>
+                        <li><a href="{!$Label.c.Privacy_statement_Link2}" target="_blank">
+                            {!$Label.c.Privacy_statement_Label2}
+                            </a></li>
+                        <li><a href="{!$Label.c.Privacy_statement_Link3}" target="_blank">
+                            {!$Label.c.Privacy_statement_Label3}
+                            </a></li>
+                        <li><a href="{!$Label.c.Privacy_statement_Link4}" target="_blank">
+                            {!$Label.c.Privacy_statement_Label4}
+                            </a></li>
+                        <li><a href="{!$Label.c.Privacy_statement_Link5}" target="_blank">
+                            {!$Label.c.Privacy_statement_Label5}
+                            </a></li>
+                    </ul>
+                    <br/>
+                    <ui:inputCheckbox disabled="{!v.readOnly}" aura:id="privacyDeclarationCheck" label="" value="{!v.isPrivacyStatementAccepted}" class="privacyCheckBox"/>I declare that I have read the privacy statement.
+                    <span id="privacyAcceptedError" class="customErrorMsg"></span>
+                    <br/>
+                    <br/>
+                    <div class="slds-align--absolute-center">
+                        <ui:button class="slds-button slds-button_brand" press="{!c.proceedToPayment}">Continue</ui:button>
+                    </div>
+                </div>
+            </aura:if>
+        </div>
+        
+        <div id="paymentDetails">
+            <aura:if isTrue="{!v.renderRenewalPaymentDetailsModal}">
+                <c:TaxiFormPaymentDetails applicationPaymentFrequency="{!v.applicationPaymentFrequency}" caseId="{!v.taxiLicenceApplicationId}" licenceRenewalFee="{!v.licenceFee}" applicationType="Renew"/>
+            </aura:if>
+        </div>
+    </div>
+</aura:component>

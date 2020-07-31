@@ -1,0 +1,179 @@
+<apex:page standardController="Case" extensions="CaseSWatchExtension">
+<apex:includeScript value="{!URLFOR($Resource.JqueryLatest)}"  />
+
+    <style>    
+        @font-face {
+        font-family: 'digital';
+        src: url("{!URLFOR($Resource.DigitalFonts,'digitalfont.ttf')}");
+        src: url("{!URLFOR($Resource.DigitalFonts,'digitalfont.ttf')}") format('truetype');
+        }
+        
+        .container {
+            padding: 200px;
+            text-align: center;
+        }
+        html{
+            overflow:hidden;
+        }
+        .timer {
+            padding: 10px;
+            background: linear-gradient(top, #222, #444);
+            display: inline-block;
+            border: 7px solid #efefef;
+            border-radius: 5px;
+            position: relative;
+            
+            box-shadow: 
+                inset 0 -2px 10px 1px rgba(0, 0, 0, 0.75), 
+                0 5px 20px -10px rgba(0, 0, 0, 1);
+        }
+        
+        .cell {
+            /*Should only display 1 digit. Hence height = line height of .numbers
+            and width = width of .numbers*/
+            width: 0.8em;
+            height: 40px;
+            font-size: 37px;
+            font-family: 'digital';
+            position: relative;
+            margin: 0 auto;
+          //  color: #707070;
+        }
+
+        .numbers {
+            width: 0.6em;
+            line-height: 40px;
+            font-family: digital, arial, verdana;
+            text-align: center;
+            color: #fff;
+            
+            position: absolute;
+            top: 0;
+            left: 0;
+            
+            /*Glow to the text*/
+            text-shadow: 0 0 5px rgba(255, 255, 255, 1);
+        }
+        
+        .cellName {
+        font-family: "Lucida Console", "Lucida Sans Typewriter", Monaco, "Bitstream Vera Sans Mono", monospace;
+        margin: 0 auto;
+       // color: #707070;
+        }
+        
+        .cellBlock {
+            float: left; 
+            -webkit-box-shadow: 10px 0px 5px -7px #888 ;
+        }
+        
+        .buttonBlock {
+            float: right; 
+            margin-left: 20px;
+        }
+        
+        .carvedhr {
+             clear: both; 
+             float: none; 
+             width: 98%; 
+             height: 2px;
+             margin:5px 0px 5px 1px;
+             border: none; 
+             background: #ddd;
+             background-image: -webkit-gradient(
+                 linear,
+                 left top,
+                 left bottom,
+                 color-stop(0.5, rgb(221,221,221)),
+                 color-stop(0.5, rgb(255,255,255))
+             );
+             background-image: -moz-linear-gradient(
+                 center top,
+                 rgb(221,221,221) 50%,
+                 rgb(255,255,255) 50%
+             );         
+        }
+        
+        .logoDiv {
+            height: 14px; 
+            float: right; 
+            padding-right:2%; 
+            padding-top:1.5%; 
+            margin-bottom:1.2%        
+        }               
+    </style>   
+
+    <script type="text/javascript">     
+       
+        var pauseTimer;
+        var isStarted = new Boolean(0);
+        var isPaused = new Boolean({!paused});
+        var startTimer = new Boolean({!startTimer});
+        var stopTimer = new Boolean({!stopTimer});
+        var confirmedStop = new Boolean(0); // used at oncomplete stop
+        var isAutoSave = true; // use this boolean to toggle auto save
+        var autoSaveCounter = 0;
+        var autoSaveTime = 2; // default auto save time 300 seconds
+
+        
+        function resume_timer(btnToChange) {
+             if (stopTimer == false) {
+                resumeTimer();
+            }
+        }
+    
+        function pause_timer() {
+            if (stopTimer == false) {
+                pauseTimer();
+            }
+          
+        }
+
+      
+
+        function onCompleteStop() {
+             window.top.location = document.referrer;
+        }
+    
+       
+    </script>
+    
+    <apex:pageMessages />
+    <apex:outputPanel rendered="{!permissionsAvailable}">   
+        <apex:form >
+            <div id="innerDiv" style="width:210px;">
+                <br/>
+                    <div class="timer">
+                        <div class="cellBlock" >
+                            <div class="cell">
+                                <div id="counterHour">
+                                    {!days}
+                                </div>
+                             </div>                        
+                             <div class="cellName">
+                                &nbsp; Days &nbsp;
+                             </div>
+                        </div>
+                    <div id="buttonBlock" class="buttonBlock">
+                        <div style="margin-top: 18px; margin-right: 8px;">     
+                            <apex:commandButton value="Pause" id="start1" action="{!pauseClock}" rendered="{!paused}"   />
+                            <apex:commandButton value="Resume" id="start" action="{!resumeClock}" rendered="{!paused}"   />
+                        </div>
+                        <div style="margin-top:4%;">
+                            <apex:commandButton value="Stop Timer" id="stopButton" onclick="stop_timer()" reRender="clockBlock" disabled="{!stopTimer}"  oncomplete=" return onCompleteStop()"/>
+                        </div>
+                    </div>
+                    <div style="padding-top:19.5%;">
+                        <hr class = "carvedhr" />
+                    </div>
+                                   
+               </div>  
+              
+                <apex:actionFunction name="resumeTimer" action="{!resumeClock}" reRender="clockBlock" />   
+               
+                <apex:actionFunction name="pauseTimer" action="{!pauseClock}" reRender="clockBlock" /> 
+                    
+                             
+            </div>     
+        </apex:form>
+    </apex:outputPanel>     
+</apex:page>

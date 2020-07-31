@@ -1,0 +1,23 @@
+<aura:component >
+        <aura:registerEvent name="filterEvent" type="c:ASPDashboardNavigationEvent"/>
+        <aura:registerEvent name="RefreshDVDQueryLogs" type="c:RefreshDVDQueryLogs"/>
+    	<aura:handler event="c:ASPDashboardTabNavigationEvent" action="{!c.renderfiltersHandler}"/>
+    
+        <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+        <div class="slds-grid slds-grid--vertical slds-navigation-list--vertical" style="color: #000000;">
+              <ul class="navigations">
+                <li style="padding: 0 0 0.5rem 0rem;" class="DriversListItem ListItem slds-is-active" aura:id="DriversListItem">
+                    <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Drivers" id="Drivers" onclick="{!c.renderfilt}">All Drivers</a>
+                </li>
+                <li style="padding: 0.5rem 0 0.5rem 0rem;" class="VehiclesListItem ListItem" aura:id="VehiclesListItem">
+                    <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Vehicles" id="Vehicles" onclick="{!c.renderfilt}">All Vehicles</a>
+                </li>
+                <li style="padding: 0.5rem 0 0.5rem 0rem;" class="DVDLogsListItem ListItem" aura:id="DVDLogsListItem">
+                    <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="DVDLogs" id="DVDLogs" onclick="{!c.renderfilt}">DVD Logs</a>
+                </li>
+                <li style="padding: 0.5rem 0 0.5rem 0rem;" class="HelpListItem ListItem" aura:id="HelpListItem">
+                    <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Help" id="Help" onclick="{!c.renderfilt}">Help</a>
+                </li>
+              </ul>
+         </div>
+</aura:component>

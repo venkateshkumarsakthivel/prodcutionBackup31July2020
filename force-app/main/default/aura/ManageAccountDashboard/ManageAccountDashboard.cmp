@@ -1,0 +1,42 @@
+<aura:component access="global">
+
+	<aura:attribute name="currentGrid" type="String"/>
+    
+	<aura:handler event="c:ASPManageAccountNavigationEvent" action="{!c.renderComponentHandler}"/>
+    <aura:handler name="navigatToCasesEvent" event="c:NavigateToCases" action="{!c.navigateToCases}"/>
+    <aura:handler name="refreshContactEvent" event="c:RefreshContactsEvent" action="{!c.refreshContacts}"/>
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <!--<lightning:spinner aura:id="spinner" variant="brand" size="large" />-->
+	<div class="slds-col slds-p-around_small container" >
+		<aura:if isTrue="{!v.currentGrid == 'Cases'}">
+			<c:ASPManageAccountCases />
+		</aura:if>
+
+		<aura:if isTrue="{!v.currentGrid == 'Account'}">
+			<c:ASPManageAccountAccounts />
+		</aura:if>
+
+		<aura:if isTrue="{!v.currentGrid == 'Contacts'}">
+			<c:ASPManageAccountContacts />
+		</aura:if>
+
+		<aura:if isTrue="{!v.currentGrid == 'Authorisation'}">
+			<c:ASPManageAccountAuthorisation />
+		</aura:if>
+        
+        <aura:if isTrue="{!v.currentGrid == 'Partners'}">
+			<c:ASPManageAccountPartners />
+		</aura:if>
+
+		<aura:if isTrue="{!v.currentGrid == 'Payments'}">
+			<c:ASPManageAccountPayments />
+		</aura:if>
+
+	</div>
+
+	<p>
+		{!v.body}
+	</p>
+
+	<div class="slds-backdrop slds-backdrop--hide" aura:id="backdrop"></div> 
+</aura:component>

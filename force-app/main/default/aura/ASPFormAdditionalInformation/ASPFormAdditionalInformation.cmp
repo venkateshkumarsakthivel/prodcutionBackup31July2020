@@ -1,0 +1,284 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPFormSectionDataController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <aura:attribute name="nationalPoliceUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="policeCertificateUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="caseId" type="String" />
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="entityType" type="String" default=""/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="withdrawnCase" type="Boolean" default="false"/>
+    <aura:attribute name="isInternalUser" type="Boolean" default="false"/>
+    
+    <aura:attribute name="disqualifyingOffenceDetails" type="String" default=""/>
+    <aura:attribute name="countryResidedDetails" type="String" default=""/>
+    <aura:attribute name="currentASPDetails" type="String" default=""/>
+    <aura:attribute name="aspRefusedDetails" type="String" default=""/>
+    
+    <aura:attribute name="licenceType" type="String" default="" />
+    
+    <aura:attribute name="disqualifyingOffenceInput" type="boolean" />
+    <aura:attribute name="residedInAustraliaInput" type="boolean" />
+    <aura:attribute name="currentASPInput" type="boolean" />
+    <aura:attribute name="aspRefusedInput" type="boolean" />
+    <aura:attribute name="associateDataProvided" type="Boolean"/>
+    <aura:attribute name="displayNationalCheckUpload" type="Boolean" default="false"/>
+    <aura:attribute name="displayPoliceCertificateUpload" type="Boolean" default="false"/>
+    
+    <aura:attribute name="nationalPoliceCheck" type="boolean" default="false"/>
+    <aura:attribute name="policeCertificateCheck" type="boolean" default="false"/>
+    
+    <aura:attribute name="aspCase" type="String"/>
+    
+    <aura:attribute name="isComplexApplication" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide fixedSpinner"/>
+    
+    <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit), not(v.withdrawnCase))}">
+        <c:ASPFormSectionProgressIndicator currentSection="{!$Label.c.Additional_Information_Header}" entityType="{!v.entityType}"/>
+        <br/>
+    </aura:if>
+    
+    <article class="slds-card" id="formPartAdditonalInfo">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#drafts'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">       
+                        {!$Label.c.Additional_Information_Header}
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!and(v.readOnly == true, v.withdrawnCase == false)}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                    <div style="float:right">   
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                            <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                        </ui:button>
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        <hr style="margin: 0 auto;"/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            
+            <div class="slds-form--stacked">
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>
+                
+                <div class="slds-grid">
+                    <div class="slds-col" style="width: 50% !important;">
+                        <label class="slds-form-element__label">
+                            Have you been convicted of or do you have current proceedings against you for a <a href="{!$Label.c.Disqualifying_Offence_Url}" target="_blank">disqualifying offence</a>&nbsp;<span class="requiredField">*</span>
+                        </label>
+                        <br/>
+                    </div>
+                    <div class="slds-col" style="width: 50% !important;">
+                        <ui:inputRadio value="{!if(v.disqualifyingOffenceInput == false, true, false)}" disabled="{!v.readOnly}" aura:id="NoDisqualifyingOffence" name="disqualifyingOffenceGroup" label="" change="{!c.disqualifyingOffenceChange}"/>&nbsp;No
+                        &nbsp;&nbsp;
+                        <ui:inputRadio value="{!if(v.disqualifyingOffenceInput == true, true, false)}" disabled="{!v.readOnly}" aura:id="YesDisqualifyingOffence" name="disqualifyingOffenceGroup" label="" change="{!c.disqualifyingOffenceChange}"/>&nbsp;Yes, provide details
+                        <br/>
+                        <span id="DisqualifyingOffenceError" class="customErrorMsg"></span>
+                    </div>
+                </div>
+                
+                <div class="slds-grid" style="padding-left: 2%;width:100%;">
+                    <div style="width: 80% !important;">
+                        <ui:inputTextarea disabled="{!v.readOnly}" aura:id="disqualifyingOffenceInputDetails" maxlength="1000" 
+                                          class="{!if(v.disqualifyingOffenceInput == true, '', 'toggleDisplay')}"
+                                          value="{!v.disqualifyingOffenceDetails}"/>
+                    </div>
+                    <div style="width: 20% !important;margin-left: 10px;">
+                    </div>
+                </div>
+                
+                <aura:if isTrue="{!v.readOnly == false}">
+	                 <div class="slds-grid">
+		                  <div class="slds-col">
+		                    <c:P2POTAttachment category="NPC" uploadStatus="{!v.nationalPoliceUploadStatus}" uniqueIdentifier="additional-national-police" FileUploadChecked="{!v.nationalPoliceCheck}" FileCheckLabel="National Police Check" aura:id="National-Police-Check" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of national police check" AllowMultiple="true" section="Additional Information" index="1" />  
+		                  </div>
+		                  <div class="slds-col"></div>
+	                 </div>
+                </aura:if>
+                
+                <div class="slds-grid">
+                    <div class="slds-col" style="width: 50% !important;">
+                        <label class="slds-form-element__label">{!$Label.c.Additional_Information_Resided_In_Australia}&nbsp;<span class="requiredField">*</span></label>
+                        <br/>
+                    </div>
+                    <div class="slds-col" style="width: 50% !important;">
+                        <ui:inputRadio value="{!if(v.residedInAustraliaInput == false, true, false)}" disabled="{!v.readOnly}" aura:id="ResidedInAustraliaNo" name="residedInAustraliaGroup" label="" change="{!c.residedInAustraliaChange}"/>&nbsp;No
+                        &nbsp;&nbsp;
+                        <ui:inputRadio value="{!if(v.residedInAustraliaInput == true, true, false)}" disabled="{!v.readOnly}" aura:id="ResidedInAustraliaYes" name="residedInAustraliaGroup" label="" change="{!c.residedInAustraliaChange}"/>&nbsp;Yes            
+                        <br/>
+                        <span id="ResidedInAustraliaError" class="customErrorMsg"></span>
+                    </div>
+                </div>
+                
+                <div class="slds-grid" style="padding-left: 2%;width:100%;">
+                    <div class="{!if(v.residedInAustraliaInput == false, 'notResidedInAustralia', 'toggleDisplay notResidedInAustralia')}"
+                         style="width: 50% !important;">
+                        <label class="slds-form-element__label">{!$Label.c.Additional_Information_Resided_Other_Country}&nbsp;<span class="requiredField">*</span></label>
+                    </div>
+                    <div class="{!if(v.residedInAustraliaInput == false, 'notResidedInAustralia', 'toggleDisplay notResidedInAustralia')}" 
+                         style="width: 50% !important;margin-left: 10px;">
+                        <ui:inputText disabled="{!v.readOnly}" aura:id="residedInOtherCountryDetails" maxlength="1000" value="{!v.countryResidedDetails}"/>
+                    </div>
+                </div>
+                
+                <aura:if isTrue="{!and(v.displayPoliceCertificateUpload, v.readOnly == false)}">
+	                 <div class="slds-grid">
+		                  <div class="slds-col">
+		                    <c:P2POTAttachment category="PCC" uploadStatus="{!v.policeCertificateUploadStatus}" uniqueIdentifier="additional-police-certificate" FileUploadChecked="{!v.policeCertificateCheck}" FileCheckLabel="Police Certificate from the country nominated in above question" aura:id="Police-Certificate-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of police certificate from country nominated" AllowMultiple="true" section="Additional Information" index="1" />  
+		                  </div>
+		                  <div class="slds-col"></div>
+	                 </div>
+                </aura:if>
+                
+                <div class="slds-grid">
+                    <div class="slds-col" style="width: 50% !important;">
+                        <label class="slds-form-element__label">{!$Label.c.Individual_Is_current_authorized_service_provider}&nbsp;<span class="requiredField">*</span></label>
+                        <br/>
+                    </div>
+                    <div class="slds-col" style="width: 50% !important;">
+                        <ui:inputSelect disabled="{!v.readOnly}" aura:id="Current-ASP-Input" class="slds-input" value="{!v.licenceType}">
+                            <ui:inputSelectOption text="" label="Please Select"/>
+                            <ui:inputSelectOption text="No"/>
+                            <ui:inputSelectOption text="Yes, Taxi Service"/>
+                            <ui:inputSelectOption text="Yes, Booking Service"/>
+                            <ui:inputSelectOption text="Yes, Combined (Taxi and Booking Service)"/>
+                        </ui:inputSelect>
+                    </div>     
+                </div>
+                
+                <!--
+                <div class="slds-grid">
+                    <div class="slds-col" style="width: 50% !important;">
+                    </div>
+                    <div class="slds-col" style="width: 50% !important;">
+                        <div class="currentASPHandler toggleDisplay">
+                            <input disabled="{!v.readOnly}" type="radio" name="currentASPServiceType" aura:id="Taxi" id="CurrentASP-Taxi" onchange="{!c.setLicenceType}" /> Taxi Service
+                            &nbsp;&nbsp;&nbsp;
+                            <input disabled="{!v.readOnly}" type="radio" name="currentASPServiceType" aura:id="Booking" id="CurrentASP-Booking" onchange="{!c.setLicenceType}" /> Booking Service
+                            &nbsp;&nbsp;&nbsp;
+                            <input disabled="{!v.readOnly}" type="radio" name="currentASPServiceType" aura:id="Taxi-and-Booking" id="CurrentASP-Taxi and Booking" onchange="{!c.setLicenceType}" /> <div style="display: inline;position: absolute;width: 162px;margin-left:5px;">Combined (Taxi and Booking Service)</div>
+                        </div>
+                        <span id="CurrentASPDetailsError" class="customErrorMsg"></span>
+                    </div>
+                </div>
+                -->
+                <div class="slds-grid">
+                    <div class="slds-col" style="width: 50% !important;">
+                        <label class="slds-form-element__label"><aura:unescapedHtml value="{!$Label.c.Individual_Has_had_authorization_refused}"/>&nbsp;<span class="requiredField">*</span></label>
+                        <br/>
+                    </div>
+                    
+                    <div class="slds-col" style="width: 50% !important;">
+                        <ui:inputRadio value="{!if(v.aspRefusedInput == false, true, false)}" disabled="{!v.readOnly}" aura:id="NoASPRefused" name="ASPRefusedGroup" label="" change="{!c.aspRefusedChange}"/>&nbsp;No
+                        &nbsp;&nbsp;
+                        <ui:inputRadio value="{!if(v.aspRefusedInput == true, true, false)}" disabled="{!v.readOnly}" aura:id="YesASPRefused" name="ASPRefusedGroup" label="" change="{!c.aspRefusedChange}"/>&nbsp;Yes, provide details
+                        <br/>
+                        <span id="ASPRefusedError" class="customErrorMsg"></span>
+                    </div>    
+                </div>
+                
+                <div class="slds-grid" style="width:80%;">
+                    <div class="slds-col refusedASPHandler"  style="padding-top:0%;">
+                      <ui:inputTextarea class="{!if(v.aspRefusedInput == true, '', 'toggleDisplay')}"
+                                        disabled="{!v.readOnly}" aura:id="aspRefusedInputDetails" maxlength="1000" 
+                                        value="{!v.aspRefusedDetails}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <label class="slds-form-element__label">
+                            Do you have a <a href="{!$Label.c.Disqualifying_Offence_Url}" target="_blank">close associate:</a> &nbsp;<span class="requiredField">*</span>
+                        </label>
+                        <br/>
+                        <ul class="slds-list--dotted">
+                            <li class="slds-item">
+                                who has been convicted of or has current proceedings against them for a disqualifying offence, or
+                            </li>
+                            <li class="slds-item">
+                                who was a holder of an authorisation under the Point to Point Transport (Taxis and Hire Vehicles) Act 2016 that was cancelled or whose most recent application for any such authorisation was refused, or
+                            </li>
+                            <li class="slds-item">
+                                who was the holder of an accreditation, or an authorisation to operate a taxi-cab network, under the Passenger Transport Act 1990 that was cancelled, or whose most recent application for any such accreditation or authorisation was refused, or
+                            </li>
+                            <li class="slds-item">
+                                who was the holder of an accreditation to operate a public passenger service under the Passenger Transport Act 2014 that was cancelled, or whose most recent application for any such accreditation was refused
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="slds-grid">
+                    <div class="slds-col" style="padding-top: 0%;">
+                        <ui:inputRadio value="{!if(v.associateDataProvided == false, true, false)}" disabled="{!v.readOnly}" aura:id="NoAssociate" name="associateGroup" label="" change="{!c.associateChange}"/>&nbsp;No
+                        &nbsp;&nbsp;
+                        <ui:inputRadio value="{!if(v.associateDataProvided == true, true, false)}" disabled="{!v.readOnly}" aura:id="YesAssociate" name="associateGroup" label="" change="{!c.associateChange}"/>&nbsp;Yes
+                        <br/>
+                        <span id="NoAssociateError" class="customErrorMsg"></span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="slds-card__footer">
+            
+            <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveFormState}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Finish Later
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+            <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                </ui:button>
+            </aura:if>
+            
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

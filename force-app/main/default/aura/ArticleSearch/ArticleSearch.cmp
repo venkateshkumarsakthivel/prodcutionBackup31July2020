@@ -1,0 +1,25 @@
+<aura:component implements="forceCommunity:searchInterface,forceCommunity:availableForAllPageTypes" access="global">
+      <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    <aura:attribute name="currentTopic" type="String" access="private"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <style>
+        [data-topic-id="{!v.currentTopic}"] {            
+            color: #c60c30!important;
+        }
+    </style>
+ <aura:attribute name="searchstring" type="string"/>
+    <div class="search">
+        <div class="search-wrapper">
+                <div class="search-input-wrapper">
+                    <ui:inputText value="{!v.searchstring}" aura:id="searchstring" keyup="{!c.checkForEnter}" placeholder="Search Articles" />
+                      <span style="cursor:pointer;padding-bottom:8px;" class="slds-truncate questionmark" id="searchArtice" onclick="{!c.checkForEnter}">
+                          		 <i class="fa fa-search" aria-hidden="true" style="font-size: 1.25em;color: grey;margin-left: -5%;"></i>
+                	           <!-- <c:svgIcon class="dashboard_icon" svgPath="/resource/slds221/assets/icons/utility-sprite/svg/symbols.svg#search"
+                                           category="utility" size="x-small" name="searchIcon" >
+                                </c:svgIcon> -->
+                      </span>
+                   
+				</div>
+        </div>
+     </div>
+</aura:component>

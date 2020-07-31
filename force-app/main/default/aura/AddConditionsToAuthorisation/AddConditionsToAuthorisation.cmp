@@ -1,0 +1,103 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" controller="AuthorisationVsConditionsHandler" access="global">
+    
+    <ltng:require styles="{!$Resource.AddConditionStyles}" />
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    
+    <aura:attribute name="aspConditions" type="Condition__c[]" />
+    <aura:attribute name="customConditions" type="Condition__c[]" />
+    <aura:attribute name="buttonText" type="String[]" />
+    <aura:attribute name="recordId" type="Id" access="public"/>
+    <aura:attribute name="selectedConditions" type="Integer[]" />
+    <aura:attribute name="internalNote" type="String" />
+    <aura:attribute name="conditionDetails" type="String" />
+    
+    <aura:attribute name="isValidToAddConditions" type="Boolean" default="true"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.retrieveConditions}" />    
+    
+    <aura:if isTrue="{!not(v.isValidToAddConditions)}">
+    <div aura:id="variationError" class="slds-notify slds-notify--alert slds-theme_error slds-theme--alert-texture toggle" role="alert">
+        <span style="color: #ffffff;font-weight: bold;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            &nbsp;Conditions can be added only when status is New, Draft and Review Pending.
+        </span>
+    </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isValidToAddConditions}">
+    <table>
+        <tr><td>
+        <h1 class="condition-title" style="color: #000000;">Add/Remove Conditions</h1>
+        <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+            <span style="color: #ffffff;">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                &nbsp;Please specify required fields highlighted below in red and try again.
+            </span>
+        </div>
+        
+        <form>
+            <table>
+            <tr class="slds-grid border-box">
+                
+                <th class="slds-col" style="width:45%;">Condition Details</th>
+                <th class="slds-col" style="width:45%;">Internal Notes</th>
+                <th class="slds-col slds-align--absolute-center" style="width:10%;">Select</th>
+            </tr>
+            <aura:iteration items="{!v.aspConditions}" var="condition" indexVar="index">
+                
+                
+                <tr class="slds-grid">
+                    
+                    <td class="slds-col condition_input_field" style="width:45%;">
+                        <aura:if isTrue="{!condition.Master_Condition__c != null}">
+                            <ui:outputRichText value="{!condition.Condition_Details__c}"/>
+                            <aura:set attribute="else">
+                                <ui:inputTextArea value="{!condition.Condition_Details__c}" rows="3" class="{!'condition_detail_error_'+index}"/>
+                                <span class="{!'required_input_'+index}"></span>
+                            </aura:set>   
+                        </aura:if>
+                    </td>
+                    
+                    <td class="slds-col" style="width:45%;">
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <ui:inputTextArea value="{!condition.Internal_Notes__c}" class="slds-textarea" maxlength="1000" rows="3" />
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td class="slds-col slds-align--absolute-center" style="width:10%;">
+                        <aura:if isTrue="{!condition.Id != null}">
+                            <input type="checkbox"  class="uiInput--checkbox" checked="checked" id="{!index}"/>
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!condition.Master_Condition__c == null}">
+                                <input type="checkbox" class="uiInput--checkbox" id="{!index}"/>
+                                	<aura:set attribute="else">
+                                        <input type="checkbox"  class="uiInput--checkbox" id="{!index}"/>
+                                    </aura:set>
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>
+                    </td>
+                </tr>
+            </aura:iteration>
+            </table>
+        </form>
+            </td></tr>
+    </table>
+    
+    <div class="slds-card__footer">
+        <ui:button class="slds-button slds-button--neutral marginleft" press="{!c.cancelModal}">
+            <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+        </ui:button>
+        <ui:button class="slds-button slds-button--neutral" press="{!c.addCondition}">
+            <i style="color:#54698d !important;" class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add more
+        </ui:button>
+        <ui:button class="slds-button slds-button--neutral marginleft" press="{!c.attachASPConditions}">
+            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+        </ui:button>
+    </div>
+    </aura:if>
+    
+</aura:component>

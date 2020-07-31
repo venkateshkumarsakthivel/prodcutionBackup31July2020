@@ -1,0 +1,25 @@
+<aura:component implements="force:hasRecordId,force:hasSObjectName,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" 
+                access="global" >
+    <lightning:empApi aura:id="empApi" />
+    <aura:attribute name="uniqueName" type="String" default=""/>
+    
+    <aura:handler event="c:refreshCardsEvent" action="{!c.refreshCards}"/>
+
+    <lightning:overlayLibrary aura:id="overlayLib"/> 
+    <aura:attribute name="subscription" type="object" />
+	
+    <aura:attribute name="width" type="String"/>
+    <lightning:flexipageRegionInfo width="{!v.width}"/>
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:if isTrue="{! v.uniqueName != ''}">
+            <c:childVisualiser aura:id="childVisualiser"
+                               uniqueName="{!v.uniqueName}"
+                               objectApiName="{!v.sObjectName}"
+                               recordId="{!v.recordId}"
+                               onbuttonclicked="{!c.buttonclicked}"
+                               onexit="{!c.disconnect}"
+                               containerWidth="{!v.width}"/>
+    </aura:if>
+</aura:component>

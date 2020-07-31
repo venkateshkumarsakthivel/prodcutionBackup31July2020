@@ -1,0 +1,40 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="CommunityHomePageRouterController">
+    
+    <aura:attribute name="showASPDownTimeAlert" type="Boolean" default="false"/>
+    <aura:attribute name="aspDownTimeAlertMessage" type="String" default=""/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div class="Container" >
+        <span class = "heading1"> Welcome to the Industry Portal</span> <br></br>
+        <div class="slds-text-color_inverse slds-text-title_caps slds-text-title_bold" style="padding:0.5rem;background:#FF0000">Coronavirus (COVID-19) SPECIAL REPORTING INSTRUCTIONS FOR INFORMATION <a href="https://www.pointtopoint.nsw.gov.au/coronavirus-covid-19-updates#Reporting%20COVID-19%20related%20Notifiable%20Occurences" class="slds-text-link_reset" target="_blank">CLICK HERE</a></div>
+        <span class = "heading2">The Industry Portal assists Service Providers and Taxi Licensees to manage their safety obligations under the new regulatory framework.</span><br/>
+        <span class = "heading3">If you hold an Authorisation and/or Taxi licence, you can login through either the Authorised Service Provider or Taxi Licence gateways below.</span> <br/>
+        
+        <c:NavigationCard title="" 
+                          description="{!$Label.c.Register_Tile_Text}"
+                          buttontext="Register"
+                          buttonhref="/industryportal/s/applicant-registration"
+                          image="{!$Resource.p2p300x200 + '/p2p300x200/CityTraffic-300x200.jpg'}"
+                          hovertext="Navigate To Registration"/>
+        
+        <c:NavigationCard title="" 
+                          description="{!$Label.c.ASP_Tile_Text}"
+                          buttontext="Login"
+                          buttonhref="{!'/industryportal/s/login'}" 
+                          image="{!$Resource.p2p300x200 + '/p2p300x200/PassingTaxi-300x200.jpg'}"
+                          hovertext="Navigate To Industry Portal"
+                          showDownTimeAlert="{!v.showASPDownTimeAlert}"
+                          downTimeAlertMessage="{!v.aspDownTimeAlertMessage}"/>
+        
+        <c:NavigationCard title="" 
+                          description="{!$Label.c.Taxi_Tile_Text}"
+                          taxiAgentRegistrationLinkhref="{!'/taxilicence/s/taxi-agent-registration'}"
+                          taxiAgentRegistrationLink="Register as an Agent"
+                          buttontext="Login"
+                          buttonhref="{!'/taxilicence/s/login'}"
+                          image="{!$Resource.p2p300X200Tile}"
+                          hovertext="Navigate To Taxi Portal"/>
+    </div>
+    
+</aura:component>

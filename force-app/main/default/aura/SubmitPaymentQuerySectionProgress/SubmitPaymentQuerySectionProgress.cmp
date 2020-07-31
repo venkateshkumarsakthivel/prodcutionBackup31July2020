@@ -1,0 +1,22 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+	<aura:attribute name="currentSection" type="String" default="Blank"/>
+    
+    <div class="slds-grid" >
+        <div class="slds-tabs--path" role="application">
+            <ul class="slds-tabs--path__nav" role="tablist">
+   
+                <li title="{!$Label.c.Submit_Payment_Query_Chevron_Title_1}" class="{!v.currentSection != 'Customer Enquiry Details' ? 'slds-tabs--path__item  slds-is-current' : 'slds-tabs--path__item  slds-is-customcomplete'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-96" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Submit_Payment_Query_Chevron_Title_1}</span>
+                    </a>
+                </li>
+            
+               <li title="{!$Label.c.Submit_Payment_Query_Chevron_Title_2}" class="{!v.currentSection == 'Customer Enquiry Details'  ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == 'Attachment' ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-96" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Submit_Payment_Query_Chevron_Title_2}</span>
+                    </a>
+                </li>                
+            </ul>
+        </div>
+    </div>
+</aura:component>

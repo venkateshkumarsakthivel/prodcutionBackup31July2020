@@ -1,0 +1,63 @@
+.THIS .sectionTitleNote {
+    
+    color: red;
+}
+
+.THIS .dashboard_icon {
+    
+    fill:#54698d !important;
+}
+
+.THIS .slds-required {
+    text-decoration:none !important;
+}
+
+.THIS .head {
+    
+    fill:#FFF !important;
+    background-color: #a094ed;
+}
+
+.THIS .othertypes {
+    
+    padding-left: 25px;
+}
+
+.THIS .feeTable {
+    
+    border-collapse: collapse;
+    width: 50%;
+}
+
+.THIS .feetableHeader {
+    
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+    background-color: #dddddd;
+}
+
+.THIS td, .THIS th {
+    
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+.THIS .slds-icon-standard-work_order{
+    background-color: #34becd;
+}
+.THIS .slds-icon-standard-contact{
+    background-color: #34becd;
+}
+.THIS .slds-icon-standard-document{
+    background-color: #34becd;
+}
+.THIS .slds-input[disabled] {
+    background-color: #f3f3f3!important;
+    border-color: rgb(208, 208, 208)!important;
+}
+.THIS select[disabled]{
+    background-color: #f3f3f3!important;
+    border-color: rgb(208, 208, 208)!important;
+}

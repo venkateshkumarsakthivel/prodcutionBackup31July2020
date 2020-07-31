@@ -1,0 +1,124 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPManageAccountAccount">
+    
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="hideDeliveryDocPreference" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="acc" type="Account" />
+    <aura:attribute name="baseUrl" type="String" default="$A.get('$Label.c.Taxi_Community_Base_Url')" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand"  size="large" ></lightning:spinner>
+    
+    <article class="slds-card" id="accountComponent">
+        <div class="slds-page-header">
+            <div class="slds-grid">
+                <div class="slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                       svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="account">
+                            </c:svgIcon>
+                        </div>
+                        <div class="slds-media__body"> 
+                            <aura:if isTrue="{!v.hideDeliveryDocPreference == true}"> 
+                                <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.AGENT_ACCT_MGMT_Header} - {!v.acc.Customer_Number__c}</p>
+                                <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="{!v.acc.Name}">{!v.acc.Name}</h2>
+                            </aura:if>
+                            <aura:if isTrue="{!and(v.accountId == '', v.hideDeliveryDocPreference == false)}"> 
+                                <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.ASP_ACCT_MGMT_Header} - {!v.acc.Customer_Number__c}</p>
+                                <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="{!v.acc.Name}">{!v.acc.Name}</h2>
+                            </aura:if>
+                            <aura:if isTrue="{!and(v.accountId != '', v.hideDeliveryDocPreference == false)}"> 
+                                <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.AGENT_LICENCE_HOLDER_MGMT_Header} - {!v.acc.Customer_Number__c}</p>
+                                <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="{!v.acc.Name}">{!v.acc.Name}</h2>
+                            </aura:if>
+                            
+                        </div>
+                        
+                        <!--Hidding the button if agent is viewing this screen-->
+                        <aura:if isTrue="{!and(v.accountId == '', v.hideDeliveryDocPreference == false)}">
+                            <a href="{!baseUrl + 'taxi-wat-application?src=myApplicationMenu'}" target="_blank">
+                                <ui:button class="slds-button slds-button--neutral headerButtons"> 
+                                    <i style="color:#54698d !important;" class="fa fa-file-text" aria-hidden="true"></i>&nbsp;&nbsp;New WAT Application
+                                </ui:button>
+                            </a>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+            <span style="color: #ffffff;">
+                <i class="fa fa-check" aria-hidden="true"></i>
+                &nbsp;{!$Label.c.ASP_ACCT_MGMT_Error_Msg}
+            </span>
+        </div>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <div class="slds-grid">
+                    <div class="slds-col"  style="width:50%;">
+                        <label class="slds-form-element__label">Entity Type</label>
+                        <ui:inputText disabled="true" value="{!v.acc.RecordType.Name}" class="slds-output slds-input"/>
+                    </div>
+                    <div class="slds-col" style="width:50%;">
+                        <c:ABNComponent isReadOnly="{!if(v.accountId == '', false, true)}" aura:id="ABN-Input" uniqueIdentifier="ABN-Input" businessName="{!v.acc.Registered_Business_Name__c}"
+                                        fieldLabel="{!$Label.c.ASP_ACCT_MGMT_ABN}" isRequired="false" abn="{!v.acc.ABN__c}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-col" style="width:50%">
+                        <c:EmailAddressComponent isReadOnly="{!if(v.accountId == '', false, true)}" aura:id="Email-Input" uniqueIdentifier="Email-Input" fieldLabel="{!$Label.c.ASP_ACCT_MGMT_Email}" isRequired="true" email="{!v.acc.Email__c}"/>
+                    </div>
+                    <div class="slds-col"  style="width:50%;">
+                        <c:PhoneComponent isReadOnly="{!if(v.accountId == '', false, true)}" aura:id="Daytime-Phone-Input" uniqueIdentifier="Daytime-Phone-Input" fieldLabel="Daytime Phone Number" isRequired="false" phoneNumber="{!v.acc.Phone}" />
+                    </div>
+                    
+                </div>
+                
+                <div class="slds-grid slds-wrap">
+                    
+                    <aura:if isTrue="{!v.hideDeliveryDocPreference == false}">
+                        <div class="slds-col" style="width:50%">
+                            <label class="slds-form-element__label">{!$Label.c.ASP_ACCT_MGMT_PREFERRED_COMM_MODE}&nbsp;<span class="requiredField">*</span></label>
+                            <ui:inputSelect class="slds-input" disabled="{!if(v.accountId == '', false, true)}" aura:id="Delivery-Preference" value="{!v.acc.Document_Delivery_Preference__c}" change="{!c.onChangeDocumentDeliveryPreference}">
+                                <ui:inputSelectOption text="" label="Please Select"/>
+                                <ui:inputSelectOption text="Email" label="Email"/>
+                                <ui:inputSelectOption text="Letter" label="Letter"/>
+                            </ui:inputSelect>
+                        </div>
+                    </aura:if>
+                    
+                    <div class="slds-col" style="width:50%">
+                        <c:EmailAddressComponent isReadOnly="{!if(v.accountId == '', false, true)}" aura:id="Notice-Email-Input" uniqueIdentifier="NoticeEmail-Input" fieldLabel="{!$Label.c.ASP_ACCT_MGMT_NOTICE_EMAIL}" isRequired="{!v.acc.Document_Delivery_Preference__c == 'Email'}" email="{!v.acc.Notice_Email__c}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid">
+                    <div class="slds-col" style="width:50%;">
+                        <label class="slds-form-element__label">{!$Label.c.ASP_ACCT_MGMT_Notice_Address}&nbsp;<span id="Notice-Address-Label-Span" class="requiredField">{!v.acc.Document_Delivery_Preference__c == 'Letter' ? '*' : ''}</span></label>
+                        <c:AddressInputComponent aura:id="Notice-Address" street="{!v.acc.Notice_Address_Street__c}" city="{!v.acc.Notice_Address_City__c}"
+                                                 state="{!v.acc.Notice_Address_State__c}" postalcode="{!v.acc.Notice_Address_Postal_Code__c}"
+                                                 fullStreet="{!v.acc.Notice_Address_Street__c}" 
+                                                 isReadOnly="{!if(v.accountId == '', false, true)}"/>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        <div class="slds-card__footer">
+            <!--Hidding the button if agent is viewing this screen-->
+            <aura:if isTrue="{!v.accountId == ''}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveAccountDetail}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;{!$Label.c.ASP_ACCT_MGMT_Save_Btn}
+                </ui:button>
+            </aura:if>
+        </div>
+    </article>
+</aura:component>

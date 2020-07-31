@@ -1,0 +1,47 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+	
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="authorisationAgentRecord" type="Authorisation_Agent__c" />
+    
+    <div class="slds-card__body">
+        
+        <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col" >
+                Agency Name
+            </div>
+            <div class="slds-col" >
+                <ui:outputText class="slds-float_right" value="{!v.authorisationAgentRecord.Account__r.Name}"/>
+            </div>
+        </div>
+        
+        <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col" >
+                Agreement Type
+            </div>
+            <div class="slds-col" >
+                <ui:outputText class="slds-float_right" value="{!v.authorisationAgentRecord.Agreement_Type__c}"/>
+            </div>
+        </div>
+        
+        <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col" >
+                Approved Date
+            </div>
+            <div class="slds-col" >
+                <ui:outputDate class="slds-float_right" value="{!v.authorisationAgentRecord.Approved_Date__c}" format="dd/MM/yyyy"/>
+            </div>
+        </div>
+        
+        <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col" >
+                Expiry Date
+            </div>
+            <div class="slds-col" >
+                <ui:outputDate class="slds-float_right" value="{!v.authorisationAgentRecord.Expiry_Date__c}" format="dd/MM/yyyy"/>
+            </div>
+        </div>
+        
+    </div>
+    
+</aura:component>

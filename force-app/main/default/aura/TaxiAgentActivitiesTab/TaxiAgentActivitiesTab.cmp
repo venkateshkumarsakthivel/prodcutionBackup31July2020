@@ -1,0 +1,89 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiAgentActivitiesTabController">
+    
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="acc" type="Account" />
+    <aura:attribute name="casesList" type="Case[]"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-show"/>
+    
+    <div id="clientAccountsTable" class="slds-grid slds-grid--vertical scrollable tableTop slds-border_top slds-card">
+        
+        <div class="slds-scrollable slds-grow">
+            <div class="slds-page-header">
+                <div class="slds-grid">
+                    <div class="slds-col slds-has-flexi-truncate">
+                        <div class="slds-media slds-no-space slds-grow">
+                            <div class="slds-media__figure">
+                                <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                           svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="fleet">
+                                </c:svgIcon>
+                            </div>
+                            <div class="slds-media__body" style="text-align:left;"> 
+                                <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.AGENT_ACCT_MGMT_Header} - {!v.acc.Customer_Number__c}</p>
+                                <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="{!v.acc.Name}">{!v.acc.Name}</h2>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="height: 450px;overflow-x:hidden;display: block;">
+                
+                <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered slds-table--striped slds-no-row-hover" style="background-color: #003577;">
+                    <thead style="background: #003577;">
+                        <tr class="slds-line-height--reset">
+                            <th scope="col"  class="tabCol" style="width:10%">
+                                <div class="slds-text-title--caps slds-text-align--center" title="Application Number">
+                                    <span class=" tableheader" title="Case Number" id="caseNumber">
+                                        Case Number
+                                    </span>
+                                </div>
+                            </th>
+                            <th scope="col" class="tabCol" style="width:30%">
+                                <div class="slds-text-title--caps" title="Application Type">
+                                    <span class=" tableheader" title="Application Type">Request</span>
+                                </div>
+                            </th>
+                            <th scope="col"  class="tabCol" style="width:10%">
+                                <div class="slds-text-title--caps" title="Request Status">
+                                    <span class=" tableheader" title="Request Status" id="Status">
+                                        Request Status
+                                    </span>
+                                </div>
+                            </th>
+                            <th scope="col" class="tabCol" style="width:10%">
+                                <div class="slds-text-title--caps slds-text-align--center" title="Date Lodged">
+                                    <span class="tableheader" title="Date Lodged">Date Lodged</span>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="casesTableBody">
+                        
+                        <aura:iteration var="record" items="{!v.casesList}">
+                            
+                            <tr class="slds-line-height--reset">
+                                
+                                <td role="gridcell" class="tabCol">
+                                    <ui:outputText class="slds-align--absolute-center" value="{!record.CaseNumber}"/> 
+                                </td>
+                                <td role="gridcell" class="tabCol">
+                                    <ui:outputText class="slds-float_left slds-truncate wrap" value="{!'Register '+record.Account.Name+' as an agent for '+record.Licence_Holder_Name__c}"/> 
+                                </td>
+                                <td role="gridcell" class="tabCol">
+                                    <ui:outputText class="slds-float_left" value="{!record.Status}"/> 
+                                </td>
+                                <td role="gridcell" class="tabCol">
+                                    <ui:outputDate class="slds-align--absolute-center" value="{!record.Date_Submitted__c}"/> 
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</aura:component>

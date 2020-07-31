@@ -1,0 +1,4 @@
+<!-- c:AddLegislationEvent-->
+<aura:event type="APPLICATION" description="Add Legislation to Case or Notice Record" >
+    <aura:attribute name="selectedLegislation" type="Object"/>
+</aura:event>

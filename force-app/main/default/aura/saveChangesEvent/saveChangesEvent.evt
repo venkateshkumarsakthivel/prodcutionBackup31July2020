@@ -1,0 +1,4 @@
+<!-- c:saveChangesEvent-->
+<aura:event type="APPLICATION" description="save Changes done for Adding Legislation to Case or Notice Record" >
+
+</aura:event>

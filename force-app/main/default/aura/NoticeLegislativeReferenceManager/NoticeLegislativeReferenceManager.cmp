@@ -1,0 +1,12 @@
+<aura:component implements="lightning:availableForFlowScreens,force:hasRecordId" access="global">
+    <aura:attribute name="recordtype" type="String" access="public" description="recordtype"/>
+    <aura:attribute name="caseId" type="String" access="public" description="Case Id of Notice" default=""/>
+    <aura:attribute name="recordId" type="String" access="public" description="Record Id of Notice" default=""/>
+
+    <c:CaseLegislationReferenceSelector caseId="{!v.caseId}" recordId="{!v.recordId}" recordtype="{!v.recordtype}"/>
+    <br/>
+    <div >
+        <c:NoticeLegislationReference noticeId="{!v.recordId}" recordtype="{!v.recordtype}" availableActions="{!v.availableActions}"
+                                      navigateFlowEvent="{!c.handleNavigate}"/>
+    </div>     
+</aura:component>

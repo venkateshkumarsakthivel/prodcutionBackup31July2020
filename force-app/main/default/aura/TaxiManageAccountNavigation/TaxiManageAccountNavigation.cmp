@@ -1,0 +1,35 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiManageAccountNavigationController">
+    
+    <aura:attribute name="accountId" type="String" default=""/>
+    
+    <aura:registerEvent name="filterEvent" type="c:TaxiManageAccountNavigationEvent"/> 
+    <aura:handler event="c:redirectToCaseActivity" action="{!c.redirectToActivity}"/>
+    <aura:handler event="c:NavigateFocusToCases" action="{!c.navigateFocusToCases}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="renderPartners" type="Boolean" default="false"/>
+    
+    <div class="slds-no-print slds-grid slds-grid--vertical slds-navigation-list--vertical" style="color: #000000;">
+        <ul class="navigations">
+            <li style="padding: 0 0 0.5rem 0rem;" class="CasesListItem ListItem slds-is-active" aura:id="CasesListItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Cases" id="Cases" onclick="{!c.renderfilter}">Activities</a>
+            </li>
+            <li style="padding: 0.5rem 0 0.5rem 0rem;" class="AccountItem ListItem" aura:id="AccountItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Account" id="Account" onclick="{!c.renderfilter}">Account</a>
+            </li>
+            <li style="padding: 0.5rem 0 0.5rem 0rem;" class="ContactsListItem ListItem" aura:id="ContactsListItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Contacts" id="Contacts" onclick="{!c.renderfilter}">Contacts</a>
+            </li>
+            <li style="padding: 0.5rem 0 0.5rem 0rem;" class="LicencesListItem ListItem" aura:id="LicencesListItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Licences" id="Licences" onclick="{!c.renderfilter}">Taxi Licences</a>
+            </li>
+            <aura:if isTrue="{!v.renderPartners}">
+                <li style="padding: 0.5rem 0 0.5rem 0rem;" class="PartnersListItem ListItem" aura:id="PartnersListItem">
+                    <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Partners" id="Partners" onclick="{!c.renderfilter}">Partners</a>
+                </li>
+            </aura:if>
+            <li style="padding: 0.5rem 0 0.5rem 0rem;" class="PaymentsListItem ListItem" aura:id="PaymentsListItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Payments" id="Payments" onclick="{!c.renderfilter}">Payments</a>
+            </li>
+        </ul>
+    </div>
+</aura:component>

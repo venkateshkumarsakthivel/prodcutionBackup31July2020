@@ -1,0 +1,73 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.TaxiLicenceActionStyle}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}"/>
+    
+    <aura:attribute name="caseId" type="String"/>
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="entityType" type="String"/>
+    
+    <aura:attribute name="applicationType" type="String" default="New"/>
+    
+    <aura:attribute name="sectionNameToRender" type="String" default="sectionA"/>
+    
+    <aura:handler name="loadSection" event="c:ASPFormSectionEvent" action="{!c.updateSectionHandlers}"/>
+    <aura:handler name="closeApplication" event="c:TaxiFormModalClosureEvent" action="{!c.closeApplication}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <br/>
+    
+    <div id="aspFormContainer">
+        <aura:If isTrue="{!v.sectionNameToRender == 'sectionA'}">
+            <c:ASPFormPartA aura:id="applicantDetails" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}" applicationType="{!v.applicationType}" applicationSource="{!v.applicationSource}"></c:ASPFormPartA>
+        </aura:If>
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'sectionB'}">
+            <c:ASPFormPartB caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormPartB>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'sectionAdditionalInfo'}">
+            <c:ASPFormAdditionalInformation caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormAdditionalInformation>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'sectionC'}">
+            <c:ASPFormPartC isFromPortal="false" caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormPartC>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'sectionC-P'}">
+            <c:ASPFormPartC_Partnership caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormPartC_Partnership>
+        </aura:if>
+        
+        <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Company Partner')}">
+            <c:ASPFormPartC_IndividualPartnership caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="true"></c:ASPFormPartC_IndividualPartnership>
+        </aura:if>
+        
+        <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Individual Partner')}">
+            <c:ASPFormPartC_IndividualPartnership caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="false"></c:ASPFormPartC_IndividualPartnership>
+        </aura:if>
+        
+        <!--
+        <aura:if isTrue="{!v.sectionNameToRender == 'sectionE'}">
+            <c:ASPFormPartE caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormPartE>
+        </aura:if>
+        -->
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'sectionDVDAccess'}">
+            <c:ASPFormDVDAccess caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormDVDAccess>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'sectionG'}">
+            <c:ASPFormPartG caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormPartG>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'review'}">
+            <c:ASPFormReview caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormReview>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'sectionH'}">
+            <c:PSPBankDetailsForm accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:PSPBankDetailsForm>
+        </aura:if>
+    </div>
+</aura:component>

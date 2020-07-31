@@ -1,0 +1,54 @@
+@font-face {
+    font-family: 'Gotham-Book';
+    src: url(/taxilicence/resource/GothamBookRegular);
+}
+.THIS {
+    
+    font-family: 'Gotham-Book' !important;
+}
+
+.THIS .slds-navigation-list--vertical__action{
+	
+    text-align:left;
+    padding: 5px 0px 5px 5px;
+}
+
+.THIS .ListItem {
+    
+	width: 100%;
+}
+
+.THIS .navigations{
+	margin-left: 0px;
+}
+
+.THIS .ListItem.slds-is-active .slds-navigation-list--vertical__action {
+    
+    background-color: #F3F3F3 !important;
+    color: #C60C30 !important;
+    border-left-color: #F3F3F3 !important; 
+}
+
+.THIS .ListItem .slds-navigation-list--vertical__action {
+    
+    color: #002664; 
+    font-weight: 700;
+}
+
+.THIS ul > li > a:hover {
+    
+    color: #C60C30 !important;
+    background: #F3F3F3 !important;
+    border-left-color: #F3F3F3 !important;
+}
+
+.THIS .slds-navigation-list--vertical__action {
+    
+    background: #F3F3F3 !important;
+    border-left-color: #F3F3F3 !important;
+}
+
+.THIS .dashboard_icon{
+    
+    fill:#54698d !important;
+}

@@ -1,0 +1,35 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="AuthorisationPaymentInformation">
+    
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="orderItem" type="OrderItem"/>
+    <aura:attribute name="period" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    
+    <div role="dialog" tabindex="-1" align="center" class="slds-modal slds-fade-in-open" style="padding-left:25%; padding-right:25%;" aura:id = "messageBox" >
+        <div class="slds-modal__container" >
+            <div class="slds-modal__header">
+                <h2 id="header43" class="slds-text-heading--medium">Payment Information</h2>
+            </div>
+            <div class="slds-modal__content slds-p-around--medium">
+                <div class="slds-grid"> 
+                    <div class="slds-col" style="width:40%" > <label class="slds-form-element__label">Total TSP Transaction: </label> </div>
+                    <div class="slds-col" style="width:60%" >  <ui:outputNumber value="{!v.orderItem.Annual_TSP_Count__c}" /> </div>
+                </div>
+                <div class="slds-grid"> 
+                    <div class="slds-col" style="width:40%" > <label class="slds-form-element__label">Total BSP Transaction: </label> </div>
+                    <div class="slds-col" style="width:60%" >  <ui:outputNumber value="{!v.orderItem.Annual_BSP_Count__c}" /> </div>
+                </div>
+                <div class="slds-grid"> 
+                    <div class="slds-col" style="width:40%" > <label class="slds-form-element__label">Authorisation fee Period: </label></div>
+                    <div class="slds-col" style="width:60%" >    {!v.period} </div>
+                </div>
+            </div>
+            <div class="slds-modal__footer">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.closeMessageBox}" >Close</ui:button>
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+    
+</aura:component>

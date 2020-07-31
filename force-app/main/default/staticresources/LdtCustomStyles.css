@@ -1,0 +1,7 @@
+
+.ldtDatatableDev .slds-grid--vertical-align-center {
+	display:none !important
+}
+.ldtDatatableDev tbody tr {
+	line-height: 1 !important;
+}

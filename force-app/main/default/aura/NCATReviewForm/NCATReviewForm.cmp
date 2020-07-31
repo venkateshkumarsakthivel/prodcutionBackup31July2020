@@ -1,0 +1,193 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" access="global" controller="NCATReviewFormController">
+    
+    <style>
+        .slds-modal__container{display:none;}    
+    </style>
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.TaxiLicenceActionStyle}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <!-- Attributes -->
+    
+    <aura:attribute name="attachmentPrefix" type="String" default="NCAT"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="acc" type="Account" />
+    <aura:attribute name="ncatdateValidationError" type="boolean" />
+    <aura:attribute name="dateRequiredValidationError" type="boolean" />
+    <aura:attribute name="internalReviewdateValidationError" type="boolean" />
+    <aura:attribute name="ncatReviewCase" type='Case' default= "{}"/>
+    <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}"/>
+    <aura:attribute name="selectedUser" type="sObject" default="{}"/>
+    <aura:attribute name="selectedContact" type="sObject" default="{}"/>
+    <aura:attribute name="aspStatusList" type="String[]" default=""/>
+    <aura:attribute name="taxiStatusList" type="String[]" default=""/>
+    <aura:attribute name="internalReviewChecked" type="String" default="Yes"/>
+    <aura:attribute name="documentUploadStatus" type="Boolean" default="false"/>
+    <aura:attribute name="authLookupValidationError" type="boolean"/>
+    <aura:attribute name="contactLookupValidationError" type="boolean"/>
+    <aura:attribute name="showNCATReviewForm" type='Boolean' default='false' />
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="medium"/>
+    <aura:if isTrue="{!v.showNCATReviewForm}">
+        <style>
+            .slds-modal__container{display:flex;}    
+        </style>
+        <div class="slds-box">
+            <article class="slds-card-wrapper" id="NcatReviewForm">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#account'}" 
+                                       category="standard" size="large" name="contact"/>
+                        </div>
+                        <div class="slds-media__body">
+                            <h2 style="font-size: 1.5em;"> 
+                                NCAT Review Information
+                            </h2>
+                        </div>
+                    </header>
+                    <div class="slds-no-flex sectionTitleNote">
+                        Fields marked with <span class="requiredField">*</span> are mandatory.
+                        <br/><br/>
+                    </div>
+                </div>
+                <hr style="margin-left: -30px; margin-right: -31px;"/>           
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>
+                <div class="slds-grid">                  
+                    <div class="slds-col--padded slds-size--2-of-4">
+                        <label class="slds-form-element__label">Account Name</label>{!v.acc.Name}
+                    </div>
+                    <div class="slds-col--padded slds-size--2-of-4">
+                        <label class="slds-form-element__label">Has there been an internal review?</label>
+                        <input type="radio" name="InternalReviewCheck" id="Internal-Review-Yes" onchange="{!c.isInternalReviewChange}" checked="true"/>&nbsp;Yes
+                        <input type="radio" name="InternalReviewCheck" id="Internal-Review-No" onchange="{!c.isInternalReviewChange}" />&nbsp;No
+                    </div>
+                </div> 
+                <br/>
+                <div class="slds-grid">                  
+                    <div class="slds-col--padded slds-size--2-of-4">
+                        <label class="slds-form-element__label">Contact Name</label><span class="requiredField">*</span><lightning:helptext content="Enter Contact Name"/>
+                        <c:customLookup objectAPIName="Contact" aura:id="Contact-Name" IconName="standard:contact" selectedRecord="{!v.selectedContact}" objectId="{!v.acc.Id}"/> 
+                        <aura:if isTrue="{!v.contactLookupValidationError}">
+                            <div class="slds-text-color_error slds-p-left_x-small">
+                                <b>{!$Label.c.Error_Message_Required_Input}</b>
+                            </div>
+                        </aura:if> 
+                    </div>
+                    <div class="slds-col--padded slds-size--2-of-4">
+                        <label class="slds-form-element__label">Authorisation/taxi licence number</label><span class="requiredField">*</span><lightning:helptext content="Enter Authorisation/taxi licence number"/>
+                        <c:customLookup objectAPIName="Authorisation__c" aura:id="Auth-Number" IconName="standard:account" selectedRecord="{!v.selectedLookUpRecord}" aspStatusList="{!v.aspStatusList}"   taxiStatusList="{!v.taxiStatusList}" objectId="{!v.acc.Id}"/>
+                        <aura:if isTrue="{!v.authLookupValidationError}">
+                            <div class="slds-text-color_error slds-p-left_x-small">
+                                <b>{!$Label.c.Error_Message_Required_Input}</b>
+                            </div>
+                        </aura:if> 
+                    </div>
+                </div>
+                <br/>
+                <div class="slds-grid"> 
+                    <div class="slds-col--padded slds-size--2-of-4">
+                        <label class="slds-form-element__label">NCAT File Number</label><span class="requiredField">*</span><lightning:helptext content="Enter NCAT file number"/>
+                        <ui:inputText aura:id='NCAT-File-Number' value="{!v.ncatReviewCase.NCAT_file_number__c}" class="slds-output slds-input" maxlength="255"/>
+                    </div>
+                    <aura:if isTrue="{!v.internalReviewChecked == 'Yes'}">
+                        <div class="slds-col--padded slds-size--2-of-4">
+                            <label class="slds-form-element__label">Name of decision maker</label>
+                            <!--<c:customLookup objectAPIName="User" IconName="standard:user" selectedRecord="{!v.selectedUser}"/>-->
+                            <c:customLookup objectAPIName="User" IconName="standard:user" selectedRecord="{!v.selectedUser}"/>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.internalReviewChecked == 'No'}">
+                        <div class="slds-col">
+                        </div>
+                    </aura:if>
+                </div>
+                <br/>
+                <div class="slds-grid">
+                    <div class="slds-col--padded slds-size--2-of-4">
+                        <label class="slds-form-element__label">Date of original decision being reviewed at NCAT</label><span class="requiredField">*</span><lightning:helptext content="Enter Date of original decision being reviewed at NCAT"/>
+                        <lightning:input class="{! v.ncatdateValidationError ? 'slds-has-error' : ''}"
+                                         type="date"
+                                         aura:id="Date-Of-Review-Decision-NCAT"
+                                         value="{!v.ncatReviewCase.Date_of_decision_being_reviewed_at_NCAT__c}"
+                                         name="date"
+                                         onchange="{!c.validateDateOfDecisionReviewedAtNCAT}"
+                                         />
+                        <aura:if isTrue="{!v.ncatdateValidationError}">
+                            <div class="slds-text-color_error slds-p-left_x-small">
+                                Date must be  present or past date
+                            </div>
+                        </aura:if> 
+                        <aura:if isTrue="{!v.dateRequiredValidationError}">
+                            <div class="slds-text-color_error slds-p-left_x-small">
+                                <b>{!$Label.c.Error_Message_Required_Input}</b>
+                            </div>
+                        </aura:if>
+                    </div>
+                    <aura:if isTrue="{!v.internalReviewChecked == 'Yes'}">
+                        <div class="slds-col--padded slds-size--2-of-4">
+                            <label class="slds-form-element__label">Date of Internal Review Decision</label><lightning:helptext content="Enter Date of Internal Review Decision"/>
+                            <lightning:input class="{! v.internalReviewdateValidationError ? 'slds-has-error' : ''}"
+                                             aura:id="Date-of-Internal-Review-Decision"
+                                             type="date"
+                                             value="{!v.ncatReviewCase.Date_of_Internal_Review_Decision__c}"
+                                             name="date1"
+                                             onchange="{!c.validateDateOfInternalReviewDecision}" />
+                            <aura:if isTrue="{!v.internalReviewdateValidationError}">
+                                <div class="slds-text-color_error slds-p-left_x-small">
+                                    Date must be present or past date
+                                </div>
+                            </aura:if>    
+                        </div> 
+                    </aura:if>
+                </div>
+                
+                
+                <div class="slds-grid">
+                   <aura:if isTrue="{!v.internalReviewChecked == 'Yes'}">
+            <div class="slds-grid">
+                <div class="slds-col--padded slds-size--2-of-4 ">
+                    <label class="slds-form-element__label">Outcome</label>
+                    <ui:inputTextArea aura:id='Outcome' value="{!v.ncatReviewCase.Outcome__c}" class="slds-output slds-input" maxlength="131072"/>
+                </div> 
+                <div class="slds-col--padded slds-size--2-of-4">
+                </div>
+            </div>
+        </aura:if>
+                </div>    
+                
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <c:P2POTAttachment category="{!v.attachmentPrefix +'-POI'}"
+                                           uploadStatus="{!v.documentUploadStatus}" 
+                                           uniqueIdentifier="NCAT-review-form-supporting-document" 
+                                           FileUploadChecked="{!v.ncatReviewCase.Internal_Review_Supporting_Documents__c}" 
+                                           FileCheckLabel="Attach Supporting Documents" 
+                                           aura:id="NCAT-Supporting-Documents-Upload" 
+                                           ParentRecordId="{!v.recordId}" 
+                                           acceptedFileTypes=".pdf"
+                                           displayAttachmentHeader="false" 
+                                           AllowMultiple="true" section="INDIVIDUAL" index="1" isRequired="false"/>
+                        <span id="documentsNotUploadedError" class="customErrorMsg"></span>
+                    </div>                
+                  </div>
+                
+                <div class="slds-card__footer">
+                    <div align='right'>
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.saveNcatReviewCase}"> 
+                            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Submit
+                        </ui:button>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </aura:if>
+</aura:component>

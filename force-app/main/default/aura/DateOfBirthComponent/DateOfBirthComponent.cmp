@@ -1,0 +1,29 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:attribute name="isRequired" type="Boolean" default="true" access="public"/>
+    <aura:attribute name="isReadOnly" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="isValid" type="Boolean" default="true" access="public"/>
+    <aura:attribute name="isdateChanged" type="Boolean" access="public"/>
+    <aura:attribute name="isInitComplete" type="Boolean" default="false" access="private"/>
+    <aura:attribute name="fieldLabel" required="true" type="String" default="Date Of Birth" access="public"/>
+    <aura:attribute name="DOB" required="true" type="String" access="public"/>
+    <aura:attribute name="oldDOB" type="String" access="public"/>
+    <aura:attribute name="uniqueIdentifier" required="true" type="String" default="DOB" access="public"/>
+    <aura:attribute name="displayDatePicker" type="Boolean" default="true" access="public"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.validateDOB}"/>
+    <aura:method name="verifyDOB" action="{!c.validateDOBForSave}" />
+    <aura:method name="isBirthDateChanged" action="{!c.isDOBChanged}" />
+    
+    <div class="slds-grid slds-wrap">
+        <div class="{!v.uniqueIdentifier + 'Content slds-size--1-of-1 uiInput--default'}">
+            <aura:if isTrue="{!v.isRequired == false}">
+                <label class="slds-form-element__label">{!v.fieldLabel}</label>
+            </aura:if>
+            <aura:if isTrue="{!v.isRequired == true}">
+                <label class="slds-form-element__label">{!v.fieldLabel}&nbsp;<span class="requiredField">*</span></label>
+            </aura:if>
+            <ui:inputDate format="dd/MM/yyyy" disabled="{!v.isReadOnly}" updateOn="keyup" click="{!c.hideDatePicker}" value="{!v.DOB}" blur="{!c.validateDOB}" displayDatePicker="{!v.displayDatePicker}" paste="{!c.validateDOB}" class="slds-input"/>
+            <span class="{!v.uniqueIdentifier + 'Error slds-form-element__help' }"></span>
+        </div>
+    </div>
+</aura:component>

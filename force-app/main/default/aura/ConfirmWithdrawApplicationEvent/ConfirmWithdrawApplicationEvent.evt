@@ -1,0 +1,7 @@
+<aura:event type="COMPONENT" description="Event template">
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="subType" type="String" />
+    <aura:attribute name="confirmType" type="String" default="Withdraw"/>
+    <aura:attribute name="authId" type="String" access="public" />
+    
+</aura:event>

@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'Gotham-Book';
+    src: url(/industryportal/resource/GothamBookRegular);
+}
+.THIS {
+    
+    font-family: 'Gotham-Book' !important;
+}

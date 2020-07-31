@@ -1,0 +1,11 @@
+.THIS .labelclass{
+	line-height:2.0;
+	font-weight: bold;
+}
+.THIS .slds-form-element__label {
+    
+    color: #000000;
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: .25rem;
+}

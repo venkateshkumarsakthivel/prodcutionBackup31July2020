@@ -1,0 +1,536 @@
+<aura:component extends="c:dataTableSort" implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiManageAccountLicences">
+    
+    <aura:attribute name="authorisationRecord" type="Authorisation__c" default="null"/>
+    
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="showTransferButton" type="Boolean" default="false" access="private" />
+    <aura:attribute name="showSurrenderButton" type="Boolean" default="false" access="private" />
+    <aura:attribute name="agentMap" type="Map" default="{}"/>
+    <aura:attribute name="authorisationAgentRecord" type="Authorisation_Agent__c" default="null"/>
+    
+    <aura:attribute name="entities" type="Authorisation__c[]" />
+    <aura:attribute name="customerNumber" type="String" access="private"/>
+    <aura:attribute name="authorisationMap" type="Map" default="{}"/>
+    <aura:attribute name="taxiLicenceConfigMap" type="Map"/>
+    <aura:attribute name="entityType" type="String" default=""/>
+    <aura:attribute name="accName" type="String" />
+    <aura:attribute name="taxiLicenceApplicationId" type="String"/>
+    <aura:attribute name="taxiLicenceCPI" type="String" default="2"/>
+    <aura:attribute name="applicationFee" type="Decimal" default="0"/>
+    <aura:attribute name="licenceFee" type="Decimal" default="0"/>
+    <aura:attribute name="applicationPaymentFrequency" type="String" default="" />
+    <aura:attribute name="currentLicenceSortOrderASC" type="Boolean" default="false" />
+    <aura:attribute name="renewalAuthorisationName" type="String"/>
+    <aura:attribute name="renewalAuthorisationStartDate" type="Date"/>
+    <aura:attribute name="renewalAuthorisationEndDate" type="Date"/>
+    <aura:attribute name="isInformationDeclared" type="Boolean" access="private" default="false"/>
+    <aura:attribute name="isPrivacyStatementAccepted" type="Boolean" default="false"/>
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="true" access="private" />
+    
+    <aura:attribute name="authCount" type="Integer" default="0"/> 
+    
+    
+    <aura:registerEvent name="redirect" type="c:redirectToCaseActivity"/>
+    
+    <aura:handler name="closeSurrenderForm" event="c:CloseTaxiSurrenderForm" action="{!c.closeSurrenderCaseFormandRedirect}"/>
+    <aura:handler name="closeSurrenderFormonly" event="c:CloseTaxiSurrenderFormRedirect" action="{!c.closeSurrenderCaseForm}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="filterEvent" type="c:TaxiManageAccountNavigationEvent"/>
+    
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:handler name="confirmAuthorisationRenewal" event="c:ConfirmAuthorisationRenewal" action="{!c.handleAuthRenewal}"/>
+    <aura:handler name="closeInternalReviewModal" event="c:InternalReviewCloseEvent" action="{!c.closeInternalReviewModal}"/>
+    
+    <lightning:spinner variant="brand" aura:id="spinner" size="large"></lightning:spinner>
+    
+    <article class="slds-card slds-no-print" id="licenceComponent">
+        <div class="slds-page-header">
+            <div class="slds-grid">
+                <div class="slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                       svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#file'}" category="standard" size="small" name="fleet">
+                            </c:svgIcon>
+                        </div>
+                        <div class="slds-media__body" style="text-align:left;"> 
+                            <aura:if isTrue="{!v.accountId == ''}"> 
+                                <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.ASP_ACCT_MGMT_Header} - {!v.customerNumber}</p>
+                            </aura:if>
+                            <aura:if isTrue="{!v.accountId != ''}"> 
+                                <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.AGENT_LICENCE_HOLDER_MGMT_Header} - {!v.customerNumber}</p>
+                            </aura:if>
+                            <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Customer number">{!v.accName}</h2>
+                        </div>
+                        
+                        <!--Hidding the button if agent is viewing this screen-->
+                        <aura:if isTrue="{!v.accountId == ''}">
+                            
+                            <ui:button class="slds-button slds-button- -neutral headerButtons" press="{!c.launchInteralReviewAppForm}">
+                                <i style="color:#54698d !important;" class="fa fa-file" aria-hidden="true"></i>&nbsp;&nbsp;Internal Review
+                            </ui:button>
+                            
+                            <ui:button class="slds-button slds-button--neutral headerButtons" press="{!c.confirmTransfer}"> 
+                                <i style="color:#54698d !important;" class="fa fa-exchange" aria-hidden="true"></i>&nbsp;&nbsp;Transfer
+                            </ui:button>
+                            
+                            <ui:button class="slds-button slds-button--neutral headerButtons" press="{!c.confirmSurrender}"> 
+                                <i style="color:#54698d !important;" class="fa fa-file" aria-hidden="true"></i>&nbsp;&nbsp;Surrender
+                            </ui:button>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.accountId != ''}">
+                            
+                            <aura:if isTrue="{!v.showTransferButton}">
+                                <ui:button class="slds-button slds-button--neutral headerButtons" press="{!c.confirmTransfer}"> 
+                                    <i style="color:#54698d !important;" class="fa fa-exchange" aria-hidden="true"></i>&nbsp;&nbsp;Transfer
+                                </ui:button>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.showSurrenderButton}">
+                                <ui:button class="slds-button slds-button--neutral headerButtons" press="{!c.confirmSurrender}"> 
+                                    <i style="color:#54698d !important;" class="fa fa-file" aria-hidden="true"></i>&nbsp;&nbsp;Surrender
+                                </ui:button>
+                            </aura:if>
+                            
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+       
+        
+        <aura:if isTrue="{!v.authCount >= 10}">
+     
+        <div id="licencesTableScrollContainer" class="slds-table--header-fixed_container" style="height:400px;background-color: #003577;"> 
+     <div class="slds-scrollable_y" style="height:100%;">   
+        <table role="grid" class="slds-table slds-table--bordered slds-table--striped slds-no-row-hover slds-table--header-fixed slds-table_fixed-layout">
+            
+            <thead>
+                <tr class="slds-line-height--reset">
+
+                    <th aria-label="Type" class="selectCol" scope="col" style="width:9%" >
+                        <span class="slds-cell-fixed tableheader slds-truncate" title="Select">SELECT</span> 
+             		</th>
+               
+                    <th aria-label="Type" class="tabCol" style="width:14%" scope="col">
+                        <span class="slds-cell-fixed tableheader slds-truncate" title="Licence Number">LICENCE #</span>
+              </th>
+               <aura:if isTrue="{!v.accountId == ''}">
+                        <th aria-label="Plate Number" class="tabCol" scope="col" style="width:13%">
+                            <span class="slds-cell-fixed tableheader" title="Plate Number">PLATE # </span> 
+                    </th>
+                        <th aria-label="Class" class="tabCol" scope="col" style="width:13%">
+                            <span class="slds-cell-fixed tableheader" title="Class">
+                               CLASS  
+                            </span> 
+                        </th>    
+                        <th aria-label="Start Date" class="tabCol" scope="col" style="width:14%">
+                            <div class="slds-cell-fixed tableheader" title="Start Date">
+                               START DATE  
+                            </div>
+                        </th>
+                        <th aria-label="Renewal Date" class="tabColSort" data-field="End_Date__c" style="width:18%" scope="col" onclick="{!c.sortLicenceByEndDate}">
+                            <div class="slds-cell-fixed tableheader" title="Renewal Date">
+                                RENEWAL DATE
+                                <div>
+                                    <aura:if isTrue="{!v.currentLicenceSortOrderASC}">
+                                        &#8593;
+                                        <aura:set attribute="else">
+                                            &#8595;
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </div>
+                        </th>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.accountId!= ''}">
+                      <th aria-label="Plate Number" class="tabCol" scope="col" style="width:10%">
+                            <div class="slds-cell-fixed tableheader" title="Plate Number">
+                              PLATE #   
+                            </div> 
+                        </th>
+                        <th aria-label="Agreement Type" class="tabColSort" scope="col" style="width:24%;" onclick="{!c.sortLicenceByAgreementType}">
+                            <div class="slds-cell-fixed tableheader" title="Agent Agreement Type">
+                               AGENT AGREEMENT TYPE  
+                                <div>
+                                    <aura:if isTrue="{!v.currentLicenceSortOrderASC}">
+                                        &#8593;
+                                        <aura:set attribute="else">
+                                            &#8595;
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </div>
+                        </th>
+                        
+                        <th aria-label="Expiry Date" class="tabColSort" data-field="End_Date__c" style="width:18%" scope="col">
+                            <div class="slds-cell-fixed tableheader" title="Expiry Date">
+                               Expiry DATE 
+                            </div>
+                        </th>
+                    </aura:if>
+                    
+                    <th aria-label="Status" class="tabCol" style="width:17%" scope="col">
+                        <aura:if isTrue="{!v.accountId == ''}"> 
+                            <div class="slds-cell-fixed tableheader" title="Status">
+                               STATUS  
+                            </div> 
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.accountId != ''}">
+                            <div class="slds-cell-fixed tableheader" title="Licence Status">
+                               LICENCE STATUS  
+                            </div> 
+                        </aura:if>
+                    </th>
+                     <th aria-label="Renewal Count" class="tabCol" style="width:20%" scope="col">
+                        <div class="slds-cell-fixed tableheader" title="Renewal Count">
+                           Renewal Count#  
+                        </div> 
+                    </th>  
+                   <th aria-label="Final Expiry Date " class="tabCol" style="width:21%" scope="col">
+                       <span class="slds-cell-fixed tableheader" title="Final Expiry Date ">
+                               Final Expiry Date 
+                            </span> 
+                </th>
+                    <aura:if isTrue="{!v.accountId == ''}"> 
+                        <th aria-label="Agent" class="tabCol" scope="col" style="width:18%">
+                            <div class="slds-cell-fixed tableheader" title="Agent">
+                              AGENT   
+                            </div>
+                        </th>
+                    </aura:if>
+                    
+                </tr>
+            </thead>
+              
+         
+            <tbody>
+                
+                <aura:iteration var="record" items="{!v.entities}">
+                    <tr class="slds-line-height--reset">
+                        <td role="gridcell" class="selectCol">
+                            
+                            <aura:if isTrue="{!v.accountId == ''}">
+                                <input type="radio" name="granted" class="radio" data-RecId="{!record.Id}" data-RecStatus="{!record.Status__c}" data-RecRenewRequested="{!record.Renewal_Requested__c}" data-RecReturnRequested="{!record.Return_Requested__c}" data-RecRenewalAttempValid="{!record.Can_Attempt_Licence_Renewal__c}" data-RecRenewalEligibility="{!record.Eligible_For_Renewal__c}" data-RecLicenceClass="{!record.Licence_Class__c}" data-RecName="{!record.Name}" data-RecPlateNumber="{!record.Plate_Number__c}" />    
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!and(and(record.Status__c != 'New', record.Status__c != 'Draft'), v.accountId != '')}">
+                                <input type="radio" name="granted" class="radio" data-RecId="{!record.Id}" onchange="{!c.toggleActionButtons}" data-RecStatus="{!record.Status__c}" data-RecRenewRequested="{!record.Renewal_Requested__c}" data-RecReturnRequested="{!record.Return_Requested__c}" data-RecRenewalAttempValid="{!record.Can_Attempt_Licence_Renewal__c}" data-RecRenewalEligibility="{!record.Eligible_For_Renewal__c}" data-RecLicenceClass="{!record.Licence_Class__c}" data-RecName="{!record.Name}" data-RecPlateNumber="{!record.Plate_Number__c}" />   
+                            </aura:if>
+                        </td>
+                        <td role="gridcell" class="tabCol">
+                            <a href="javascript:void(0)" data-RecId="{!record.Id}" onclick="{!c.viewLicenceDetails}"> 
+                                <ui:outputText class="slds-truncate wrap" value="{!record.Name}"/>
+                            </a>
+                        </td>
+                        
+                        <aura:if isTrue="{!v.accountId == ''}">
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputText class="slds-truncate wrap" value="{!record.Plate_Number__c}" />
+                            </td>
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputText class="slds-truncate wrap" value="{!record.Licence_Class__c}" />
+                            </td>
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputDate class="slds-truncate wrap" value="{!record.Start_Date__c}" format="dd/MM/yyyy"/>
+                            </td>
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputDate class="slds-truncate wrap" value="{!record.End_Date__c}" format="dd/MM/yyyy"/>
+                            </td>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.accountId != ''}">
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputText class="slds-truncate wrap" value="{!record.Plate_Number__c}" />
+                            </td>
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputText class="slds-truncate wrap" value="{!record.Agreement_Type__c}" />
+                            </td>
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputDate class="slds-truncate wrap" value="{!record.End_Date__c}" format="dd/MM/yyyy"/>
+                            </td>
+                        </aura:if>
+                        
+                        <td role="gridcell" class="tabCol">
+                            <ui:outputText class="slds-truncate wrap" value="{!record.Status__c}"/>
+                        </td>
+                        <td role="gridcell" class="tabCol">
+                                <ui:outputText class="slds-truncate wrap" value="{!record.Renewal_Count_Remaining__c}" />
+                            </td>
+                        <td role="gridcell" class="tabCol">
+                            <ui:outputDate class="slds-truncate wrap" value="{!record.Final_Expiry_Date__c}" format="dd/MM/yyyy"/>
+                        </td>
+                        <aura:if isTrue="{!v.accountId == ''}"> 
+                            <td role="gridcell" class="tabCol">
+                                <aura:if isTrue="{!and(and(record.Agency__c != null, record.Agency__c != ''), record.No_of_Active_Auth_Agents__c != 0)}">
+                                    <a href="javascript:void(0)" data-RecId="{!record.Id}" onclick="{!c.viewAgentDetails}"> 
+                                        <ui:outputText class="slds-truncate wrap" value="{!record.Agency__r.Name+'-'+record.Agreement_Type__c}"/>
+                                    </a>
+                                </aura:if>
+                            </td>
+                        </aura:if>
+                        
+                    </tr>
+                </aura:iteration>
+                 
+            </tbody>
+             
+        </table>
+        </div>
+            
+         </div>   
+            
+ 	        
+     
+        
+ <aura:set attribute="else">
+         <div id="licencesTableScrollContainer" class="slds-table--header-fixed_container" style="background-color: #003577;"> 
+      
+        <div class="slds-scrollable_y" style="height:100%;">   
+        <table role="grid" class="slds-table  slds-table--bordered slds-table--striped slds-no-row-hover slds-table--header-fixed slds-table_fixed-layout">
+            
+            <thead >
+                <tr class="slds-line-height--reset">
+
+                    <th aria-label="Type" class="selectCol" scope="col" style="width:8%">
+                        <span class="slds-cell-fixed tableheader" title="Select">SELECT</span> 
+             		</th>
+               
+                    <th aria-label="Type" class="tabCol" style="width:14%" scope="col">
+                        <span class="slds-cell-fixed tableheader" title="Licence Number">LICENCE #</span>
+              </th>
+               <aura:if isTrue="{!v.accountId == ''}">
+                        <th aria-label="Plate Number" class="tabCol" scope="col" style="width:13%">
+                            <span class="slds-cell-fixed tableheader" title="Plate Number">PLATE # </span> 
+                    </th>
+                        <th aria-label="Class" class="tabCol" scope="col" style="width:13%">
+                            <span class="slds-cell-fixed tableheader" title="Class">
+                               CLASS  
+                            </span> 
+                        </th>    
+                        <th aria-label="Start Date" class="tabCol" scope="col" style="width:14%">
+                            <div class="slds-cell-fixed tableheader" title="Start Date">
+                               START DATE  
+                            </div>
+                        </th>
+                        <th aria-label="Renewal Date" class="tabColSort" data-field="End_Date__c" style="width:18%" scope="col" onclick="{!c.sortLicenceByEndDate}">
+                            <div class="slds-cell-fixed tableheader" title="Renewal Date">
+                                RENEWAL DATE
+                                <div>
+                                    <aura:if isTrue="{!v.currentLicenceSortOrderASC}">
+                                        &#8593;
+                                        <aura:set attribute="else">
+                                            &#8595;
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </div>
+                        </th>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.accountId!= ''}">
+                      <th aria-label="Plate Number" class="tabCol" scope="col" style="width:10%">
+                            <div class="slds-cell-fixed tableheader" title="Plate Number">
+                              PLATE #   
+                            </div> 
+                        </th>
+                            
+                           
+                        <th aria-label="Agreement Type" class="tabColSort" scope="col" style="width:24%;" onclick="{!c.sortLicenceByAgreementType}">
+                            <div class="slds-cell-fixed tableheader" title="Agent Agreement Type">
+                               AGENT AGREEMENT TYPE  
+                                <div>
+                                    <aura:if isTrue="{!v.currentLicenceSortOrderASC}">
+                                        &#8593;
+                                        <aura:set attribute="else">
+                                            &#8595;
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </div>
+                        </th>
+                        
+                        <th aria-label="Expiry Date" class="tabColSort" data-field="End_Date__c" style="width:18%" scope="col">
+                            <div class="slds-cell-fixed tableheader" title="Expiry Date">
+                               Expiry DATE 
+                            </div>
+                        </th>
+                    </aura:if>
+                    
+                    <th aria-label="Status" class="tabCol" style="width:17%" scope="col">
+                        <aura:if isTrue="{!v.accountId == ''}"> 
+                            <div class="slds-cell-fixed tableheader" title="Status">
+                               STATUS  
+                            </div> 
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.accountId != ''}">
+                            <div class="slds-cell-fixed tableheader" title="Licence Status">
+                              LICENCE STATUS  
+                            </div> 
+                        </aura:if>
+                    </th>
+                     <th aria-label="Renewal Count" class="tabCol" style="width:20%" scope="col">
+                        <div class="slds-cell-fixed tableheader" title="Renewal Count">
+                           Renewal Count#  
+                        </div> 
+                    </th>  
+                   <th aria-label="Final Expiry Date" class="tabCol" style="width:21%" scope="col">
+                       <span class="slds-cell-fixed tableheader" title="Final Expiry Date">
+                               Final Expiry Date  
+                            </span> 
+                </th>
+                    <aura:if isTrue="{!v.accountId == ''}"> 
+                        <th aria-label="Agent" class="tabCol" scope="col" style="width:17%">
+                            <div class="slds-cell-fixed tableheader" title="Agent">
+                              AGENT   
+                            </div>
+                        </th>
+                    </aura:if>
+                    
+                </tr>
+            </thead>
+              
+         
+            <tbody>
+                
+                <aura:iteration var="record" items="{!v.entities}">
+                    <tr class="slds-line-height--reset">
+                        <td role="gridcell" class="selectCol">
+                            
+                            <aura:if isTrue="{!v.accountId == ''}">
+                                <input type="radio" name="granted" class="radio" data-RecId="{!record.Id}" data-RecStatus="{!record.Status__c}" data-RecRenewRequested="{!record.Renewal_Requested__c}" data-RecReturnRequested="{!record.Return_Requested__c}" data-RecRenewalAttempValid="{!record.Can_Attempt_Licence_Renewal__c}" data-RecRenewalEligibility="{!record.Eligible_For_Renewal__c}" data-RecLicenceClass="{!record.Licence_Class__c}" data-RecName="{!record.Name}" data-RecPlateNumber="{!record.Plate_Number__c}" />    
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!and(and(record.Status__c != 'New', record.Status__c != 'Draft'), v.accountId != '')}">
+                                <input type="radio" name="granted" class="radio" data-RecId="{!record.Id}" onchange="{!c.toggleActionButtons}" data-RecStatus="{!record.Status__c}" data-RecRenewRequested="{!record.Renewal_Requested__c}" data-RecReturnRequested="{!record.Return_Requested__c}" data-RecRenewalAttempValid="{!record.Can_Attempt_Licence_Renewal__c}" data-RecRenewalEligibility="{!record.Eligible_For_Renewal__c}" data-RecLicenceClass="{!record.Licence_Class__c}" data-RecName="{!record.Name}" data-RecPlateNumber="{!record.Plate_Number__c}" />   
+                            </aura:if>
+                        </td>
+                        <td role="gridcell" class="tabCol">
+                            <a href="javascript:void(0)" data-RecId="{!record.Id}" onclick="{!c.viewLicenceDetails}"> 
+                                <ui:outputText class="slds-truncate wrap" value="{!record.Name}"/>
+                            </a>
+                        </td>
+                        
+                        <aura:if isTrue="{!v.accountId == ''}">
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputText class="slds-truncate wrap" value="{!record.Plate_Number__c}" />
+                            </td>
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputText class="slds-truncate wrap" value="{!record.Licence_Class__c}" />
+                            </td>
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputDate class="slds-truncate wrap" value="{!record.Start_Date__c}" format="dd/MM/yyyy"/>
+                            </td>
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputDate class="slds-truncate wrap" value="{!record.End_Date__c}" format="dd/MM/yyyy"/>
+                            </td>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.accountId != ''}">
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputText class="slds-truncate wrap" value="{!record.Plate_Number__c}" />
+                            </td>
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputText class="slds-truncate wrap" value="{!record.Agreement_Type__c}" />
+                            </td>
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputDate class="slds-truncate wrap" value="{!record.End_Date__c}" format="dd/MM/yyyy"/>
+                            </td>
+                        </aura:if>
+                        
+                        <td role="gridcell" class="tabCol">
+                            <ui:outputText class="slds-truncate wrap" value="{!record.Status__c}"/>
+                        </td>
+                        <td role="gridcell" class="tabCol">
+                                <ui:outputText class="slds-truncate wrap" value="{!record.Renewal_Count_Remaining__c}" />
+                            </td>
+                        <td role="gridcell" class="tabCol">
+                            <ui:outputDate class="slds-truncate wrap" value="{!record.Final_Expiry_Date__c}" format="dd/MM/yyyy"/>
+                        </td>
+                        <aura:if isTrue="{!v.accountId == ''}"> 
+                            <td role="gridcell" class="tabCol">
+                                <aura:if isTrue="{!and(and(record.Agency__c != null, record.Agency__c != ''), record.No_of_Active_Auth_Agents__c != 0)}">
+                                    <a href="javascript:void(0)" data-RecId="{!record.Id}" onclick="{!c.viewAgentDetails}"> 
+                                        <ui:outputText class="slds-truncate wrap" value="{!record.Agency__r.Name+'-'+record.Agreement_Type__c}"/>
+                                    </a>
+                                </aura:if>
+                            </td>
+                        </aura:if>
+                        
+                    </tr>
+                </aura:iteration>
+                 
+            </tbody>
+             
+        </table>
+        </div>
+            
+         </div>   
+     </aura:set>
+            
+             </aura:if>     
+            
+    </article>
+    <p>{!v.body}</p>
+    
+    <div role="dialog" tabindex="-1" class="slds-modal" aura:id="LicenceDetailsMessageBox">
+        <div class="slds-modal__container" style="width:90%;">
+            
+            <div class="slds-modal__header">
+              
+               <div class="slds-grid" style="padding-left:1%;">
+        <div>
+          <img src="{!$Resource.P2P_PortalLogo}" style="max-width:200px;"  />
+             </div>
+        <div>
+             <h2 id="header43" class="slds-text-heading--medium">
+                    Taxi Licence Summary
+                </h2>
+             
+        </div>
+    </div>
+        </div>
+           <div class="slds-modal__content slds-p-around--medium">
+                <aura:if isTrue="{!v.authorisationRecord != null}">
+               <!--<c:TaxiLicenceRecordDetails licenceRecord="{!v.authorisationRecord}"/>-->
+                    <c:TaxiLicenceSummaryPage licenceRecord="{!v.authorisationRecord}" />
+                   
+                </aura:if>
+            </div>
+            <div class="slds-modal__footer slds-no-print">
+                
+                <ui:button class="slds-button slds-button--neutral headerButtons" press="{!c.closeLicenceDetails}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Close
+                </ui:button>
+            </div>
+        </div>
+    </div>
+    
+    <div role="dialog" tabindex="-1" class="slds-modal" aura:id="AgentDetailsMessageBox">
+        <div class="slds-modal__container" style="width:50%;">
+            <div class="slds-modal__header">
+                <h2 id="header43" class="slds-text-heading--medium">
+                    Agent Details
+                </h2>
+            </div>        
+            <div class="slds-modal__content slds-p-around--medium">
+                
+                <aura:if isTrue="{!v.authorisationAgentRecord != null}">
+                    <c:AuthorisationAgentRecordDetails authorisationAgentRecord="{!v.authorisationAgentRecord}"/>
+                </aura:if>
+            </div>
+            <div class="slds-modal__footer">
+                
+                <ui:button class="slds-button slds-button--neutral headerButtons" press="{!c.closeAgentDetails}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Close
+                </ui:button>
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop" aura:id="LicenceDetailsMessageBoxBackdrop"></div>
+</aura:component>

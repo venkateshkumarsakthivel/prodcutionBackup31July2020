@@ -1,0 +1,86 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="SubmitPaymentQueryController">
+
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    
+    <aura:attribute name="record_Id" type="String"/>
+    <aura:attribute name="documentUploadStatus" type="Boolean" default="false"/>
+    <aura:attribute name="submitPaymentWrpObj" type="SubmitPaymentQueryController.SubmitPaymentWrapper"/>
+    
+	 <!-- Event Registration -->
+    <aura:registerEvent name="closeSubmitQueryModal" type="c:SubmitPaymentQueryCloseEvent" />
+    <aura:registerEvent name="loadSection" type="c:SubmitPaymentQueryLoadSectionEvent"/>
+       
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    <c:SubmitPaymentQuerySectionProgress currentSection="Attachment"/>
+    <br/>
+    
+    <div class="slds-box">
+    <article class="slds-card" id="submitPaymentQueryAttch">
+        <!-- Header -->
+         <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#drafts'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>                
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">                         
+                        {!$Label.c.Internal_Review_Chevron_Title_2}                  
+                    </h2>
+                </div>
+            </header>
+        </div>
+         
+        <hr/>
+        <!-- Disply errors if any , no required fields are currently included in the form-->
+        <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+            <span style="color: #ffffff;">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+            </span>
+        </div>
+        
+        <!-- Body -->
+        <aura:if isTrue="{!v.readOnly == false}">
+            <div class="slds-form--stacked"> 
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <c:P2POTAttachment category="IRA" uploadStatus="{!v.documentUploadStatus}" uniqueIdentifier="applicant-poi" 
+                                           FileUploadChecked="{!v.submitPaymentWrpObj.csObj.Internal_Review_Supporting_Documents__c}" 
+                                           FileCheckLabel="Supporting documents for payment query" 
+                                           aura:id="Identity-Document-Upload" ParentRecordId="{!v.submitPaymentWrpObj.csObj.Id}" 
+                                           acceptedFileTypes=".pdf" FileInputLabel="Attach copies of your supporting documents for payment query" 
+                                           AllowMultiple="true" section="INDIVIDUAL" index="1" isRequired="false"/>
+                        <span id="documentsNotUploadedError" class="customErrorMsg"></span>
+                    </div>
+                    <div class="slds-col">
+                    </div>	
+                </div>                             	
+            </div>
+        </aura:if>
+
+        <aura:if isTrue="{!v.readOnly == true}">
+            <c:P2POTAttachments parent="{!v.submitPaymentWrpObj.csObj.Id}" />
+        </aura:if>
+
+        <div class="slds-card__footer">           
+            <ui:button class="slds-button slds-button--neutral" press="{!c.onPreviousClick}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+            </ui:button>
+            <aura:if isTrue="{!v.readOnly == false}">
+                <ui:button aura:id="submitButton" class="slds-button slds-button--neutral" press="{!c.submitQuery}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Submit Query
+                </ui:button>    
+            </aura:if>
+            <ui:button class="slds-button slds-button--neutral" press="{!c.processCancel}"> 
+                <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+            </ui:button>
+        </div>
+    </article>
+    </div>    
+    <p>{!v.body}</p>
+</aura:component>

@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Event for set Index No." >
+    <aura:attribute name="navIndexEvent" type="integer" default=""/>
+</aura:event>

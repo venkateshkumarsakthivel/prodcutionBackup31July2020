@@ -1,0 +1,128 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="LicenceAgreementRegistrationController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:handler name="DeleteRowEvt" event="c:LicenceAgreementRegistrationDeleteRow" action="{!c.removeDeletedRow}"/>
+    <aura:handler name="AddRowEvt" event="c:LicenceAgreementRegistrationAddRow" action="{!c.addNewRow}"/>
+    
+    <aura:attribute name="RelatedContactList" type="Related_Contact__c[]" access="public"/>
+    <aura:attribute name="tempRelatedContact" type="Related_Contact__c" access="public" default="{'sobjectType': 'Related_Contact__c',
+                                                                                                 'Taxi_Licence__c': '',
+                                                                                                 'Plate_Number__c': ''}"/>
+    <aura:attribute name="TaxiErrorList" type="String" access="public"/>
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="false" />
+    <aura:attribute name="caseId" type="String" access="public" default=""/>
+    <aura:attribute name="uliUploadStatus" type="Boolean" access="public" default="false"/>
+    <aura:attribute name="identityCheck" type="boolean" access="public" default="false"/>
+    <aura:attribute name="accountId" type="String" default="" access="public"/>
+    
+    <aura:attribute name="hideNewRow" type="boolean" access="public" default="false"/>
+    
+    <aura:registerEvent name="loadSection" type="c:TaxiAgentLicenceAgreementRegistrationEvent" access="public"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <c:TaxiAgentLicenceAgreementRegistrationProgressIndicator currentSection="{!$Label.c.Licence_Agreement_Registration_Details}"/>
+    <br/>
+    
+    <article class="slds-card" id="licenceAgreementRegistration">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/custom-sprite/svg/symbols.svg#custom18'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">   
+                        {!$Label.c.Licence_Agreement_Registration_Details}
+                    </h2>
+                </div>
+            </header>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <div class="slds-section" aura:id="sectiontitle">
+                    <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Click to expand or collapse">
+                        <button class="slds-button slds-section__title-action" onclick="{!c.toggleSectionContent}" style="background-color: #003577;color: #ffffff;">
+                            <aura:if isTrue="{!v.isSectionExpanded}">
+                                <i class="fa fa-minus" style="font-size: 0.875rem;color:#ffffff !important" aria-hidden="true"></i>
+                                <aura:set attribute="else">
+                                    <i class="fa fa-plus" style="font-size: 0.875rem;color:#ffffff !important" aria-hidden="true"></i>
+                                </aura:set>
+                            </aura:if>
+                            &nbsp;&nbsp;{!$Label.c.Licence_Agreement_Details}
+                        </button>
+                    </h5>
+                    <div class="slds-section__content" style="border-width: 1px;border-style: solid;border-color: rgb(208, 208, 208);border-top: 0;">
+                        <p class="slds-form- -stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+                            <p>
+                                {!$Label.c.Licence_Registration_Text_1}
+                            </p>
+                            <br/>
+                            <p>
+                                {!$Label.c.Licence_Registration_Text_2}
+                            </p>
+                            <br/>
+                            <p><aura:unescapedHtml value="{!$Label.c.Licence_Registration_Text_3}"></aura:unescapedHtml>
+                            </p>
+                            <br/>
+                            <p>
+                                {!$Label.c.Licence_Registration_Text_4}
+                            </p>
+                        </p>
+                    </div>
+                </div>
+                
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!v.TaxiErrorList}
+                    </span>
+                </div>
+                
+                <!--Table Part-->           
+                <table class="slds-table slds-table_cell-buffer"> 
+                    <thead>
+                        <tr>
+                            <th scope="col">
+                                <label class="slds-form-element__label">{!$Label.c.Taxi_Licence}</label>&nbsp;<i class="fa fa-question-circle" aria-hidden="true" title="This number is specified in the Taxi Licence Certificate."></i>
+                            </th>
+                            <th scope="col">
+                                <label class="slds-form-element__label">{!$Label.c.Plate_Number}</label>
+                            </th>
+                        </tr>
+                    </thead>   
+                    <tbody>
+                        <!--Iterate the child Component for display Table rows 
+                   with pass the List Item Index for track the Every child Component 
+                   and pass each List Contact Instance -->         
+                        <aura:iteration items="{!v.RelatedContactList}" var="item" indexVar="index">
+                            <c:LicenceAgreementRegistrationRowItem RelatedcontactInstance="{!item}" rowIndex="{!index+1}" />
+                        </aura:iteration>
+                        
+                        <aura:if isTrue="{!v.hideNewRow == false}">
+                         <c:LicenceAgreementRegistrationRowItem RelatedcontactInstance="{!v.tempRelatedContact}" rowIndex="{!0}" />
+                        </aura:if>
+                     </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="slds-card__footer">
+            
+            <ui:button class="slds-button slds-button--neutral" press="{!c.continueSaveFn}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+            </ui:button>
+            
+        </div>
+        
+    </article>
+    
+</aura:component>

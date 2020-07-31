@@ -1,0 +1,54 @@
+<aura:component implements="lightning:availableForFlowScreens,force:lightningQuickAction,force:hasRecordId" access="global" controller="NoticeGeneratorController">
+    <aura:attribute name="lstOfRecordType" type="List" /> 
+    <aura:attribute name="caseRecord" type="Case" access="public"/>
+    <aura:attribute name="caseRelatedRec" type="Case" access="public"/>
+    <aura:attribute name="data" type="List"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="showLegislation" type="Boolean" default='false'/>
+    <aura:attribute name="selectedLegCount" type="Integer" default="0"/>
+    <aura:attribute name="selectedCaseLegislation" type="List" default=""/>
+    <aura:attribute name="noticeRecordTypeId" type="String" default=''/>
+    <aura:attribute name="noticeRecordTypeMap" type="Map" default=''/>
+    <aura:attribute name="noticeRecordTypeName" type="String" default=''/>
+    <aura:attribute name="noticeRecordId" type="String" default=''/>
+    <aura:attribute name="loaded" type="Boolean" default="false" />
+    <aura:attribute name="AuthorisedOfficerNumber" type="String" default=""/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:layout multipleRows="true" horizontalAlign="center" >    
+        <lightning:layoutItem flexibility="auto" padding="around-small"
+                              size="12"
+                              largeDeviceSize="12"
+                              mediumDeviceSize="12"
+                              smallDeviceSize="12">  
+            <!-- select to hold all available record type names list -->
+            <lightning:select aura:id="recordTypePickList" name="selectRecordType" label="Notice Record Type" onchange="{!c.onNoticeRecordTypeChange}" required="true">
+                <option value="">--None--</option>
+                <aura:iteration items="{!v.lstOfRecordType}" var="item" indexVar="Key">
+                    <option value="{!item.Key}" text="{!item.Value}"/>
+                </aura:iteration>
+            </lightning:select>
+        </lightning:layoutItem>
+        
+        <aura:if isTrue="{!v.showLegislation}">
+            <lightning:layoutItem padding="around-small" size="12" >
+                <aura:if isTrue="{! v.loaded }">
+                    <lightning:spinner alternativeText="Loading" variant="brand" />
+                </aura:if>
+                <h1 aura:id="selectedCount" class="slds-p-around_small">Selected Legislations: {! v.selectedLegCount }</h1>
+                <lightning:datatable aura:id="caseLegis"
+                                     columns="{! v.columns }"
+                                     data="{! v.data }"
+                                     keyField="Legislation__c"
+                                     onrowselection="{! c.updateSelectedLegislation }"
+                                     />
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small" size="12" class="slds-align_absolute-center" >
+                <lightning:button label="Cancel" onclick="{!c.closeModel}"/>
+                <lightning:button label="Save" onclick="{!c.createNotice}" variant="brand"/>
+            </lightning:layoutItem>
+        </aura:if>
+    </lightning:layout>
+    
+</aura:component>

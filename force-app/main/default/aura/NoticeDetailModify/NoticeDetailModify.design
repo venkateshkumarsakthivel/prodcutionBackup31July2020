@@ -1,0 +1,4 @@
+<design:component>
+    <design:attribute name="recordId" label="recordId" Description="Notice Recod"/>
+    <design:attribute name="showTypeSubType" label="Show Type and Sub Type" Description="To Show Type and Sub Type field in the Component"/>
+</design:component>

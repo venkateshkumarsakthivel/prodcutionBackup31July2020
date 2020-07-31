@@ -1,0 +1,8 @@
+.slds-text-heading_label-normal, .slds-text-heading--label-normal,.slds-form-element__label, .slds-button{
+	font-weight:800 !important;
+}
+
+.slds-form-element__static{
+	padding-top: 0rem !important;
+    padding-bottom: 0rem !important;
+}

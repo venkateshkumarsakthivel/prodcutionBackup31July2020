@@ -1,0 +1,391 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global" controller="TaxiTransferController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:attribute name="sellerPOIUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="contractUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="baseUrl" type="String" default="$A.get('$Label.c.Taxi_Community_Base_Url')" />
+    
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="true" />
+    
+    <aura:attribute name="existingLicence" type="String"/>
+    <aura:attribute name="sellerCaseId" type="String" default=""/>
+    
+    <aura:attribute name="saleDocId" type="String" default=""/>
+    <aura:attribute name="poiDocId" type="String" default=""/>
+    <aura:attribute name="poiDocCheck" type="Boolean" default="false" />
+    <aura:attribute name="saleDocCheck" type="Boolean" default="false" />
+	<aura:attribute name="email" type="String" default=""/>
+	<aura:attribute name="daytimePhone" type="String" default=""/>
+    <aura:attribute name="licenceMarketValue" type="String" default=""/>
+    <aura:attribute name="levyDueAmount" type="String" default=""/>
+    <aura:attribute name="authName" type="String"/>
+    <aura:attribute name="authAccountId" type="String"/>
+    <aura:attribute name="endDate" type="Date"/>
+    <aura:attribute name="operationArea" type="String"/>
+    <aura:attribute name="licenceTerm" type="String"/>
+    <aura:attribute name="licenceClass" type="String"/>
+    
+    <aura:attribute name="transferReason" type="String"/>
+    <aura:attribute name="transferPrice" type="String"/>
+    <aura:attribute name="buyerType" type="String"/>
+    
+    <aura:attribute name="isInternalUser" type="Boolean" default="false"/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="canEdit" type="Boolean" default="true"/>
+    <aura:attribute name="renderOnReviewPage" type="Boolean" default="false"/>
+    
+    <aura:attribute name="individualPartner" type="Related_Contact__c"
+                    default="{'sobjectType':'Related_Contact__c',
+                             'Title__c':'',
+                             'First_Given_Name__c':'',
+                             'Family_Name__c':'',
+                             'Other_Given_Name__c':'',
+                             'Date_of_Birth__c':'',
+                             'unknown_custom_field':'',
+                             'Australian_Driver_Licence_State__c':'',
+                             'Contact_Type__c':'Individual Beneficiary'
+                             }" />  
+    
+    <aura:attribute name="corporatePartner" type="Related_Contact__c"
+                    default="{'sobjectType':'Related_Contact__c',
+                             'Corporation_Name__c':'',
+                             'ACN__c':'',
+                             'Contact_Type__c':'Corporate Beneficiary'
+                             }" /> 
+    
+    <aura:attribute name="jointHoldersIndividualPartners" type="Related_Contact__c[]" />
+    <aura:attribute name="jointHoldersCorporatePartners" type="Related_Contact__c[]" />
+    
+    <aura:method name="fetchExistingAuthorisationDetails" action="{!c.fetchExistingAuthorisationDetails}" access="PUBLIC"/>
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">
+        <c:TransferFormSectionProgressIndicator currentSection="General Details"/><br/>
+    </aura:if>
+    
+    <article class="slds-card" id="formPartA">
+        
+        <div class="slds-card__header slds-grid">
+            
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#work_order'}" 
+                               category="standard" size="large" name="work_order"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">       
+                        {!$Label.c.Taxi_Transfer_Form_Header}
+                    </h2>
+                    <b>Note:</b> To be completed by the current licence holder of the taxi licence or in the case of a deceased estate, the executor or legal representative.
+                </div>
+            </header>
+            
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with&nbsp;<span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!and(and(v.readOnly, not(v.reviewEdit)), v.canEdit)}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                    <div style="float:right">
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                            <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                        </ui:button>
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+            
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <div class="slds-section slds-is-open" aura:id="sectiontitle">
+                    <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Click to expand or collapse">
+                        <button class="slds-button slds-section__title-action" onclick="{!c.toggleSectionContent}" style="background-color: #003577;color: #ffffff;">
+                            <aura:if isTrue="{!v.isSectionExpanded}">
+                                <i class="fa fa-minus" style="font-size: 0.875rem;" aria-hidden="true"></i>
+                                <aura:set attribute="else">
+                                    <i class="fa fa-plus" style="font-size: 0.875rem;" aria-hidden="true"></i>
+                                </aura:set>
+                            </aura:if>
+                            &nbsp;&nbsp;{!$Label.c.All_Applicant_Application_Checklist}
+                        </button>
+                    </h5>
+                    <div class="slds-section__content" style="border-width: 1px;border-style: solid;border-color: rgb(208, 208, 208);border-top: 0;">
+                        <p class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+                            <p><aura:unescapedHtml value="{!$Label.c.Taxi_Transfer_Checklist_1}"/></p><br/>
+                            <p><aura:unescapedHtml value="{!$Label.c.Taxi_Transfer_Checklist_2}"/></p><br/>
+                            <p><aura:unescapedHtml value="{!$Label.c.Taxi_Transfer_Checklist_3}"/></p><br/>
+                            <p><aura:unescapedHtml value="{!$Label.c.Taxi_Transfer_Checklist_4}"/></p>
+                        </p>
+                    </div>
+                </div>
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>
+                
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 30% !important;">
+                            <div class="slds-media__body">
+                                <h2 style="font-size: 1.3em; font-color:gray">       
+                                    {!$Label.c.Taxi_Licence_Details_Sub_Header}
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="slds-col" style="width: 30% !important;">
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" >
+                            <label class="slds-form-element__label">{!$Label.c.Taxi_Transfer_Licence_Name}&nbsp;</label>
+                            <ui:inputText class="slds-input" disabled="true" aura:id="Authorisation-Name-Input" value="{!v.authName}"/> 
+                        </div>
+                        <div class="slds-col" >
+                            <label class="slds-form-element__label">{!$Label.c.Taxi_Transfer_Licence_End_Date} &nbsp;</label>
+                            <ui:inputDate class="slds-input" disabled="true" aura:id="End-Date-Input" value="{!v.endDate}"/> 
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">{!$Label.c.Taxi_Transfer_Operation_Area} &nbsp;</label>
+                            <ui:inputText class="slds-input" disabled="true" aura:id="Operation-Area-Input" value="{!v.operationArea}"/>
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">{!$Label.c.Taxi_Transfer_Licence_Term} &nbsp;</label>
+                            <ui:inputText class="slds-input" disabled="true" aura:id="Operation-Area-Input" value="{!v.licenceTerm}"/>
+                        </div>
+                    </div>
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">{!$Label.c.Taxi_Transfer_Licence_Class} &nbsp;</label>
+                            <ui:inputText class="slds-input" disabled="true" aura:id="Licence-Class-Input" value="{!v.licenceClass}"/>
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">{!$Label.c.Taxi_Transfer_Reason}&nbsp;<span class="requiredField">*</span></label>
+                            <ui:inputSelect aura:id="Transfer-Reason-Input" disabled="{!v.readOnly}" value="{!v.transferReason}">
+                                <ui:inputSelectOption text="" label="---Please Select---"/>
+                                <ui:inputSelectOption text="Sale"/>
+                                <ui:inputSelectOption text="Estate"/>
+                                <ui:inputSelectOption text="Court Order"/>
+                                <ui:inputSelectOption text="Divorce"/>
+                            </ui:inputSelect> 
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">{!$Label.c.Taxi_Transfer_Price} &nbsp;<span class="requiredField">*</span></label>
+                            <ui:inputText aura:id="Transfer-Price-Input" disabled="{!v.readOnly}" class="slds-input" value="{!v.transferPrice}" placeholder="$ " blur="{!c.autoCorrectTransferPrice}"/>  
+                        </div>
+                    </div>
+                    <aura:if isTrue="{!v.readOnly == false}">
+                    <fieldset>
+                        <div class="slds-grid">
+                            <div class="slds-col-left" style="width: 50% !important;">
+                                <c:P2POTAttachment category="POI" FileUploadChecked="{!v.saleDocCheck}" aura:id="seller-poi-Upload" uploadStatus="{!v.sellerPOIUploadStatus}" attachId="{!v.poiDocId}" uniqueIdentifier="seller-poi" ParentRecordId="{!v.existingLicence}" acceptedFileTypes=".pdf" AllowMultiple="true" section="AUTH" index="1" />
+                            </div>
+                        </div>
+                        <div class="slds-grid" >
+                            <div class="slds-col-left" style="width: 50% !important;">
+                                <c:P2POTAttachment category="POI" FileUploadChecked="{!v.poiDocCheck}" aura:id="transfer-sale-contract" uploadStatus="{!v.contractUploadStatus}" uniqueIdentifier="contract-sale" displayAttachmentHeader="false" FileCheckLabel="Contract of Sale or Probated Will and Death Certificate" ParentRecordId="{!v.existingLicence}" attachId="{!v.saleDocId}" acceptedFileTypes=".pdf" AllowMultiple="true" section="AUTH" index="1" />
+                            </div>                            
+                        </div>
+                    </fieldset>
+                	</aura:if>
+                    <aura:if isTrue="{!and(v.readOnly, not(v.canEdit))}">
+                        <div class="slds-grid">
+                            <div class="slds-col" style="width: 50% !important;">
+                                <label class="slds-form-element__label">{!$Label.c.Taxi_Transfer_Market_Value} &nbsp;</label>
+                                <ui:inputText aura:id="Licence-Market_value-Input" disabled="{!v.readOnly}" class="slds-input" value="{!v.licenceMarketValue}" placeholder="$ "/>  
+                            </div>
+                            <div class="slds-col" style="width: 50% !important;">
+                                <label class="slds-form-element__label">{!$Label.c.Taxi_Transfer_Levy_Due}&nbsp;</label>
+                                <ui:inputText aura:id="Levy-Due-Input" disabled="{!v.readOnly}" class="slds-input" value="{!v.levyDueAmount}" placeholder="$ "/>  
+                            </div>
+                        </div>
+                    </aura:if>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <div class="slds-media__body">
+                                <h2 style="font-size: 1.3em; font-color:gray">       
+                                    {!$Label.c.Taxi_Buyer_Details_Sub_Header}
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 100% !important;">
+                            <label class="slds-form-element__label">{!$Label.c.Taxi_Transfer_Buyer_Type}&nbsp;<span class="requiredField">*</span></label>
+                            <br/>
+                            <input type="radio" disabled = "{!v.readOnly}" checked = "{!v.buyerType == 'Individual'}" name="buyerType" aura:id="Individual" id="Individual" onchange="{!c.setBuyerType}" /> Individual
+                            &nbsp;&nbsp;&nbsp;
+                            <input type="radio" disabled = "{!v.readOnly}" checked = "{!v.buyerType == 'Corporation'}" name="buyerType" aura:id="Corporation" id="Corporation" onchange="{!c.setBuyerType}" /> Corporation
+                            &nbsp;&nbsp;&nbsp;
+                            <input type="radio" disabled = "{!v.readOnly}" checked = "{!v.buyerType == 'Joint-Holders'}" name="buyerType" aura:id="Joint-Holders" id="Joint-Holders" onchange="{!c.setBuyerType}" /> Joint Holders 
+                            <br/>
+                            <span id="buyerTypeError" class="customErrorMsg"></span>
+                            <span id="buyerTypeJointHoldersError" class="customErrorMsg"></span>
+                        </div>
+                    </div>
+                    
+                    <aura:if isTrue="{!v.buyerType == 'Corporation'}">
+                        
+                        <c:CorporatePartnerFormComponent aura:id="corporatePartnerForm" readOnly="{!v.readOnly}"
+                                                         relatedContact="{!v.corporatePartner}"/>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.buyerType == 'Individual'}">
+                        
+                        <c:IndividualPartnerFormComponent aura:id="individualPartnerForm" readOnly="{!v.readOnly}"
+                                                          relatedContact="{!v.individualPartner}"/>
+                    </aura:if>
+                    
+                    <!-- Start of Joint-Holders -->
+                    <aura:if isTrue="{!v.buyerType == 'Joint-Holders'}">
+                        
+                        <table>
+                            <aura:iteration items="{!v.jointHoldersIndividualPartners}" var="individualContact" indexVar="index">
+                                <tr>
+                                    <td>
+                                        
+                                        <h2 style="width: 100%;margin: 15px 0px;padding-left: 2%;text-align: left;font-size: 1.3em;">
+                                            Individual Partner {!index+1} Details
+                                        </h2>
+                                        
+                                        <c:IndividualPartnerFormComponent aura:id="jointHoldersIndividualPartnerForm"
+                                                                          formIndex="{!index}" readOnly="{!v.readOnly}"
+                                                                          relatedContact="{!individualContact}"/>
+                                        
+                                        <div class="slds-card__footer">
+                                            <aura:if isTrue="{!not(v.readOnly)}">
+                                                <button type="button" onclick="{!c.removeIndividualPartner}" id="{!index}" class="slds-button slds-button--neutral">
+                                                    <i style="color:#54698d !important;" class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Remove Individual Partner
+                                                </button>
+                                            </aura:if>
+                                        </div>
+                                        
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </table>
+                        
+                        <table>
+                            <aura:iteration items="{!v.jointHoldersCorporatePartners}" var="corporateContact" indexVar="index">
+                                <tr>
+                                    <td>
+                                        
+                                        <h2 style="width: 100%;margin: 15px 0px;padding-left: 2%;text-align: left;font-size: 1.3em;">
+                                            Corporate Partner {!index+1} Details
+                                        </h2>
+                                        
+                                        <c:CorporatePartnerFormComponent aura:id="jointHoldersCorporatePartnerForm"
+                                                                         formIndex="{!index}" readOnly="{!v.readOnly}"
+                                                                         relatedContact="{!corporateContact}"/>
+                                        
+                                        <div class="slds-card__footer">
+                                            <aura:if isTrue="{!not(v.readOnly)}">
+                                                <button type="button" onclick="{!c.removeCorporatePartner}" id="{!index}" class="slds-button slds-button--neutral">
+                                                    <i style="color:#54698d !important;" class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Remove Corporate Partner
+                                                </button>
+                                            </aura:if>
+                                        </div>
+                                        
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </table>
+                        
+                        <aura:if isTrue="{!not(v.readOnly)}">
+                            <div class="slds-grid">
+                                <div class="slds-col" style="width: 50%!important; text-align: right">
+                                    <ui:button class="slds-button slds-button--neutral" press="{!c.addIndividualPartner}"> 
+                                        <i style="color:#54698d !important;" class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add Individual Partner
+                                    </ui:button>
+                                </div>
+                                <div class="slds-col" style="width: 50% !important;">
+                                    <ui:button class="slds-button slds-button--neutral" press="{!c.addCorporatePartner}"> 
+                                        <i style="color:#54698d !important;" class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add Corporate Partner
+                                    </ui:button>
+                                </div>
+                            </div>
+                        </aura:if>
+                        
+                    </aura:if>
+                    <!-- End of Joint-Holders -->
+					
+					<div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+							<c:EmailAddressComponent isReadOnly="{!v.readOnly}" aura:id="Transferee-Email-Input" uniqueIdentifier="Transferee-Email-Input" 
+                                                 fieldLabel="{!$Label.c.Taxi_Transfer_Email}" isRequired="true" email="{!v.email}" />
+                             
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                            <c:PhoneComponent isReadOnly="{!v.readOnly}" aura:id="Transferee-daytimePhoneNumber" uniqueIdentifier="Transferee-daytimePhoneNumber" fieldLabel="{!$Label.c.Taxi_Transfer_Daytime_Phone}" isRequired="true" phoneNumber="{!v.daytimePhone}" /> 
+                        </div>
+                    </div>
+                
+            </div>
+        </div>
+        
+        <div class="slds-card__footer">
+            
+            <aura:if isTrue="{!and(v.readOnly, not(v.renderOnReviewPage))}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+            <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+            <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                </ui:button>
+            </aura:if>
+        </div>
+        
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

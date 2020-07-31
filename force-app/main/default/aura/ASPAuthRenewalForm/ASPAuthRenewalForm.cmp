@@ -1,0 +1,39 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="caseId" type="String"/>
+    <aura:attribute name="sectionNameToRender" type="String" default="sectionA"/>
+    <aura:attribute name="isTSPAuthSelected" type="Boolean" default="false"/>
+    <aura:attribute name="isBSPAuthSelected" type="Boolean" default="false"/>
+    
+    <aura:handler name="loadSection" event="c:ASPAuthRenewalFormSectionEvent" action="{!c.updateSectionHandlers}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	
+    <br/>
+    <h2 style="width: 100%;margin: 0;padding: 0;text-align: center;">
+        <hr style="display: inline-block;margin: 0 20px 8px 0;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr> 
+          Authorisation Renewal Application 
+        <hr style="display: inline-block;margin: 0 0 8px 20px;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr>
+    </h2>
+    <br/>
+    
+    <aura:if isTrue="{!v.sectionNameToRender == 'sectionA'}">
+        <c:ASPAuthRenewalFormPartA_AuthDetails caseId="{!v.caseId}"></c:ASPAuthRenewalFormPartA_AuthDetails>
+    </aura:if>
+    
+   <aura:if isTrue="{!v.sectionNameToRender == 'sectionB'}">
+        <c:ASPAuthRenewalFormPartB_PrivacyStatment caseId="{!v.caseId}" isTSPAuthSelected="{!v.isTSPAuthSelected}" isBSPAuthSelected="{!v.isBSPAuthSelected}"></c:ASPAuthRenewalFormPartB_PrivacyStatment>
+    </aura:if>
+    
+    <!--<aura:if isTrue="{!v.sectionNameToRender == 'sectionC'}">
+        <c:ASPAuthRenewalFormPartC_Review caseId="{!v.caseId}" isTSPAuthSelected="{!v.isTSPAuthSelected}" isBSPAuthSelected="{!v.isBSPAuthSelected}"></c:ASPAuthRenewalFormPartC_Review>
+    </aura:if>-->
+    
+    <aura:if isTrue="{!v.sectionNameToRender == 'sectionD'}">
+        <c:PSPBankDetailsForm applicationType="Renew" caseId="{!v.caseId}" isTSPAuthSelected="{!v.isTSPAuthSelected}" isBSPAuthSelected="{!v.isBSPAuthSelected}"></c:PSPBankDetailsForm>
+    </aura:if>
+    
+</aura:component>

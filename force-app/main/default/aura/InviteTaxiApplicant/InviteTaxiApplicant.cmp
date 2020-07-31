@@ -1,0 +1,48 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global" controller="InviteTaxiApplicantController">
+    
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    <aura:attribute name="allCases" type="string"/>
+    <aura:attribute name="renderButton" type="boolean" default="true"/>
+    <aura:attribute name="incompleteApplications" type="boolean" default="false"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <span>
+    	Invite users to review application?
+    </span>
+    <aura:if isTrue="{!v.renderButton}">
+        <div class = "marginleft">
+            <ui:button class="slds-button slds-button--neutral" press="{!c.InviteApplicant}">
+                <i style="color:#54698d !important;" class="fa fa-envelope-open" aria-hidden="true"></i>&nbsp;&nbsp;<b>Invite Applicants</b>
+            </ui:button>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.incompleteApplications}">
+        <div aura:id="inviteError"
+            class="slds-notify slds-notify--alert slds-theme_error slds-theme--alert-texture" role="alert">
+            <span style="color: #ffffff;font-weight: bold;">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                &nbsp;Atleast one of the tender application contact does not have email. Please complete email for each
+                tender application contact.
+            </span>
+        </div>
+    </aura:if>
+
+    <div aura:id="inviteConfirmation" class="slds-notify slds-notify--alert slds-theme_success slds-theme--alert-texture toggle" role="alert">
+        <span style="color: #ffffff;font-weight: bold;">
+            <i class="fa fa-check" aria-hidden="true"></i>
+            &nbsp;Invitition sent successfully.
+        </span>
+    </div>
+    
+    <div aura:id="invititionFailure" class="slds-notify slds-notify--alert slds-theme_error slds-theme--alert-texture toggle" role="alert">
+        <span style="color: #ffffff;font-weight: bold;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            &nbsp;Failed to send invite. Please contact System Adminstrator for more details.
+        </span>
+    </div>
+    
+    
+</aura:component>

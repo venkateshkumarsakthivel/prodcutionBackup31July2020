@@ -1,0 +1,15 @@
+.THIS .slds-input {
+    width:30%;
+}
+.THIS .slds-lookup__menu {
+    width:29% ;
+}
+.THIS .slds-is-open{
+    display:block;
+}
+.THIS .slds-is-close{
+    display:none;
+}
+.THIS .slds-listbox__item{
+    cursor:pointer;
+}

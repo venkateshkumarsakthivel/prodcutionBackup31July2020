@@ -1,0 +1,22 @@
+.THIS.backgroundContainer>div{ 
+    padding:1rem
+}
+
+.THIS .containerLabel{
+    font-weight:600;
+    font-size:1rem;
+}
+
+.THIS .inputBox input {
+	padding-left: 30px;
+}
+
+.THIS .btn_add button {
+    background-color : #4bca81;
+}
+
+.THIS .txt_align_right {
+    text-align:right;
+    font-weight:1000;
+    font-size:medium;
+}

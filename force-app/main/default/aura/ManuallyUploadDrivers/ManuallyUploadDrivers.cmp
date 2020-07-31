@@ -1,0 +1,50 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="SingleFleetUpload">
+    <aura:attribute name="lastName" type="String" />
+    <aura:attribute name="dob" type="Date" />
+    <aura:attribute name="licenceNo" type="String" /> 
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:registerEvent name="createFleetEntity" type="c:CreateFleetEntityEvent"/> 
+    
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" aura:id="modalDiv">
+        <div class="slds-modal__container formbox">
+            <div class="slds-modal__header">
+                <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closemodal}">
+                    <c:svgIcon class="dashboard_icon" svgPath="/resource/slds221/assets/icons/utility-sprite/svg/symbols.svg#close"
+                               category="utility" size="x-small" name="close"></c:svgIcon>        
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 id="header43" class="slds-text-heading--medium">Add Driver</h2>
+            </div>        
+            
+            <div class="slds-modal__content slds-p-around--medium">
+                <form class="slds-form" >
+                    <div class="slds-form--stacked">
+                      <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <c:DriverLicenceComponent aura:id="licenceNumber" fieldLabel="NSW Driver Licence" licence="{!v.licenceNo}"/>
+                        </div>
+                      </div>
+                      <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="inputSample2">Last Name&nbsp;<span class="requiredField">*</span></label>
+	                        <ui:inputText maxlength="100" aura:id="lastname" value="{!v.lastName}" class="slds-input" />
+                        </div>
+                      </div>
+                      <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="inputSample2">Date of Birth (dd/mm/yyyy)&nbsp;<span class="requiredField">*</span></label>
+                            <ui:inputDate format="dd/MM/yyyy" aura:id="dob" value="{!v.dob}" displayDatePicker="true" click="{!c.hideDatePicker}" keyup="{!c.onKeyUp}" class="slds-input"/>
+                        </div>
+                      </div>
+                    </div>
+                </form> 
+            </div>
+            
+            <div class="slds-modal__footer">
+                <ui:button class="slds-button slds-button-neutral" press="{!c.closemodal}">Cancel</ui:button>
+                <ui:button class="slds-button slds-button-neutral" press="{!c.saveDriverRecord}">Save</ui:button>
+            </div> 
+        </div> 
+    </div>
+    <div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+</aura:component>

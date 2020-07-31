@@ -1,0 +1,125 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="closeAssociateActionInput" type="boolean" />  
+    <aura:attribute name="associateIndex" type="String" />
+    
+    <aura:attribute name="index" type="Integer" />
+    
+    <aura:attribute name="residentialUnitType" type="String" default=""/>
+    <aura:attribute name="residentialStreet" type="String" />
+    <aura:attribute name="residentialCity" type="String" />
+    <aura:attribute name="residentialState" type="String" />
+    <aura:attribute name="residentialPostalCode" type="String" />
+    <aura:attribute name="residentialCountry" type="String" />
+    
+    <aura:attribute name="familyName" type="string" default="" />
+    <aura:attribute name="firstName" type="string" default="" />
+    <aura:attribute name="otherName" type="string" default="" />
+    <aura:attribute name="otherNameDetails" type="string" default=""/>
+    
+    <aura:attribute name="closeAssociateDOB" type="string" default="" />
+    <aura:attribute name="closeAssociateTitle" type="string" default="" />
+    
+    <aura:attribute name="invalidDetails" type="boolean" />
+    <aura:method name="validateData" action="{!c.performBlankInputCheck}" access="PUBLIC"/>
+    
+    <aura:attribute name="hasOneMoreAssociateAbove" type="boolean" default="true" />
+    
+    <aura:if isTrue="{!v.hasOneMoreAssociateAbove}">
+     <hr style="margin:0 20px 0 20px;"></hr>
+    </aura:if>
+    
+    <div class="slds-card__body">
+            <div class="slds-form--stacked">
+                
+                <fieldset>
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <legend class="slds-form-element__legend slds-form-element__label">{!$Label.c.Close_Associate_Title}&nbsp;<span class="requiredField">*</span></legend>
+                            <ui:inputSelect disabled="{!v.readOnly}" class="single" aura:id="InputSelectTitle" value="{!v.closeAssociateTitle}">
+                                <ui:inputSelectOption text="" label="Please Select"/>
+                                <ui:inputSelectOption text="Mr." />
+                                <ui:inputSelectOption text="Mrs."/>
+                                <ui:inputSelectOption text="Ms." />
+                                <ui:inputSelectOption text="Miss."/>
+                                <ui:inputSelectOption text="Other"/>
+                            </ui:inputSelect>
+                        </div>
+                        <div class="slds-col">
+                              
+                            <c:DateOfBirthComponent isReadOnly="{!v.readOnly}" aura:id="DOB" uniqueIdentifier="{!v.associateIndex + 'DOB'}" 
+                                                    fieldLabel="{!$Label.c.Close_Associate_Birthdate}"
+                                                    isRequired="true" DOB="{!v.closeAssociateDOB}"/>
+                        </div>
+                        
+                    </div>
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label" for="firstGivenFamilyName">{!$Label.c.Close_Associate_First_Name}&nbsp;<span class="requiredField">*</span></label>
+                            <ui:inputText disabled="{!v.readOnly}" value="{!v.firstName}" required="true" maxlength="40" class="slds-input" aura:id="firstGivenFamilyName" />
+                        </div>
+                        <div class="slds-col">
+                            <label class="slds-form-element__label" for="familyName">{!$Label.c.Close_Associate_Last_Name}&nbsp;<span class="requiredField">*</span></label>
+                            <ui:inputText disabled="{!v.readOnly}" value="{!v.familyName}" required="true" maxlength="80" class="slds-input upperCaseInput" aura:id="familyName" />
+                        </div>
+                        
+                    </div>
+                    <div class="slds-grid">
+                        
+                        <div class="slds-col">
+                            <label class="slds-form-element__label" for="otherGivenFamilyName">{!$Label.c.Close_Associate_Other_given_name}</label>
+                            <ui:inputText disabled="{!v.readOnly}" value="{!v.otherName}" required="true" maxlength="255" class="slds-input" aura:id="otherGivenFamilyName" />
+                            <span aura:id="otherGivenFamilyNameError" class="slds-form-element__help"></span>
+                        </div>
+                        
+                        <div class="slds-col">
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col" style="width: 50% !important;">
+                            <label class="slds-form-element__label">{!$Label.c.Close_Associate_Ever_been_known_by_another_name}&nbsp;<span class="requiredField">*</span></label>
+                            <br/>
+                        </div>
+                        <div class="slds-col" style="width: 50% !important;">
+                            <ui:inputRadio value="{!if(v.closeAssociateActionInput == false, true, false)}" disabled="{!v.readOnly}" aura:id="no_closeAssociate" class="closeAssociateHandler" name="{!v.associateIndex + 'otherNameGroup'}" label="" change="{!c.otherNameChange}"/>&nbsp;No
+                            &nbsp;&nbsp;
+                            <ui:inputRadio value="{!if(v.closeAssociateActionInput == true, true, false)}" disabled="{!v.readOnly}" aura:id="yes_closeAssociate" class="closeAssociateHandler" name="{!v.associateIndex + 'otherNameGroup'}" label="" change="{!c.otherNameChange}"/>&nbsp;Yes, provide details
+                            <br/>
+                            <span id="{!v.associateIndex + '-closeAssociateError'}" class="customErrorMsg"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid" style="padding-left: 2%;width:80%;">
+                        <ui:inputTextarea disabled="{!v.readOnly}" aura:id="closeAssociateInputDetails" maxlength="1000" 
+                                          class="{!if(v.closeAssociateActionInput == true, '', 'toggleDisplay')}"
+                                          value="{!v.otherNameDetails}"/>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <legend class="slds-form-element__legend slds-form-element__label">{!$Label.c.Close_Associate_Residential_Address}&nbsp;<span class="requiredField">*</span></legend>
+                            <c:AddressInputComponent reviewReadOnly="{!v.readOnly}" aura:id="Residential-Address-Input" unitType="{!v.residentialUnitType}" street="{!v.residentialStreet}" city="{!v.residentialCity}" 
+                                                     state="{!v.residentialState}" postalcode="{!v.residentialPostalCode}" country="{!v.residentialCountry}" 
+                                                     addressType="{!v.associateIndex + '_CloseAssociate_Residential_Address'}"
+                                                     fullStreet="{!v.residentialStreet}"/>
+                        </div>
+                        <div class="slds-col">
+                        </div>
+                    </div>
+                    
+                </fieldset>
+                <aura:if isTrue="{!v.readOnly == false}">
+                    <fieldset>
+                        <div class="slds-grid">
+                            <div class="slds-col">
+                                <c:P2POTAttachment category="POI" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of your proof of identity document" AllowMultiple="true" section="{!'CLOSE_ASSOC_' + v.index}" index="{!v.index}" />
+                            </div>
+                            <div class="slds-col"></div>
+                        </div>
+                    </fieldset>                    
+                </aura:if>
+            </div>
+        </div>
+</aura:component>

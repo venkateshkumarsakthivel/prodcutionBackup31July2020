@@ -1,0 +1,42 @@
+<!-- This component is used in upload drivers using csv functionality -->
+
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="BulkUploadFleet">
+    <aura:attribute name="fileToUpload" type="String" />
+    <aura:attribute name="successUploads" type="Integer" default="0" />
+    <aura:attribute name="isSuccess" type="Boolean" default="false" />
+    <aura:attribute name="baseUrl" type="String" default="$A.get('$Label.c.Community_Base_Url')" />
+    <aura:registerEvent name="createFleetEntity" type="c:CreateFleetEntityEvent"/> 
+    <!--<aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+ <aura:registerEvent name="createFleetEntity" type="c:CreateFleetEntityEvent"/>
+ <aura:attribute name="onclose" type="Aura.Action" default="{!c.destroyComponent}"/>-->
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide "/>
+    
+    
+    <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aura:id = "modalDiv">
+        <div class="slds-modal__container">
+            <div class="slds-modal__header">
+                <!--<c:svgIcon svgPath="/resource/slds221/assets/icons/utility-sprite/svg/symbols.svg#close" category="utility" size="large" name="close" />-->
+                <!--<button class="slds-button slds-modal__close slds-button- -icon-inverse" title="Close">
+           <span class="slds-assistive-text">Close</span>
+         </button>-->
+                <a href="{!baseUrl + 'article/bulk-upload-drivers?popup=false'}" style="float:right;" title="Bulk driver template" target="_blank">Bulk driver template</a>
+                <h2 id="header43" class="slds-text-heading--medium">Upload Drivers</h2>
+                
+            </div>
+            
+            <div class="slds-modal__content slds-p-around--medium">
+                <center>
+                    <input type="file" class="file" accept=".csv" aura:id="file" value="{!v.fileToUpload}"/>
+                    <ui:button class="slds-button slds-button--neutral" press="{!c.readFile}"> Upload Drivers </ui:button>
+                </center>
+            </div>
+            
+            <div class="slds-modal__footer">
+                <button class="slds-button slds-button--neutral" onclick="{!c.destroyComponent}">Cancel</button>
+            </div>
+        </div>
+    </div> 
+    <div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+    
+</aura:component>

@@ -1,0 +1,164 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="PSPPaymentFormController">
+    <style>
+       .slds-modal__container{
+               max-width: 150rem !important;
+               width:70% !important;
+        }
+    </style>
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    
+    <aura:attribute name="paymentMethod" type="String"/>
+    <aura:attribute name="paymentReferenceNumber" type="String" default="" />
+    <aura:attribute name="icrnNumber" type="String" default="" />
+    <aura:attribute name="paymentAmount" type="Decimal"/>
+    <aura:attribute name="surchargeAmount" type="Decimal"/>
+    <aura:attribute name="isInitiatedFromManageAccount" type="Boolean" default="false" />
+    <aura:attribute name="isInitiatedByInternalUser" type="Boolean" default="false" /> 
+    <aura:attribute name="communityContext" type="String"/>
+    <aura:attribute name="profileName" type="String"/>
+    <aura:attribute name="receiptNumber" type="String"/>
+    
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <article class="slds-card" id="formPartA">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/utility-sprite/svg/symbols.svg#moneybag'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">   
+                        Payment Details
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <aura:if isTrue="{!v.paymentMethod == 'Credit Card/Debit Card'}">
+                    <p style="font-size: 15px !important;">
+                        Your payment has been processed successfully.
+                    </p>
+                </aura:if>
+                
+                <aura:if isTrue="{!or(v.paymentMethod == 'Direct Debit', v.paymentMethod == 'BPay')}">
+                    <p style="font-size: 15px !important;">
+                        Processing will commence only when the payment has cleared which may take up to four business days. 
+                        The Commission will only contact you if your payment is dishonoured.
+                    </p>
+                </aura:if>
+                
+                <aura:if isTrue="{!v.paymentMethod == 'Bank Cheque'}">
+                    <p style="font-size: 15px !important;">
+                        Bank Cheque to be made payable to Transport for NSW and mailed to Point to Point Commission, PO Box 533, Burwood NSW 1805 with the reference {!v.paymentReferenceNumber}.
+                    </p>
+                </aura:if>
+                
+                <aura:if isTrue="{!v.paymentMethod == 'Money Order'}">
+                    <p style="font-size: 15px !important;">
+                        Money Order to be made payable to Transport for NSW and mailed to Point to Point Commission, PO Box 533, Burwood NSW 1805 with the reference {!v.paymentReferenceNumber}.
+                    </p>
+                </aura:if>
+                
+                <aura:if isTrue="{!v.paymentMethod == 'Contact P2P Commission'}">
+                    <p style="font-size: 15px !important;">
+                        Contact our contact centre on {!$Label.c.Contact_Centre_Number}.
+                    </p>
+                </aura:if>
+                
+                <br/>
+                
+                <div class="slds-grid">
+                    <div class="{!v.paymentMethod == 'BPay' ? 'slds-col slds-size_3-of-7' : 'slds-col'}">
+                        <table style="font-size: 15px; border= 0px">
+                            <tr>
+                                <td>
+                                    <b>Amount</b>
+                                    <br/><br/>
+                                </td>
+                                <td style="text-align:left;">
+                                    &nbsp;&nbsp;<ui:outputCurrency value="{!v.paymentAmount}"/>
+                                    <br/><br/>
+                                </td>
+                            </tr>
+                            <aura:if isTrue="{!v.paymentMethod == 'Credit Card/Debit Card'}">
+                                <tr>
+                                    <td>
+                                        <b>Surcharge Amount</b>
+                                        <br/><br/>
+                                    </td>
+                                    <td style="text-align:left;">
+                                        &nbsp;&nbsp;<ui:outputCurrency value="{!v.surchargeAmount}"/>
+                                        <br/><br/>
+                                    </td>
+                                </tr>
+                            </aura:if>
+                            <tr>
+                                <td>
+                                    <b>Payment Reference Number</b>
+                                    <br/><br/>
+                                </td>
+                                <td style="text-align:left;">
+                                    &nbsp;&nbsp;<ui:outputText value="{!v.paymentReferenceNumber}"/>
+                                    <br/><br/>
+                                </td>
+                            </tr>
+                            <aura:if isTrue="{!or(v.paymentMethod == 'Credit Card/Debit Card', v.paymentMethod == 'Direct Debit')}">
+                                <tr>
+                                    <td>
+                                        <b>Receipt Number</b>
+                                        <br/><br/>
+                                    </td>
+                                    <td style="text-align:left;">
+                                        &nbsp;&nbsp;<ui:outputText value="{!v.receiptNumber}"/>
+                                        <br/><br/>
+                                    </td>
+                                </tr>
+                            </aura:if>
+                            <tr>
+                                <td>
+                                    <b>Payment Method</b>
+                                    <br/><br/>
+                                </td>
+                                <td style="text-align:left;">
+                                    &nbsp;&nbsp;<ui:outputText value="{!v.paymentMethod}"/>
+                                    <br/><br/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="{!v.paymentMethod == 'BPay' ? 'slds-col slds-size_1-of-7' : 'slds-col'}">
+                    </div>
+                    <div class="{!v.paymentMethod == 'BPay' ? 'slds-col slds-size_3-of-7' : 'slds-col slds-hide'}">
+                        <aura:if isTrue="{!v.paymentMethod == 'BPay'}">
+                            <div style="font-size:12px;">
+                                <c:BPAY_Template paymentRefNumber="{!v.icrnNumber}"/>
+                            </div>
+                        </aura:if>
+                    </div>
+                </div>
+                
+                <br/>
+                
+            </div>
+        </div>
+        
+        <div class="slds-card__footer">
+            
+            <ui:button class="slds-button slds-button--neutral" press="{!c.navigateForward}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+            </ui:button>
+            
+        </div>
+        
+    </article>
+</aura:component>

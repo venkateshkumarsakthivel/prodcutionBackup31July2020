@@ -1,0 +1,64 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.TaxiLicenceActionStyle}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}"/>
+    
+    <aura:attribute name="caseId" type="String"/>
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="entityType" type="String"/>
+    
+    <aura:attribute name="applicationType" type="String" default="New"/>
+    
+    <aura:attribute name="sectionNameToRender" type="String" default="sectionA"/>
+    
+    <aura:handler name="loadSection" event="c:ASPFormSectionEvent" action="{!c.updateSectionHandlers}"/>
+    <aura:handler name="closeApplication" event="c:TaxiFormModalClosureEvent" action="{!c.closeApplication}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <br/>
+    
+    <div id="taxiFormContainer">
+        <aura:If isTrue="{!v.sectionNameToRender == 'sectionA'}">
+           <c:TaxiFormTenderDetails readOnly="true" disabledInput="true" isFromPortal="true" aura:id="tenderDetails" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormTenderDetails>
+        </aura:If>
+        
+        <aura:If isTrue="{!v.sectionNameToRender == 'sectionB'}">
+            <c:TaxiFormIndividual isFromPortal="true" caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:TaxiFormIndividual>
+        </aura:If>
+        
+        <aura:If isTrue="{!v.sectionNameToRender == 'sectionC'}">
+            <c:TaxiFormCorporation isFromPortal="true"  caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:TaxiFormCorporation>
+        </aura:If>
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'sectionC-P'}">
+            <c:TaxiFormCorporatePartnership isFromPortal="true" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormCorporatePartnership>
+        </aura:if>
+        
+        <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Company Partner')}">
+            <c:TaxiFormIndividualPartnership isFromPortal="true" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="true"></c:TaxiFormIndividualPartnership>
+        </aura:if>
+        
+        <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Individual Partner')}">
+            <c:TaxiFormIndividualPartnership isFromPortal="true" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="false"></c:TaxiFormIndividualPartnership>
+        </aura:if>
+        
+        <aura:If isTrue="{!v.sectionNameToRender == 'sectionD'}">
+            <c:TaxiFormNominatedDirector isFromPortal="true" caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:TaxiFormNominatedDirector>
+        </aura:If>
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'sectionE'}">
+            <c:TaxiFormPrivacyStatement isFromPortal="true" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormPrivacyStatement>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'review'}">
+            <c:TaxiFormExternalReview isFromPortal="true"  accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormExternalReview>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.sectionNameToRender == 'sectionF'}">
+            <c:TaxiFormPaymentDetails applicationType="New" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormPaymentDetails>
+        </aura:if>
+        
+    </div>
+</aura:component>

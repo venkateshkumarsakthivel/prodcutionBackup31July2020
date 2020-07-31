@@ -1,0 +1,17 @@
+<aura:component controller="PayFromOrderDetailsLayoutController" implements="force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global">
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    <aura:attribute name="order" type="Order" />
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    
+    <aura:if isTrue="{!not('Taxi Licence' == v.order.Authorisation__r.Authorisation_Type__c)}">
+        <div class="slds-modal__content slds-p-around--medium">
+            <c:PSPBankDetailsForm isInitiatedByInternalUser="true" isInitiatedFromManageAccount="true" orderId="{!v.order.Id}" paymentReferenceNumber="{!v.order.Payment_Reference__c}" application_fee="{!v.order.TotalAmount}" selectedPaymentMethod="{!v.order.Payment_Method__c}" orderStatus="{!v.order.Status}" orderReceiptNumber="{!v.order.Receipt_Number__c}"/>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!('Taxi Licence' == v.order.Authorisation__r.Authorisation_Type__c)}">
+        <div class="slds-modal__content slds-p-around--medium">
+            <c:TaxiFormPaymentDetails isInitiatedByInternalUser="true" isInitiatedFromManageAccount="true" orderId="{!v.order.Id}" paymentReferenceNumber="{!v.order.Payment_Reference__c}" application_fee="{!v.order.TotalAmount}"  />
+        </div>    
+    </aura:if>
+    
+</aura:component>

@@ -1,0 +1,46 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="SingleFleetUpload">
+    <aura:attribute name="plateNumber" type="String" />
+    <!--Changed to String[] from String (:Mahesh) -->
+    <aura:attribute name="plateType" type="String[]" default="O, M"/>
+    <aura:attribute name="chassisNumber" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
+    <aura:registerEvent name="createFleetEntity" type="c:CreateFleetEntityEvent"/>
+
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" aura:id="modalDiv">
+        <div class="slds-modal__container">
+            <div class="slds-modal__container formbox">
+            <div class="slds-modal__header">
+                <div style="font-size:2em;">Add Vehicle</div>
+            </div>
+            <div class="slds-modal__content slds-p-around--medium">
+                <form class="slds-form" >
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="platenumber">Plate Number&nbsp;<span class="requiredField">*</span></label>
+                        <ui:inputText maxlength="20" aura:id="platenumber" value="{!v.plateNumber}"/>
+                    </div>
+                    <div class="slds-form-element">
+                       <!--Replaced text field with the inputSelect to have picklist behaviour (:Mahesh) -->
+                        <label class="slds-form-element__label" for="platetype">Plate Type&nbsp;<span class="requiredField">*</span></label>
+                        <ui:inputSelect aura:id="platetype">
+                            <aura:iteration items="{!v.plateType}" var="pType">
+                                 <ui:inputSelectOption text="{!pType}" label="{!pType}"/>
+                            </aura:iteration>
+                        </ui:inputSelect>
+                    </div>
+                    <div class="slds-form-element">
+                        <!-- Added max length to 4 for this field(Mahesh) -->
+                        <label class="slds-form-element__label" for="chassisnumber">Last 4 digits of VIN or Chassis #&nbsp;<span class="requiredField">*</span></label>
+                        <ui:inputText aura:id="chassisnumber" value="{!v.chassisNumber}" maxlength="4" keyup="{!c.onKeyUp}"/>
+                    </div>
+                    
+                </form> 
+            </div>
+            <div class="slds-modal__footer">
+                <ui:button class="slds-button slds-button-neutral" press="{!c.closemodal}">Cancel</ui:button>
+                <ui:button class="slds-button slds-button-neutral" press="{!c.saveVehicleRecord}">Save</ui:button>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+</aura:component>

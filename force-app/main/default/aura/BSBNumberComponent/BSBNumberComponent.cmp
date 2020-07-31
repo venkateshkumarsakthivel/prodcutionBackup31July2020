@@ -1,0 +1,66 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="BSBNumberProcessor">
+    
+    <aura:attribute name="isRequired" type="Boolean" default="true" access="public"/>
+    <aura:attribute name="isReadOnly" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="isValid" type="Boolean" default="true" access="public"/>
+    <aura:attribute name="isHorizontalLayout" type="Boolean" default="false" access="public"/>
+    
+    <aura:attribute name="bsbNumber" type="String" default="" access="public" />
+    <aura:attribute name="bankName" type="String" default="" access="public" />
+    <aura:attribute name="bankSuburb" type="String" default="" access="public" />
+    
+    <aura:attribute name="fieldLabel" required="true" type="String" default="BSB Number" access="public"/>
+    <aura:attribute name="uniqueIdentifier" required="true" type="String" default="bsbNumber" access="public"/>
+    <aura:attribute name="isInitComplete" type="Boolean" default="false" access="private"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.validateBSB}"/>
+    <aura:method name="verifyBSB" action="{!c.validateBSBForSave}" />
+    <aura:attribute name="isPortalUser" type="Boolean" default="false" access="public"/>
+   
+    <aura:if isTrue="{!v.isHorizontalLayout == false}">
+        <div class="slds-grid slds-wrap">
+            <div class="{!v.uniqueIdentifier + 'Content slds-size--1-of-1 uiInput--default'}">
+                <aura:if isTrue="{!v.isRequired == false}">
+                    <label class="slds-form-element__label" >{!v.fieldLabel}</label>
+                </aura:if>
+                <aura:if isTrue="{!v.isRequired == true}">
+                    <label class="slds-form-element__label" >{!v.fieldLabel}&nbsp;<span class="requiredField">*</span></label>
+                </aura:if>
+                
+                <ui:inputText disabled="{!v.isReadOnly}" updateOn="keyup" value="{!v.bsbNumber}" blur="{!c.validateBSB}" paste="{!c.validateBSB}" maxlength="7" class="slds-input"/>   	
+                <span class="{!v.uniqueIdentifier + 'Error slds-form-element__help' }"></span>
+                
+            </div>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isHorizontalLayout}">
+        
+        <div class="slds-grid" style="width:80%;">
+            
+            <div class="slds-col1">
+                <aura:if isTrue="{!v.isRequired == false}">
+                    <label class="slds-form-element__label">{!v.fieldLabel}</label>
+                </aura:if>
+                <aura:if isTrue="{!v.isRequired == true}">
+                    <label class="slds-form-element__label">{!v.fieldLabel}&nbsp;<span class="requiredField">*</span></label>
+                </aura:if>
+            </div>
+            
+            <div class="{!v.uniqueIdentifier + 'Content slds-col1'}">
+               
+               <!-- 
+                <ui:inputText disabled="{!v.isReadOnly}" updateOn="keyup" value="{!v.bsbNumber}" blur="{!c.validateBSB}" paste="{!c.validateBSB}" maxlength="7" class="slds-input"/>   	
+                <span class="{!v.uniqueIdentifier + 'Error slds-form-element__help' }"></span> -->
+            <aura:if isTrue="{!v.isPortalUser}">  
+                          <ui:inputText disabled="{!v.isReadOnly}" updateOn="keyup" value="{!v.bsbNumber}" blur="{!c.validateBSB}" paste="{!c.validateBSB}" maxlength="7" class="slds-input"/>   	
+                <span class="{!v.uniqueIdentifier + 'Error slds-form-element__help' }"></span>
+                            </aura:if>
+                        <aura:if isTrue="{!not(v.isPortalUser)}"> 
+                        <ui:inputText disabled="true" updateOn="keyup" value="{!v.bsbNumber}" blur="{!c.validateBSB}" paste="{!c.validateBSB}" maxlength="7" class="slds-input"/>   	
+                <span class="{!v.uniqueIdentifier + 'Error slds-form-element__help' }"></span>
+                         </aura:if>
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

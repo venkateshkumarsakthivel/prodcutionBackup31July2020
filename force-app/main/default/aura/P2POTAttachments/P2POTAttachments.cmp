@@ -1,0 +1,50 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="P2POTAttachmentController">
+	<aura:attribute name="parent" type="String" default="" />
+    <aura:attribute name="caseLodged" type="boolean" default="true" access="private"/>
+	<aura:attribute name="attachments" type="Object[]" default="" />
+	<aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    <aura:method name="fetchAttachmentDetails" action="{!c.initialize}" access="PUBLIC"/>
+    <aura:handler name="confirmDeleteAttachment" event="c:DeleteAttachmentEvent" action="{!c.confirmDeleteAttachment}"/>
+    <article class="slds-card slds-m-10-around_10">
+		<div class="slds-card__header slds-grid">
+			<header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                    <h3>All Attached Documents</h3>
+                </div>
+			</header>
+		</div>
+		<div class="slds-card__body">
+			<table class="slds-table slds-table--bordered slds-table--cell-buffer slds-table--fixed-layout">
+			    <thead>
+			      <tr class="slds-text-heading--label">
+			        <th scope="col" width="90%"><div class="slds-truncate" title="ID">Files</div></th>
+                    <th style="text-align:center" scope="col"><div class="slds-truncate"  title="View" >View</div></th>
+                   
+                      <th style="text-align:center" scope="col"><div class="slds-truncate"  title="Delete">Delete</div></th>
+                                    
+			      </tr>
+			    </thead>
+			    <tbody>
+				    	<aura:iteration items="{!v.attachments}" var="attachment">
+				    		<tr>
+				    			<td><ui:outputText value="{!attachment.name}" /></td>
+                                <td align="center">
+                                    <div class="slds-truncate slds-align_absolute-center wrap" >
+                                        <i style="color:#54698d !important;"  onclick="{!c.viewAttachment}" title='View' class="fa fa-eye" aura:id="viewAttachment" data-recordId="{!attachment.attachmentId}" ></i>
+                                    </div>
+                                </td>
+                              
+                                    <td align="center">
+                                        <div class="slds-truncate slds-align_absolute-center wrap" >
+                                            <i style="color:#54698d !important;"  onclick="{!c.deleteAttachment}" title='Delete' class="fa fa-trash" aura:id="DeleteAttachment" data-recordId="{!attachment.attachmentId}" ></i>
+                                        </div>
+                                    </td>
+                               
+				    		</tr>
+				    	</aura:iteration>
+			    </tbody>
+		  	</table>
+		</div>
+	</article>
+    <p>{!v.body}</p>
+</aura:component>

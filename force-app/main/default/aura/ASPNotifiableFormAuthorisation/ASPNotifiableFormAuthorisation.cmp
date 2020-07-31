@@ -1,0 +1,327 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" controller='ASPNotifiableFormAuthorisation' >
+     
+    <aura:attribute name="showNotifiableOccurenceModal" type="Boolean" />
+    <aura:registerEvent name="showform" type="c:showNotifiableModalForm"/>
+    <aura:registerEvent name="closeModalOnSuccess" type="c:saveOnSuccessAndCloseModal" />
+    
+    <aura:attribute name="street" type="String"  />
+    <aura:attribute name="city" type="String"  />
+    <aura:attribute name="state" type="String"  />
+    <aura:attribute name="postalcode" type="String"  />
+    <aura:attribute name="UnitType" type="String"  />
+    <aura:attribute name="DateTimeVal" type="DateTime" />
+    
+    <aura:attribute name="NoCovidResponse" type="String" />
+    <aura:attribute name="readOnly" type="Boolean" default="False" access="public"/>
+    
+    <aura:attribute name="inputN" type="Decimal"/>
+    
+    <aura:attribute name="checkbox-A" type="boolean" default='false' />
+    <aura:attribute name="checkbox-B" type="boolean" default='false' />
+    <aura:attribute name="checkbox-C" type="boolean" default='false' />
+    <aura:attribute name="checkbox-D" type="boolean" default='false' />
+    <aura:attribute name="checkbox-E" type="boolean" default='false' />
+    
+    <aura:attribute name="selectedAuthorization" type="Authorisation__c" />
+    <aura:attribute name="loggedInContactDetails" type="Contact" />
+    <aura:attribute name="selectedCase" type="Case" />
+    
+    <aura:attribute name="onCaseSubmitMessage" type="String" default="{!$Label.c.ASP_Notifiable_On_Case_Creation_Success}" />
+    <aura:attribute name="record_Id" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <article id="OccurrenceForm" > 
+        <div>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+                <div class="slds-modal__container" style = "width: 70%; height: 90%">
+                    <header class="slds-modal__header" >
+                        <div class="slds-media slds-align_absolute-center">
+                            <div class="slds-media__figure">
+                                <span class="slds-icon_container slds-icon-standard-opportunity">
+                                    <c:svgIcon class="slds-icon"
+                                               svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#note'}"  category="standard" size="large" name="fleet">
+                                    </c:svgIcon>
+                                </span>
+                            </div>
+                            <span>
+                                <div class = 'slds-form-element__label '>
+                                    <h1 class="slds-page-header__title slds-text-heading_medium slds-hyphenate" style = "font-size : 26px"><b>Notifiable Occurrences Notification Form</b></h1>
+                                </div>
+                            </span>
+                        </div>
+                        <p align = 'right' class="slds-text-body_small slds-line-height_reset">Fields marked with <span class="requiredField">*</span> are mandatory</p>
+                    </header>
+                    
+                    <lightning:spinner aura:id="spinner1" variant="brand" size="large" class=" slds-hide"/>
+                    
+                    <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                        <span style="color: #ffffff;">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                        </span>
+                    </div>
+                    <div class="slds-modal__content slds-p-around_medium" style = "padding: 2rem;" id="modal-content-id-1">
+                        <div>
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <span class="slds-icon_container slds-icon-standard-opportunity">
+                                        <c:svgIcon class="slds-icon"
+                                                   svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#sales_path'}"  category="standard" size="smalls" name="fleet">
+                                        </c:svgIcon>
+                                    </span>
+                                </div>
+                                <span>
+                                    <div class = 'slds-form-element__label '>
+                                        <h1 class="slds-page-header__title slds-text-heading_medium slds-hyphenate" style = "font-size : 20px"><b>Instructions</b></h1>
+                                    </div>
+                                </span>
+                            </div>
+                            &nbsp;
+                            <ul class="slds-list--dotted">
+                                <li> {!$Label.c.ASP_Notifiable_instruction_1_1}&nbsp;<i>{!$Label.c.ASP_Notifiable_instruction_1_2}</i> </li>
+                                <li> {!$Label.c.ASP_Notifiable_instruction_2_1}&nbsp;<i>{!$Label.c.ASP_Notifiable_instruction_2_2}</i> </li>
+                                <li> {!$Label.c.ASP_Notifiable_instruction_3_1}&nbsp;<a href="https://www.pointtopoint.nsw.gov.au/file/1686/download?token=qmncCUY9">Notifiable Occurrences fact sheet</a></li>
+                                <li> {!$Label.c.ASP_Notifiable_instruction_5_1}&nbsp;<a href="https://www.pointtopoint.nsw.gov.au/files/notifiable-occurrences-user-guide-v10pdf">Notifiable Occurrences User Guide</a></li>
+                                <li> {!$Label.c.ASP_Notifiable_instruction_4_1}&nbsp;<a href="https://www.pointtopoint.nsw.gov.au/files/notitfiable-occurrence-example-1-faultpdf">mechanical faults</a> and <a href="https://www.pointtopoint.nsw.gov.au/files/notifiable-occurrence-example-2-car-accidentpdf">injury</a></li>
+                            </ul>
+                        </div>
+                        <hr /> 
+                        <div>
+                            <h2 class="slds-text-heading_medium slds-hyphenate">{!$Label.c.ASP_Notifiable_Part_A}</h2>
+                            <div class="slds-grid">
+                                <div class="slds-col slds-size--1-of-2">
+                                    <label class="slds-form-element__label">{!$Label.c.ASP_Notifiable_Part_A_Authorisation_Name} <span class="requiredField">*</span></label>
+                                    <ui:inputText aura:id='authName' disabled="true" value="{!v.selectedAuthorization.Name}" class="slds-output slds-input"/>
+                                </div>
+                                <div class="slds-col slds-size--2-of-2" >
+                                    <label class="slds-form-element__label">{!$Label.c.ASP_Notifiable_Part_A_Account_Name} <span class="requiredField">*</span></label>
+                                    <ui:inputText aura:id='authAccName' disabled="true" value="{!v.selectedAuthorization.Service_Provider__r.Name}" class="slds-output slds-input"/>
+                                </div> 
+                            </div>
+                            
+                            <div class="slds-grid">
+                                <div class="slds-col slds-size--1-of-2">
+                                    <label class="slds-form-element__label">{!$Label.c.ASP_Notifiable_Part_A_FirstName} <span class="requiredField">*</span></label>
+                                    <ui:inputText aura:id='FirstName' disabled="true" value="{!v.loggedInContactDetails.FirstName}" class="slds-output slds-input"/>
+                                </div>
+                                <div class="slds-col slds-size--2-of-2" >
+                                    <label class="slds-form-element__label">{!$Label.c.ASP_Notifiable_Part_A_LastName} <span class="requiredField">*</span></label>
+                                    <ui:inputText aura:id='LastName' disabled="true" value="{!v.loggedInContactDetails.LastName}" class="slds-output slds-input"/>
+                                </div> 
+                            </div>
+                            
+                            <div class="slds-grid">
+                                <div class="slds-col slds-size--1-of-2">
+                                    <label class="slds-form-element__label">{!$Label.c.ASP_Notifiable_Part_A_Daytime_Phone} <span class="requiredField">*</span></label>
+                                    <ui:inputText aura:id='dayTimePhone' disabled="true" value="{!v.loggedInContactDetails.Phone}" class="slds-output slds-input"/>
+                                </div>
+                                <div class="slds-col slds-size--2-of-2" >
+                                    <label class="slds-form-element__label">{!$Label.c.ASP_Notifiable_Part_A_Email_Address} <span class="requiredField">*</span></label>
+                                    <ui:inputText aura:id='emailAddress' disabled="true" value="{!v.loggedInContactDetails.Email}" class="slds-output slds-input"/>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <div>
+                            <hr /> 
+                        </div>
+                        <div>
+                            <h2 class="slds-text-heading_medium slds-hyphenate" >{!$Label.c.ASP_Notifiable_Part_B} </h2>
+                            <br />
+                            
+                             
+                       		<div class="slds-text-color_inverse slds-text-title_caps slds-text-title_bold" style="padding:0.5rem;background:#FF0000">Coronavirus (COVID-19) SPECIAL REPORTING INSTRUCTIONS:</div>
+                            
+                    <label class="slds-form-element__label">Are you reporting a Notifiable Occurrence that is related to COVID-19? &nbsp;<span class="requiredField">*</span></label>
+                        <div class="radiobuttonClass">
+                            <ui:inputRadio  aura:id="CovidR0" change="{!c.onNoCovidResponse}" name="CovidResponse" label="" value="{!v.NoCovidResponse == 'Yes' ? true : false}"/> Yes &nbsp;&nbsp;&nbsp;
+                            <ui:inputRadio  aura:id="CovidR1" change="{!c.onNoCovidResponse}" name="CovidResponse" label="" value="{!v.NoCovidResponse == 'No' ? true : false}"/> No
+                        </div>
+                            
+                             <span id="CovidReturnError" class="requiredField"></span>
+                    <br />
+                            <div class="slds-box slds-box_small">
+                          <p><b>IF YES,</b> select notifiable occurrence Category <b>A</b> (below) then provide details in <b>Part C</b>- Occurrence Description (below), and complete other mandatory fields as required. Please also provide name and contact details for a follow up call. </p>
+                            <br />
+                            <p><b>IF NO,</b> complete the form as you usually would for a notifiable occurrence.</p>
+                            </div>
+                              
+                           <div class="slds-grid">
+                                <div class="slds-col slds-size--1-of-2">
+                                    <label class="slds-form-element__label">{!$Label.c.ASP_Notifiable_Part_B_DateTime} <span class="requiredField">*</span> </label>
+                                    <p>
+                                        {!$Label.c.ASP_Notifiable_HT_DateTime} 
+                                    </p>
+                                    
+                                    <ui:inputDateTime aura:id="DateTimeValue" class="form-control" displayDatePicker="true"/> 
+                                    
+                                    <br/>
+                                    <label class="slds-form-element__label">{!$Label.c.ASP_Notifiable_Part_B_Became_Aware_Date_Time} <span class="requiredField">*</span> </label>
+                                    <p>
+                                        {!$Label.c.ASP_Notifiable_HT_Became_Aware_Date_Time} 
+                                    </p>
+                                    
+                                    <ui:inputDateTime aura:id="BecameAwareDateTimeValue" class="form-control" displayDatePicker="true" /> 
+                                    <br/>
+                                    <label class = "slds-form-element__label ">{!$Label.c.ASP_Notifiable_Part_B_Occ_Location} <span class="requiredField">*</span></label>
+                                    <p style = "margin-bottom: 2%;">
+                                        {!$Label.c.ASP_Notifiable_HT_Occurrence_Location}
+                                    </p>
+                                    <!--    <p style="padding-top: 6px; margin-top: -5%;">
+                                       
+                                        <c:AddressInputComponent aura:id="Postal-Address-Input" isReadOnly="false" street="{!v.street}" 
+                                                                 city="{!v.city}" state="{!v.state}" unitType="{!v.UnitType}"
+                                                                 postalcode="{!v.postalcode}" addressType="NominatedDirector_Residential_Address"
+                                                                 />
+          -->
+                                    <p style="padding-top: 6px;">
+                                        <label class="slds-form-element__label">Street</label>
+                                        <ui:inputText maxlength="255" aura:id="street" value="{!v.street}" />
+                                        <br/>
+                                        <label class="slds-form-element__label">City/Suburb</label>
+                                        <ui:inputText maxlength="255" aura:id="city" value="{!v.city}" class="upperCaseInput" />
+                                        <br/>
+                                        <div class="slds-inputselect">
+                                            <label class="slds-form-element__label">State/Territory</label>
+                                            <ui:inputSelect aura:id="state" value="{!v.state}" class="slds-inputselect" >
+                                                <ui:inputSelectOption text="" label="Please Select"/>
+                                                <ui:inputSelectOption text="NSW"/>
+                                                <ui:inputSelectOption text="ACT"/>
+                                                <ui:inputSelectOption text="VIC"/>
+                                                <ui:inputSelectOption text="QLD"/>
+                                                <ui:inputSelectOption text="SA"/>
+                                                <ui:inputSelectOption text="NT"/>
+                                                <ui:inputSelectOption text="TAS"/>
+                                                <ui:inputSelectOption text="WA"/>
+                                            </ui:inputSelect>
+                                        </div>
+                                        <br/>
+                                        <label class="slds-form-element__label">Postcode</label>
+                                        <ui:inputText maxlength="4" aura:id="postalcode" value="{!v.postalcode}" class="upperCaseInput"
+                                                      keypress="{!c.validate}" keyup="{!c.validate}" keydown="{!c.validate}"  updateOn="keypress, keyup, keydown"/>
+                                    </p>                   
+                                </div>
+                                <div class="slds-col slds-size--2-of-2 ">
+                                </div>
+                            </div>
+                            
+                            &nbsp;
+                            
+                            
+                            <fieldset class="slds-form-element ">
+                                <label class="slds-form-element__label">{!$Label.c.ASP_Notifiable_Part_B_Checkbox} <span class="requiredField">*</span></label>
+                                <div class="slds-form-element">
+                                    <p>
+                                        <span class="slds-checkbox" style = 'width : 116%;'>  
+                                            <input class="slds-checkbox" type="checkbox" name="options" id="checkbox-A" value="on" onclick= '{!c.clickCheckbox}'/> 
+                                            <label class="slds-checkbox__label" for="checkbox-A">
+                                                <span class="slds-checkbox_faux"></span>
+                                                <div style="display: inline-flex;width:90%;margin-left:5px;">
+                                                    <span class='checkboxlabel1'>A.&nbsp;&nbsp;{!$Label.c.ASP_Notifiable_checkbox_1}
+                                                    </span>
+                                                </div>
+                                            </label>
+                                        </span>
+                                    </p>
+                                    &nbsp;
+                                    <p>
+                                        <span class="slds-checkbox" style = 'width : 116%;'>
+                                            <input type="checkbox" name="options" id="checkbox-B" value="on" onclick= '{!c.clickCheckbox}' />
+                                            <label class="slds-checkbox__label" for="checkbox-B">
+                                                <span class="slds-checkbox_faux"></span>
+                                                <div style="display: inline-flex;width:90%;margin-left:5px;">
+                                                    <span class='checkboxlabel2'>B.&nbsp;&nbsp;{!$Label.c.ASP_Notifiable_checkbox_2}</span>
+                                                </div>
+                                            </label>
+                                        </span>
+                                    </p>
+                                    &nbsp;
+                                    <p>
+                                        <span class="slds-checkbox" style = 'width : 116%;'>
+                                            <input type="checkbox" name="options" id="checkbox-C" value="on" onclick= '{!c.clickCheckbox}' />
+                                            <label class="slds-checkbox__label" for="checkbox-C">
+                                                <span class="slds-checkbox_faux"></span>
+                                                <div style="display: inline-flex;width:90%;margin-left:5px;">
+                                                    <span class='checkboxlabel3'>C.&nbsp;&nbsp;{!$Label.c.ASP_Notifiable_checkbox_3}</span>
+                                                </div>
+                                            </label>
+                                        </span>
+                                    </p>
+                                    &nbsp;
+                                    <p>
+                                        <span class="slds-checkbox" style = 'width : 116%;'>
+                                            <input type="checkbox" name="options" id="checkbox-D" value="on" onclick= '{!c.clickCheckbox}' />
+                                            <label class="slds-checkbox__label" for="checkbox-D">
+                                                <span class="slds-checkbox_faux"></span>
+                                                <div style="display: inline-flex;width:90%;margin-left:5px;">
+                                                    <span class='checkboxlabel4'>D.&nbsp;&nbsp;{!$Label.c.ASP_Notifiable_checkbox_4}
+                                                    </span>
+                                                </div>
+                                            </label>
+                                        </span>
+                                    </p>
+                                    &nbsp;
+                                    <p>
+                                        <span class="slds-checkbox" style = 'width : 116%;'>
+                                            <input type="checkbox" class='uiInput uiInputCheckbox uiInput--default uiInput--checkbox checkbox'  name="options" id="checkbox-E" value="on" onclick= '{!c.clickCheckbox}'/>
+                                            <label class="slds-checkbox__label" for="checkbox-E">
+                                                <span class="slds-checkbox_faux"></span>
+                                                <div style="display: inline-flex;width:90%;margin-left:5px;">
+                                                    <span class='checkboxlabel5'>E.&nbsp;&nbsp;{!$Label.c.ASP_Notifiable_checkbox_5}
+                                                    </span>
+                                                </div>
+                                            </label>
+                                        </span>
+                                    </p>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <hr /> 
+                        <div>
+                            <h2 class="slds-text-heading_medium slds-hyphenate">{!$Label.c.ASP_Notifiable_Part_C}</h2>
+                            <div class="slds-col3 ">
+                                <label class="slds-form-element__label">{!$Label.c.ASP_Notifiable_Part_C_Full_occurrence_description} <span class="requiredField">*</span></label>
+                                <p>
+                                    {!$Label.c.ASP_Notifiable_HT_Full_Occurrence_description}
+                                </p> 
+                                <ui:inputTextArea aura:id="fullOccerrenceDescription" rows="4" required='true'/>
+                            </div>
+                            
+                            <div class="slds-col3 ">
+                                <label class="slds-form-element__label">{!$Label.c.ASP_Notifiable_Part_C_Description_of_cause} <span class="requiredField">*</span></label>
+                                <p>
+                                    {!$Label.c.ASP_Notifiable_HT_Description_of_cause_contributing_factors}
+                                </p> 
+                                <ui:inputTextArea aura:id="contributingFactors" rows="4" required='true'/>
+                            </div>
+                            
+                            <div class="slds-col3 ">
+                                <label class="slds-form-element__label">{!$Label.c.ASP_Notifiable_Part_C_Description_of_follow_up_action} <span class="requiredField">*</span></label>
+                                <p>
+                                    {!$Label.c.ASP_Notifiable_HT_Description_of_follow_up_action}
+                                </p> 
+                                <ui:inputTextArea aura:id="followUpDescription" rows="4" required='true'/>
+                            </div>
+                        </div>
+                        <br />
+                        <div>
+                            <footer class="slds-modal__footer slds-modal__footer_directional slds-docked-form-footer">
+                                <ui:button class="slds-button slds-button--neutral"  press="{!c.cancelForm}"> 
+                                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                                </ui:button>
+                                <ui:button aura:id="submitButton" class="slds-button slds-button--neutral" press="{!c.saveNotifiableForm}"> 
+                                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Submit
+                                </ui:button>
+                            </footer>
+                        </div>
+                    </div>
+                </div>
+                
+            </section>
+            <div class="slds-backdrop slds-backdrop_open" />
+        </div>
+    </article>
+    
+</aura:component>

@@ -1,0 +1,14 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+		
+	<div class="container"> 
+        
+        <div class="navigation" style="width:14%;Text-align:center;float:left;margin-top:0px;">
+            <c:TaxiAgentNavigation />
+        </div>
+
+        <div class="slds-grid dashboard">
+            <c:TaxiAgentManagementDashboard/>
+        </div>
+        
+    </div>
+</aura:component>

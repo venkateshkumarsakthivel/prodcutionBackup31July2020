@@ -1,0 +1,15 @@
+<aura:component implements="forceCommunity:searchInterface,forceCommunity:availableForAllPageTypes" access="global">
+
+<div class="slds-form-element slds-lookup" data-select="single">
+  <label class="slds-form-element__label" for="lookup-63">Account Name</label>
+  <div class="slds-form-element__control">
+    <div class="slds-input-has-icon slds-input-has-icon--right">
+        <i class="fa fa-search" aria-hidden="true" style="font-size: 2em;"></i>
+     <!-- <c:svgIcon class="slds-input__icon"  svgPath="/resource/1492777742000/slds221/assets/icons/standard-sprite/svg/symbols.svg#user" >
+        
+      </c:svgIcon> -->
+      <input type="search" id="lookup-63" class="slds-lookup__search-input slds-input" placeholder="Search Accounts" aria-owns="lookup-63" role="combobox" aria-activedescendant="" aria-expanded="false" aria-autocomplete="list" />
+    </div>
+  </div>
+  </div>
+</aura:component>

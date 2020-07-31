@@ -1,0 +1,15 @@
+@font-face {
+    font-family: 'Gotham-Book';
+    src: url(/industryportal/resource/GothamBookRegular);
+}
+.THIS {
+    
+    font-family: 'Gotham-Book' !important;
+}
+.THIS .slds-input[disabled]{
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+.THIS .slds-icon-standard-contact {
+    background-color: #34becd !important;
+}

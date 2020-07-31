@@ -1,0 +1,110 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,lightning:isUrlAddressable,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="getAuthorisationHistoryDetails" >
+
+    <ltng:require styles="/resource/slds2102/assets/styles/salesforce-lightning-design-system-ltng.min.css" />
+ 
+    <!-- attributes -->
+    <aura:attribute name="Authorisation" type="Authorisation__c[]"/>
+    <aura:attribute name="RelatedlistID" type="String"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="errorText" type="String"/>
+    <aura:attribute name="boolean" type="boolean" default="true"/>
+
+    <!-- handlers-->
+    
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+<aura:if isTrue="{!v.boolean}">
+    <div class="slds-page-header">
+      <div class="slds-page-header__row">
+        <div class="slds-page-header__col-title">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <lightning:icon iconName="action:approval" alternativeText="Approved" />
+                    </div>
+                    <div class="slds-media__body">
+                      <div class="slds-page-header__name">
+                        <div class="slds-page-header__name-title">
+                          <h1>
+                              <span class="slds-page-header__title slds-truncate" title="Authorisation ID">Old Authorisation Histories
+                              </span>
+                            
+                            </h1>
+                        </div>
+                      </div>
+                         <p class="slds-page-header__name-meta"> Currently viewing Histories of all the old Authorisations</p>
+                    </div>
+                 </div>
+        </div>
+      </div>
+    </div>
+         
+ <br></br>        
+
+<aura:iteration items="{!v.Authorisation}" var="Authorisation" indexVar="key"> 
+
+    <div class="slds-page-header">
+  <div class="slds-page-header__row">
+    <div class="slds-page-header__col-title">
+        <div class="slds-media">
+        <div class="slds-media__figure">
+       
+            <lightning:icon iconName="standard:event" alternativeText="Event" />
+        </div>
+        <div class="slds-media__body">
+          <div class="slds-page-header__name">
+            <div class="slds-page-header__name-title">
+              <h1>
+                  <span class="slds-page-header__title slds-truncate" title="Authorisation ID">Authorisation Name : {!Authorisation.Name}
+                  </span>
+                  <a href="{!'/lightning/r/'+ Authorisation.Id+ '/view'}" target="_blank">View</a>
+                </h1>
+            </div>
+          </div>
+          </div>
+      </div>
+    </div>
+  </div>
+
+    
+
+<div class="slds-page-header__row slds-page-header__row_gutters">
+<div class="slds-page-header__col-details">
+<ul class="slds-page-header__detail-row">
+<li class="slds-page-header__detail-block">
+<div class="slds-text-title slds-truncate" title="Field 1">Authorisation Number :</div>
+<div class="slds-truncate" title="{!Authorisation.Authorisation_Number__c}">{!Authorisation.Authorisation_Number__c}</div>
+</li>
+<li class="slds-page-header__detail-block">
+<div class="slds-text-title slds-truncate" title="Field 1">Created Date :</div>
+<div class="slds-truncate" title="{!Authorisation.CreatedDate}">{!Authorisation.CreatedDate}</div>
+</li>
+<li class="slds-page-header__detail-block">
+<div class="slds-text-title slds-truncate" title="Field 1">Status :</div>
+<div class="slds-truncate" title="{!Authorisation.Status__c}">{!Authorisation.Status__c}</div>
+</li>
+<li class="slds-page-header__detail-block">
+<div class="slds-text-title slds-truncate" title="Field 1">Last Modified By :</div>
+<div class="slds-truncate" title="{!Authorisation.LastModifiedDate}">{!Authorisation.LastModifiedDate}</div>
+</li>
+</ul>
+</div>
+</div>    
+    
+</div>    
+     <c:AuthorisationHistoryIteratorTable RelatedAuthID="{!Authorisation.Id}" />
+    <br></br>
+</aura:iteration>    
+  
+    <aura:set attribute="else">
+        
+   <lightning:card>
+    <ui:message title="Error" severity="error" closable="true">
+			{!v.errorText}
+	</ui:message>
+
+        </lightning:card> 
+    </aura:set>
+  </aura:if> 
+    
+    
+</aura:component>

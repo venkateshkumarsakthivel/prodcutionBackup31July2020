@@ -1,0 +1,40 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="AddressValidator">
+   
+    <aura:attribute name="transactionId" type="String"/>
+    <aura:attribute name="searchString" type="String"/>
+    <aura:attribute name="searchList" type="List" />
+    <aura:attribute name="Street" type="String"/>
+    <aura:attribute name="City" type="String"/>
+    <aura:attribute name="Unit" type="String"/>
+    <aura:attribute name="State" type="String"/>
+    <aura:attribute name="PostCode" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    
+
+    <div class="slds-m-around--large">
+        <div aura:id="res" class="slds-form-element slds-lookup" data-select="single">
+            <label class="slds-form-element__label" for="lookup-348"> Shipping Address </label>
+            <!--This part is for display search bar for lookup-->  
+            <div class="slds-form-element__control">
+                <div aura:id="lookupField" class="slds-show">
+                    <ui:inputText updateOn="keyup" class="slds-lookup__search-input slds-input " aura:id="thisInput" value="{!v.searchString}" keyup="{!c.addressSearch}" placeholder="address.."/>
+                </div>   
+            </div>
+        </div>
+        <!--This part is for Display typehead lookup result List-->  
+        <div class="slds-lookup__menu slds-is-close" aura:id="searchRes">
+            <ul class="slds-lookup__list" role="listbox">
+                <aura:iteration items="{!v.searchList}" var="cus">
+                    <li role="presentation" class="slds-listbox__item" onclick="{!c.getAddressDetails}" data-id="{!cus.id}">
+                        {!cus.fullAddress}<br/><br/>
+                    </li>
+                </aura:iteration>
+            </ul>
+        </div>
+    </div>
+    Unit:&nbsp;&nbsp;<ui:outputText aura:id="street" value="{!v.Unit}" class="streetClass"/><br/>
+    Street:&nbsp;&nbsp;<ui:outputText aura:id="street" value="{!v.Street}" class="streetClass"/><br/>
+    City:&nbsp;&nbsp;<ui:outputText aura:id="street" value="{!v.City}" class="streetClass"/><br/>
+    State:&nbsp;&nbsp;<ui:outputText aura:id="state" value="{!v.State}" class="stateClass"/><br/>
+    PostCode:&nbsp;&nbsp;<ui:outputText aura:id="postcode" value="{!v.PostCode}" class="postcodeClass"/>
+</aura:component>

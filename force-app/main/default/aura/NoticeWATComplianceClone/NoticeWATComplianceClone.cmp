@@ -1,0 +1,21 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="NoticeWATComplianceCloneController">
+	<aura:handler name="init" value="{!this}" action="{!c.init}" />
+    
+    <aura:attribute name="noticeRecordId" type="String" default="" access="public"/>
+    <aura:attribute name="noticeRecord" type="Object" default="" access="public"/>
+    <aura:attribute name="disableShowNotice" type="boolean" default="true" access="public"/>
+    <aura:attribute name="disableGenerateNotice" type="boolean" default="true" access="public"/>
+    
+    <lightning:flow aura:id="flowData" onstatuschange="{!c.handleStatusChange}"/>
+    
+    <lightning:card class="slds-align_absolute-center">
+        <lightning:layout >
+            <lightning:layoutItem flexibility="auto" padding="around-small">
+                <lightning:button label="Generate Next Notice" title="Generate Next Notice" onclick="{! c.handleClick }" variant="brand" disabled="{!v.disableGenerateNotice}"/>
+            </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" padding="around-small">    
+                <lightning:button label="View Next Notice" title="View Next Notice" onclick="{!c.navigateToRecord}" variant="brand" disabled="{!v.disableShowNotice}"/>
+            </lightning:layoutItem>        
+        </lightning:layout>
+    </lightning:card>
+</aura:component>

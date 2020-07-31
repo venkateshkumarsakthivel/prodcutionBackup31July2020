@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" 
+            description="Propagating Container Events to Card to fire Container Controller actions">
+    <aura:attribute name="callback" type="String"/>
+</aura:event>

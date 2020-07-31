@@ -1,0 +1,7 @@
+<design:component label="Register For Applicant">
+    <design:attribute name="firstnameLabel" default=""/>
+    <design:attribute name="lastnameLabel" default=""/>
+    <design:attribute name="emailLabel" default=""/>
+    <design:attribute name="submitButtonLabel" default=""/>
+     <design:attribute name="mobileLabel" default=""/>
+</design:component>

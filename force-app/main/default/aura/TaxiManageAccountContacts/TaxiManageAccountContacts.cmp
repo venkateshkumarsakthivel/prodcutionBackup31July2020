@@ -1,0 +1,167 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPManageAccountContacts">
+    
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="hideAccessLevels" type="Boolean" default="false"/>
+    
+    <aura:attribute name="accountName" type="String" />
+    <aura:attribute name="customerNumber" type="String" access="private"/>
+    <aura:attribute name="contactList" type="Contact[]"/>
+    <aura:attribute name="baseUrl" type="String"/>
+    <aura:attribute name="contactId" type="String" />
+    <aura:attribute name="loggedInUserContactId" type="String" />
+    <aura:attribute name="hasTPR" type="Boolean" default="false" />
+    <aura:attribute name="selectedContactRecords" type="String[]"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="refreshContactEvent" event="c:RefreshContactsEvent" action="{!c.doInit}"/>
+    <aura:handler name="confirmDeactivate" event="c:ConfirmRecordDeactivateEvent" action="{!c.contactDeactivate}"/>
+    <aura:method name="deactivateContact" action="{!c.confirmContactDeactivate}"/>
+    
+    
+    <lightning:spinner variant="brand" aura:id="spinner" size="large" ></lightning:spinner>
+    
+    <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+        <span style="color: #ffffff;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            &nbsp;Please select checkbox
+        </span>
+    </div>
+    
+    <article class="slds-card" id="contactComponent"> 
+        <div class="slds-page-header">
+            <div class="slds-grid">
+                <div class="slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                       svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="fleet">
+                            </c:svgIcon>
+                        </div>
+                        <div class="slds-media__body" style="text-align:left;"> 
+                            <aura:if isTrue="{!v.hideAccessLevels == true}"> 
+                                <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.AGENT_ACCT_MGMT_Header} - {!v.customerNumber}</p>
+                                <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="{!v.accountName}">{!v.accountName}</h2>
+                            </aura:if>
+                            <aura:if isTrue="{!and(v.accountId == '', v.hideAccessLevels == false)}"> 
+                                <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.ASP_ACCT_MGMT_Header} - {!v.customerNumber}</p>
+                                <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Customer number">{!v.accountName}</h2>
+                            </aura:if>
+                            <aura:if isTrue="{!and(v.accountId != '', v.hideAccessLevels == false)}"> 
+                                <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.AGENT_LICENCE_HOLDER_MGMT_Header} - {!v.customerNumber}</p>
+                                <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Customer number">{!v.accountName}</h2>
+                            </aura:if>
+                        </div>
+                        <div>
+                         <ui:button class="slds-button slds-button- -neutral headerButtons" press="{!c.addContact}"> 
+                                <i style="color:#54698d !important;" class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;&nbsp;New Contact
+                            </ui:button>
+                            <ui:button class="slds-button slds-button- -neutral headerButtons" press="{!c.confirmContactDeactivate}"> 
+                                <i style="color:#54698d !important;" class="fa fa-user-times" aria-hidden="true"></i>&nbsp;&nbsp;Remove Contact
+                            </ui:button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered slds-table--striped slds-no-row-hover" style="background-color: #003577;" >
+            <thead style="background: #003577;">
+        
+                    
+                    <tr class="slds-line-height--reset">
+                            
+                            <th class="selectCol" scope="col">
+                                <span class="slds-align- -absolute-left tableheader" title="Select">
+                                    SELECT
+                                </span> 
+                            </th>
+                    <!--
+                    
+                    <th class="selectCol" scope="col">
+                                <span class="slds-align- -absolute-left tableheader" title="Select">
+                                    SELECT
+                                </span> 
+                            </th-->
+                    
+                    <th class="primaryContactCol" scope="col" style="width:20%">
+                        <span class="tableheader" title="IsPrimaryContact">
+                            IS PRIMARY CONTACT
+                        </span> 
+                    </th>
+                    <th scope="col"  class="tabCol" style="width:20%">
+                        <span class="tableheader" title="Type" style="color:#fff">TYPE</span> 
+                    </th>
+                    
+                    <th scope="col"  class="tabCol" style="width:20%">
+                        <span class="tableheader"  title="Family Name" style="color:#fff">FAMILY NAME</span> 
+                    </th>                    
+                    
+                    <th scope="col"  class="tabCol" style="width:20%">
+                        <span class="tableheader" title="First Given Name" style="color:#fff">FIRST GIVEN NAME</span>
+                    </th>
+                    <th class="tabCol" scope="col" style="width:10%">
+                        <span class="tableheader" title="State">
+                            State
+                        </span>
+                    </th>
+                 
+                </tr>
+            </thead> 
+            
+            <tbody >
+                
+                <aura:iteration var="record" items="{!v.contactList}">
+                    <!--<aura:if isTrue="{!record.Contact_Type__c == 'General Contact'}">-->
+                     <tr class="slds-line-height--reset">
+                                <aura:if isTrue="{!v.loggedInUserContactId == record.Id || record.Of_Interest__c}">
+                                    <td role="gridcell" class="selectCol">
+                                        
+                                    </td>
+                                    <aura:set attribute="else">
+                                        <td role="gridcell" class="selectCol">
+                                            <input type="radio" name="selectContact" class="radio" data-RecId="{!record.Id}" data-Contacttype="{!record.Contact_Type__c}" data-Levycontactaccess="{!record.Is_Access_Level_Levy_Administrator__c}" data-DVDcontactaccess="{!record.Is_Access_Level_DVD_Administrator__c}" />                                    
+                                        </td>
+                                    </aura:set>
+                                </aura:if>
+                        
+                        <td scope="col" class="primaryContactCol" >
+                            <div class="slds-truncate wrap">
+                                <input type="checkbox" class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox checkbox" 
+                                       data-RecId="{!record.Primary_Contact__c}"
+                                       checked="{!record.Primary_Contact__c == true}"
+                                       change="" disabled="true"/> 
+                            </div>
+                        </td> 
+                        
+                        <td scope="col" class="tabCol" >
+                            <div class="slds-truncate wrap">
+                                <ui:outputText value="{!record.Contact_Type__c}" />
+                            </div>
+                        </td>
+                        <td scope="col" class="tabCol" >
+                            <div class="slds-truncate wrap">
+                                <ui:outputText value="{!record.LastName}"/>
+                            </div>
+                        </td>
+                        <td scope="col" class="tabCol" >
+                            <div class="slds-truncate  wrap" >
+                                <ui:outputText value="{!record.FirstName}"/>
+                            </div>
+                        </td>
+                        
+                        <td role="gridcell" class="tabCol">
+                            <div class="slds-truncate  wrap" >
+                                <ui:outputText class="slds-truncate wrap" value="{!record.MailingState}" />
+                            </div>
+                        </td>
+                        
+                      
+                    </tr>
+                       <!-- </aura:if>-->
+                </aura:iteration>
+            </tbody>
+        </table>
+    </article>
+    
+    <div aura:id ="modaldiv">{!v.body}</div>
+</aura:component>

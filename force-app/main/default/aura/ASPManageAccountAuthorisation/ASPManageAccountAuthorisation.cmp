@@ -1,0 +1,237 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPManageAccountAuthorisation">
+    
+    <aura:attribute name="customerNumber" type="String" access="private"/>
+    <aura:attribute name="accName" type="String" />
+    <aura:attribute name="authorisationList" type="Authorisation__c[]"/>
+    <aura:attribute name="notifiableOccurrencesList" type="Case[]"/>
+    <aura:attribute name="currentCaseNumberSortOrderASC" type="Boolean"/>
+    <aura:attribute name="currentAuthorisationNumberSortOrderASC" type="Boolean"/>
+    <aura:attribute name="currentOccurrenceDateTimeSortOrderASC" type="Boolean"/>
+    <aura:attribute name="isApplicationTab" type="Boolean" default="false"/>
+    <aura:attribute name="isAuthorisationTab" type="Boolean" default="false"/>
+    <aura:attribute name="authorisationsStatus" type="List" default="['Granted With Conditions','Granted Unconditionally','Suspended', 'Cancelled', 'Refused']"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:dependency resource="markup://c:ASPAuthorisationSurrenderForm" />
+     <aura:handler name="closeSurrenderFormonly" event="c:CloseTaxiSurrenderFormRedirect" action="{!c.closeSurrenderCaseForm}"/>
+     <aura:handler name="closeSurrenderForm" event="c:CloseTaxiSurrenderForm" action="{!c.closeSurrenderCaseFormandRedirect}"/>
+    <aura:handler name="confirmReturnDisclaimer" event="c:ConfirmReturnDisclaimer" action="{!c.handleSurrenderApplication}"/>
+    <aura:handler name="confirmAuthorisationRenewal" event="c:ConfirmAuthorisationRenewal" action="{!c.handleAuthRenewal}"/>
+    
+    <aura:handler name="showform" event="c:showNotifiableModalForm" action="{!c.closeModal}"/>
+    <aura:handler name="closeInternalReviewModal" event="c:InternalReviewCloseEvent" action="{!c.closeInternalReviewModal}"/>
+    <aura:handler name="closeModalOnSuccess" event="c:saveOnSuccessAndCloseModal" action="{!c.closeSavedCaseModal}"/>
+   
+    <lightning:spinner variant="brand" aura:id="spinner" size="large"></lightning:spinner>
+    
+    <div class="slds-grid slds-grid--vertical scrollable tableTop slds-border_top slds-card">
+        <div class="slds-scrollable slds-grow">
+            
+            <div id="generalSuccessMsgDiv" class="slds-notify slds-notify--success slds-theme--success slds-theme--alert-texture" role="success" style="display:none;margin-left: 10%;margin-right: 10%;border: solid 10px; border-color: rgba(4, 132, 75,9.1);">
+                <div class = "slds-grid">
+                    <div class="slds-col slds-size--1-of-12">
+                        <span style="color: #ffffff;">
+                            <i class="fa fa-check-circle-o" aria-hidden="true" style="font-size:55px"></i>
+                        </span>
+                    </div>
+                    <div class="slds-col slds-size--11-of-12">
+                        <span style="color: #ffffff;">
+                            <p align ="center">
+                                &nbsp;{!$Label.c.ASP_Notifiable_On_Case_Creation_Success}<br/>
+                                {!$Label.c.ASP_Notifiable_On_Case_Creation_Success_1}
+                            </p>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-page-header">
+                <div class="slds-grid">
+                    <div class="slds-col slds-has-flexi-truncate">
+                        <div class="slds-media slds-no-space slds-grow">
+                            <div class="slds-media__figure">
+                                <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                           svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="fleet">
+                                </c:svgIcon>
+                            </div>
+                            <div class="slds-media__body" style="text-align:left;"> 
+                                <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.ASP_ACCT_MGMT_Header} - {!v.customerNumber}</p>
+                                <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Customer name">{!v.accName}</h2>
+                            </div>
+                            <aura:if isTrue="{!!v.isAuthorisationTab}">
+                            
+                                <ui:button class="slds-button slds-button--neutral headerButtons" press="{!c.launchInteralReviewAppForm}"> 
+                                    <i style="color:#54698d !important;" class="fa fa-file-text-o" aria-hidden="true"></i>&nbsp;&nbsp;Internal Review
+                                </ui:button>
+                                &nbsp;
+                                <div> 
+                                    <ui:button class="slds-button slds-button--neutral headerButtons" press="{!c.launchNOForm}"> 	
+                                        <i style="color:#54698d !important;" class="fa fa-file-text-o" aria-hidden="true"></i>&nbsp;&nbsp;Notifiable Occurrence	
+                                    </ui:button>	
+                                </div>
+                                &nbsp;
+                                <ui:button class="slds-button slds-button--neutral headerButtons" press="{!c.confirmReturnDisclaimer}"> 
+                                    <i style="color:#54698d !important;" class="fa fa-mail-reply" aria-hidden="true"></i>&nbsp;&nbsp;Surrender
+                                </ui:button>
+                            </aura:if>
+                            <!--
+                            <ui:button class="slds-button slds-button- -neutral headerButtons" press="{!c.confirmRenewal}"> 
+                                <i style="color:#54698d !important;" class="fa fa-mail-forward" aria-hidden="true"></i>&nbsp;&nbsp;Renew
+                            </ui:button>
+                            -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-tabs--scoped" style="padding-top:2px;">
+                <ul class="slds-tabs--scoped__nav" role="tablist" style="float:left;" aura:id="caseSubmenu">
+                    <li class="slds-tabs--scoped__item  casesTab" title="Notice Records" role="presentation" aura:id="notice__item">
+                        <a class="slds-tabs--scoped__link " href="javascript:void(0);" role="tab" onclick="{!c.filterShowAllAuthorisations}" tabindex="0" aria-selected="true" aria-controls="tab-scoped-1">Authorisations</a>
+                    </li>
+                    <li class="slds-tabs--scoped__item casesTab" title="Application" role="presentation" aura:id="application__item">
+                        <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" onclick="{!c.filterNotifiableOccurrences}" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-2">Notifiable Occurrences</a>
+                    </li>
+                </ul>
+                <div style="clear:both;"></div>
+                <div class="slds-grid slds-grid--vertical">
+                    <div class="slds-grow">
+                        <div id="caseTableScrollContainer" style="height:400px;overflow-x:hidden;display:block;">
+                            <aura:if isTrue="{!!v.isApplicationTab}">
+                                <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered  slds-no-row-hover" style="background-color: #003577;">
+                                    <thead style="background: #003577;">
+                                        <tr class="slds-line-height--reset">
+                                            <th aria-label="Type" class="selectCol" scope="col">
+                                                <span class="slds-align--absolute-left tableheader" title="Select">
+                                                    SELECT
+                                                </span> 
+                                            </th>
+                                            <th aria-label="Type" class="tabCol" scope="col">
+                                                <span class="tableheader" title="Type">
+                                                    TYPE
+                                                </span> 
+                                            </th>
+                                            <th aria-label="Number" class="tabCol" scope="col">
+                                                <span class="tableheader" title="Number">
+                                                    NUMBER
+                                                </span> 
+                                            </th>                    
+                                            <th aria-label="Start Date" class="tabCol" scope="col">
+                                                <span class="slds-align--absolute-center tableheader" title="Start Date">
+                                                    START DATE
+                                                </span>
+                                            </th>
+                                            <th aria-label="End Date" class="tabCol" scope="col">
+                                                <span class="slds-align--absolute-center tableheader" title="End Date">
+                                                    END DATE
+                                                </span>
+                                            </th>
+                                            <th aria-label="Status" class="tabCol" scope="col">
+                                                <span class="tableheader" title="Status">
+                                                    STATUS
+                                                </span> 
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <aura:iteration var="record" items="{!v.authorisationList}">
+                                            <tr class="slds-line-height--reset">
+                                                <td role="gridcell" class="selectCol">
+                                                    <input type="radio" name="granted" class="radio" data-RecId="{!record.Id}" data-RecStatus="{!record.Status__c}" data-RecRenewRequested="{!record.Renewal_Requested__c}" data-RecReturnRequested="{!record.Return_Requested__c}" data-RecName="{!record.Name}" />                                    
+                                                </td>
+                                                <td role="gridcell" class="tabCol">
+                                                    <ui:outputText class="slds-truncate wrap" value="{!record.Authorisation_Type__c}"/>
+                                                </td>
+                                                <td role="gridcell" class="tabCol">
+                                                    <ui:outputText class="slds-truncate wrap" value="{!record.Name}" />
+                                                </td>
+                                                <td role="gridcell" class="tabCol">
+                                                    <ui:outputDate class="slds-truncate slds-align--absolute-center wrap" value="{!record.Start_Date__c}" format="dd/MM/yyyy"/>
+                                                </td>
+                                                <td role="gridcell" class="tabCol">
+                                                    <ui:outputDate class="slds-truncate slds-align--absolute-center wrap" value="{!record.End_Date__c}" format="dd/MM/yyyy"/>
+                                                </td>
+                                                <td role="gridcell" class="tabCol">
+                                                    <ui:outputText class="slds-truncate wrap" value="{!record.Status__c}"/>
+                                                </td>
+                                            </tr>
+                                        </aura:iteration>
+                                    </tbody>
+                                </table>
+                                <aura:set attribute="else">
+                                    <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered  slds-no-row-hover" style="background-color: #003577;">
+                                        <thead style="background: #003577;">
+                                            <tr class="slds-line-height--reset">
+                                                <th aria-label="Case Number" class="selectCol tabColSort" style="width:25%;" scope="col" onclick="{!c.sortCaseNumber}"> 
+                                                    <span class="slds-align--absolute-left tableheader" title="Case Number">
+                                                        CASE NUMBER
+                                                        <span>
+                                                            <aura:if isTrue="{!v.currentCaseNumberSortOrderASC}">
+                                                                &#8593;
+                                                                <aura:set attribute="else">
+                                                                    &#8595;
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </span>
+                                                    </span> 
+                                                </th>
+                                                <th aria-label="Authorisation Number" class="tabCol tabColSort" style="width:40%;" scope="col" onclick="{!c.sortCaseAuthorisationNumber}">
+                                                    <span class="tableheader" title="Authorisation Number">
+                                                        AUTHORISATION NUMBER
+                                                        <span>
+                                                            <aura:if isTrue="{!v.currentAuthorisationNumberSortOrderASC}">
+                                                                &#8593;
+                                                                <aura:set attribute="else">
+                                                                    &#8595;
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </span>
+                                                    </span> 
+                                                </th>
+                                                <th aria-label="Occurrence Date/Time" class="tabCol tabColSort" style="width:33%;" scope="col" onclick="{!c.sortCaseOccurrenceDateTime}">
+                                                    <span class="tableheader" title="Occurrence Date/Time">
+                                                        OCCURRENCE DATE/TIME
+                                                        <aura:if isTrue="{!v.currentOccurrenceDateTimeSortOrderASC}">
+                                                            &#8593;
+                                                            <aura:set attribute="else">
+                                                                &#8595;
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </span> 
+                                                </th>
+                                                <th aria-label="Occurrence Location" style="width:20%;" class="tabCol tabColSort" scope="col">
+                                                    <span class="slds-text-align_left tableheader" title="Occurrence Location">
+                                                        OCCURRENCE LOCATION
+                                                    </span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration var="notifiableOccurrencesRecord" items="{!v.notifiableOccurrencesList}">
+                                                <tr class="slds-hint-parent">
+                                                    <td role="gridcell" class="selectCol" >
+                                                        <a onclick="{!c.passid}" data-RecId="{!notifiableOccurrencesRecord.Id}" value="{!notifiableOccurrencesRecord.Id}">{!notifiableOccurrencesRecord.CaseNumber}</a>  
+                                                        <!-- <ui:outputText class="slds-truncate wrap" value="{!notifiableOccurrencesRecord.CaseNumber}" click="{!c.passid}"/>      -->                        
+                                                    </td>
+                                                    <td role="gridcell" class="tabCol" >
+                                                        <ui:outputText class="slds-truncate wrap" value="{!notifiableOccurrencesRecord.Authorisation__r.Name}"/>
+                                                    </td>
+                                                    <td role="gridcell" class="tabCol" >
+                                                        <ui:outputDateTime class="slds-truncate wrap" value="{!notifiableOccurrencesRecord.Commencement_Date_Time__c}" />
+                                                    </td>
+                                                    <td role="gridcell" class="tabCol">
+                                                        <div class="slds-truncate" style="width: 99%; overflow: hidden; text-overflow: ellipsis;">{!notifiableOccurrencesRecord.Street_Address_Line_1__c}{!notifiableOccurrencesRecord.City__c}{!notifiableOccurrencesRecord.State__c}{!notifiableOccurrencesRecord.Postcode__c}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {!v.body}
+    
+</aura:component>

@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="sectionName" type="String" access="global"/>
+    <aura:attribute name="caseId" type="String" access="global"/>
+    <aura:attribute name="isTSPAuthSelected" type="Boolean" default="false" access="global"/>
+    <aura:attribute name="isBSPAuthSelected" type="Boolean" default="false" access="global"/>
+</aura:event>

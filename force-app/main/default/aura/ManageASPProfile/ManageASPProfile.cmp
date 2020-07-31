@@ -1,0 +1,52 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ManageAccountAndContact">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="account" type="Account"/>
+    <aura:attribute name="recordId" type="Id" />
+
+        <div class="slds-page-header" role="banner">
+          <div class="slds-grid">
+            <div class="slds-col slds-has-flexi-truncate">
+              <div class="slds-media">
+                <div class="slds-media__figure">
+                     <c:svgIcon class="slds-icon slds-icon--medium slds-icon-standard-user" 
+                        svgPath="/resource/slds221/assets/icons/utility-sprite/svg/symbols.svg#user">
+                    </c:svgIcon>
+                </div>
+                <div class="slds-media__body">
+                  <p class="slds-text-heading-label">Account Name</p>
+                  <div class="slds-grid">
+                    <h1 class="slds-page-header__title slds-m-right--small slds-truncate slds-align-middle" title="Record Title">{!v.account.Name}</h1>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="slds-col slds-no-flex slds-align-bottom">
+                <div data-record="{!v.account.id}" onclick="{!c.showEditPanel}">
+                    <lightning:button label="Edit"  />
+                </div>
+            </div>
+          </div>
+          <ul class="slds-grid slds-page-header__detail-row">
+            <li class="slds-col--padded slds-size--1-of-4">
+              <p class="slds-text-heading-label slds-truncate" title="Notification Contact">NOTIFICATION CONTACT</p>
+                <p >{!v.account.Notification_Contact__r.Name}</p>
+            </li>
+            <li class="slds-col--padded slds-size--1-of-4">
+              <p class="slds-text-heading-label slds-truncate" title="ABN">ABN</p>
+                <p >{!v.account.ABN__c}</p>
+            </li>
+            <li class="slds-col--padded slds-size--1-of-4">
+              <p class="slds-text-heading-label slds-truncate" title="ACN">ACN</p>
+                <p>{!v.account.ACN__c}</p>
+            </li>
+            <li class="slds-col--padded slds-size--1-of-4">
+              <p class="slds-text-heading-label slds-truncate" title="Address">REGISTERED ADDRESS</p>
+                <!--<p class="slds-text-body-regular">{!v.account.Account_Postal_Address__c}</p> -->
+                <aura:unescapedHtml value="{!v.account.Account_Postal_Address__c}"/>  
+            </li>
+          </ul>
+        </div>
+        <div>
+           {!v.body}
+        </div>
+</aura:component>

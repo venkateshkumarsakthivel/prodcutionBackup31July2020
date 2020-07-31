@@ -1,0 +1,56 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" access="global" controller="TaxiLicenceCancellationController">
+    
+    <style>
+        .slds-modal__container{display:none;}    
+    </style>
+    
+    <aura:attribute name="decisionReason" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="showSuspensionReasons" type='Boolean' default='false' />
+    
+    <aura:attribute name="selectedAuthorization" type="Authorisation__c" />
+    <aura:attribute name="suspensionCaseCreated" type='Case' />
+    
+    <lightning:spinner variant="brand" size="medium" aura:id="spinner"/>
+    
+    <aura:if isTrue="{!v.showSuspensionReasons}">
+        <style>
+            .slds-modal__container{display:flex;}    
+        </style>
+        
+        
+        <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                        <span style="color: #ffffff;">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            &nbsp; <b>Select atleast one reason to proceed.</b>
+                        </span>
+                    </div>
+        
+        <div aura:id="variationSuccess" style="width: 100%;" class="toggle">
+            <div class="slds-align--absolute-center slds-page-header__title slds-text-heading_medium slds-hyphenate" style = "font-size : 18px">
+                <h3><b>You are about to cancel Taxi License. Select Cancellation reason to continue.</b></h3>
+            </div> 
+            <br></br>
+            <div class="row">
+               <p style ="font-size: initial;">
+                   <ui:outputText value="Select a Cancellation Reason (for multiple, hold ctrl while selecting reasons):" />
+                </p>
+                
+                <ui:inputSelect multiple="true" class="multiple dynamic" aura:id="InputSelectMultiple" change="{!c.onMultiSelectChange}">
+                    
+                </ui:inputSelect>
+                <br />
+                <p style ="font-size: initial">Selected Cancellation Reason(s):</p>
+                <p><ui:outputText class="result" aura:id="multiResult" value="" /></p>
+            </div>
+            <br />
+            <div class="slds-align--absolute-center">
+                <ui:button class="slds-button slds-button_brand" press="{!c.confirmAndClose}">Submit</ui:button>
+            </div>
+        </div>
+    </aura:if>
+    
+    
+    
+</aura:component>

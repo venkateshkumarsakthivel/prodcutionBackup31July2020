@@ -1,0 +1,20 @@
+<aura:component access="global" controller="CaseStopWatchController" implements="forceCommunity:availableForAllPageTypes,flexipage:availableForAllPageTypes,force:hasRecordId">
+    <aura:attribute name="case" type="Object"/>
+    <!-- Handle component initialization in a client-side controller -->
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    <div class="slds-box slds-grid slds-size_4-of-4 slds-theme_default">
+        <div class="slds-col slds-box slds-text-align_center">
+            <div aura:id="time" class=""><ui:outputText value="Case Age" /><ui:outputText class="slds-m-left_medium slds-text-heading_medium slds-case_age_number_font_size slds-case_age_number_font_weigth" value="{!v.case.Case_Age__c}"/><ui:outputText class="slds-m-left_medium" value="Days" /></div>
+        </div>
+        <aura:if isTrue="{!not(v.case.IsClosed)}">
+            <div class="slds-grid">
+                <div class="slds-col slds-p-around_medium">
+                    <lightning:buttonIcon title="Pause" iconName="utility:pause" alternativeText="Pause" aura:id="pause_button" class="{!v.case.isPaused__c == true ? 'slds-button slds-button-neutral slds-hide' : 'slds-button slds-button-neutral slds-show'}" onclick="{!c.pause}"/>
+                </div>
+                <div class="slds-col slds-p-around_medium">
+                    <lightning:buttonIcon title="Resume" iconName="utility:refresh" alternativeText="Resume" aura:id="resume_button" class="{!v.case.isPaused__c == true ? 'slds-button slds-button-neutral slds-show' : 'slds-button slds-button-neutral slds-hide'}" onclick="{!c.resume}" />
+                </div>
+            </div>
+        </aura:if>
+    </div>
+</aura:component>

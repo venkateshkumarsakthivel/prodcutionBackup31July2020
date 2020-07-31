@@ -1,0 +1,135 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiFormSectionDataController">
+	
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <aura:attribute name="caseId" type="String" />
+    <aura:attribute name="entityType" type="String"/>
+    <aura:attribute name="aspCase" type="String"/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="isPrivecyStatementAccepted" type="Boolean" default="false"/>
+    <aura:attribute name="isInformationDeclared" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="withdrawnCase" type="Boolean" default="false"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit), not(v.withdrawnCase))}">
+        <c:TaxiFormWATSectionProgressIndicator currentSection="{!$Label.c.Privacy_Statement_Header}" entityType="{!v.entityType}"/>
+        <br/>
+    </aura:if>
+    
+    <article class="slds-card" id="formPartC">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#document'}" 
+                               category="standard" size="large" name="document"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">      
+                        {!$Label.c.Privacy_Statement_Header}
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                <br/><br/>
+                <aura:if isTrue="{!and(v.readOnly == true, v.withdrawnCase == false)}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                  <div style="float:right">
+                    <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                        <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                    </ui:button>
+                    <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                        <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                    </ui:button>
+                  </div>
+                </aura:if>
+            </div>
+        </div>
+        
+        <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+            <span style="color: #ffffff;">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+            </span>
+        </div>
+        
+        
+        <hr style="margin: 0 auto;"/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <p>
+                   <aura:unescapedHtml value="{!$Label.c.Taxi_Privacy_Declaration_Para_1}"></aura:unescapedHtml>
+                </p>
+                <p>
+                   <aura:unescapedHtml value="{!$Label.c.Taxi_Privacy_Declaration_Para_2}"></aura:unescapedHtml>
+                </p>
+                <br/>
+                <p>
+                   <aura:unescapedHtml value="{!$Label.c.Taxi_Privacy_Declaration_Para_3}"></aura:unescapedHtml>
+                </p>
+                
+                <br/>
+                <h2 style="width: 100%;margin: 0;padding: 0;text-align: left;">
+                    Declaration
+                </h2>
+                <p>{!$Label.c.Declaration_Text}</p><br/>
+                
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        
+                        <ui:inputCheckbox disabled="{!v.readOnly}" aura:id="isInformationDeclared" label="" value="{!v.isInformationDeclared}" class="privacyCheckBox"/>{!$Label.c.Privacy_Information_Declared}
+                        <span id="privacyDeclaredError" class="customErrorMsg"></span>
+                    </div>
+                </div>
+                
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        
+                        <ui:inputCheckbox disabled="{!v.readOnly}" aura:id="isAuthorisedApplicant" label="" value="{!v.isPrivecyStatementAccepted}" class="privacyCheckBox"/>{!$Label.c.Privacy_Statement_Is_Privacy_Statement_Declared}
+                        <span id="privacyAcceptedError" class="customErrorMsg"></span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        <div class="slds-card__footer">
+            <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.finishLater}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Finish Later
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+            <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                </ui:button>
+            </aura:if>
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

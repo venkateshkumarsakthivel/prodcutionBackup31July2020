@@ -1,0 +1,7 @@
+<aura:event type="COMPONENT" description="This event send business address fields to ASP form part A" >
+	<aura:attribute name="baStreet" type="String" />
+	<aura:attribute name="baCity" type="String" />
+	<aura:attribute name="baPostalCode" type="String" />
+	<aura:attribute name="baInternationalAddress" type="String" />
+	<aura:attribute name="AddressType" type="String" />
+</aura:event>

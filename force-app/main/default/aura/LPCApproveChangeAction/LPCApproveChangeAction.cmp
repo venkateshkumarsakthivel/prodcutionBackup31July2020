@@ -1,0 +1,30 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickAction" access="global" controller="LPCApproveChangeActionController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:handler name="init" action="{!c.init}" value="{!this}" /> 
+    <aura:attribute name="approveErrorMessage" type="String" access="public"/>
+    <aura:attribute name="approveSuccessMessage" type="String" access="public"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-show"/>
+    
+    <article class="slds-card" id="approveChangesAction">
+        <div class="slds-card__body">
+            <div class="slds-form--stacked">
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!v.approveErrorMessage}                 
+                    </span>
+                </div>
+                <div id="generalSuccessMsgDiv" class="slds-notify slds-notify--alert slds-theme--success slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                        &nbsp;{!v.approveSuccessMessage}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </article>
+</aura:component>

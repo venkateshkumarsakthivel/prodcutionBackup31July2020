@@ -1,0 +1,120 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiAgentsClientAccountsTabController">
+    
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:attribute name="accountMap" type="Map" default="{}"/>
+    <aura:attribute name="clientAccountList" type="Account[]"/>
+    <aura:attribute name="acc" type="Account" />
+    <aura:attribute name="currentAccountNameSortOrderASC" type="Boolean" default="false" />
+    <aura:attribute name="currentAccountEntityTypeSortOrderASC" type="Boolean" default="false" />
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-show"/>
+    
+    <div id="clientAccountsTable" class="slds-grid slds-grid--vertical scrollable tableTop slds-border_top slds-card">
+        
+        <div class="slds-scrollable slds-grow">
+            <div class="slds-page-header">
+                <div class="slds-grid">
+                    <div class="slds-col slds-has-flexi-truncate">
+                        <div class="slds-media slds-no-space slds-grow">
+                            <div class="slds-media__figure">
+                                <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                           svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="fleet">
+                                </c:svgIcon>
+                            </div>
+                            <div class="slds-media__body" style="text-align:left;"> 
+                                <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.AGENT_ACCT_MGMT_Header} - {!v.acc.Customer_Number__c}</p>
+                                <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="{!v.acc.Name}">{!v.acc.Name}</h2>
+                            </div>
+                            
+                            <ui:button class="slds-button slds-button--neutral headerButtons" press="{!c.launchLicenceAgreement}"> 
+                                <i style="color:#54698d !important;" class="fa fa-file" aria-hidden="true"></i>&nbsp;&nbsp;New Agent Agreement
+                            </ui:button>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="height: 450px;overflow-x:hidden;display: block;">
+                
+                <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered slds-table--striped slds-no-row-hover" style="background-color: #eef1f6;">
+                    <thead style="{!v.authorisationList.length > 20 ? 'display:block; width: calc(100% - 17px);background: #003577;' : 'background: #003577;'}">
+                        <tr class="slds-line-height--reset">
+                            <th aria-label="Customer Number" class="tabCol" scope="col">
+                                <span class="slds-align--absolute-center tableheader" title="Customer Number">
+                                    CUSTOMER NUMBER
+                                </span> 
+                            </th>
+                            <th aria-label="Account Name" class="tabColSort" scope="col" onclick="{!c.sortAccountByName}">
+                                <span class="slds-float_left tableheader" title="Account Name">
+                                    ACCOUNT NAME
+                                    <span>
+                                        <aura:if isTrue="{!v.currentAccountNameSortOrderASC}">
+                                            &#8593;
+                                            <aura:set attribute="else">
+                                                &#8595;
+                                            </aura:set>
+                                        </aura:if>
+                                    </span>
+                                </span> 
+                            </th>
+                            <th aria-label="Entity Type" class="tabColSort" scope="col" onclick="{!c.sortAccountByEntityType}">
+                                <span class="slds-align--absolute-center tableheader" title="Entity Type">
+                                    ENTITY TYPE
+                                    <span>
+                                        <aura:if isTrue="{!v.currentAccountEntityTypeSortOrderASC}">
+                                            &#8593;
+                                            <aura:set attribute="else">
+                                                &#8595;
+                                            </aura:set>
+                                        </aura:if>
+                                    </span>
+                                </span> 
+                            </th>                    
+                            <th aria-label="No. of Licences" class="tabCol" scope="col">
+                                <span class="slds-align--absolute-center tableheader" title="Number of Licences">
+                                    NUMBER OF LICENCES
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration var="record" items="{!v.clientAccountList}">
+                            
+                            <tr class="slds-line-height--reset">
+                                
+                                <td role="gridcell" class="selectCol">
+                                    <a href="javascript:void(0)" data-RecId="{!record.Id}" onclick="{!c.viewAccountDetails}"> 
+                                        <ui:outputText class="slds-align--absolute-center" value="{!record.Customer_Number__c}"/>
+                                    </a>
+                                </td>
+                                <td role="gridcell" class="tabCol">
+                                    <ui:outputText class="slds-float_left" value="{!record.Name}"/> 
+                                </td>
+                                <td role="gridcell" class="tabCol">
+                                    
+                                    <aura:if isTrue="{!record.Record_Type_Dev_Name__c == 'Company'}"> 
+                                        <ui:outputText class="slds-align--absolute-center" value="Corporation"/>       
+                                    </aura:if>
+                                    
+                                    <aura:if isTrue="{!record.Record_Type_Dev_Name__c == 'Individual'}"> 
+                                        <ui:outputText class="slds-align--absolute-center" value="Individual"/>       
+                                    </aura:if>
+                                    
+                                    <aura:if isTrue="{!or(record.Record_Type_Dev_Name__c == 'Corporate_Partnership', record.Record_Type_Dev_Name__c == 'Individual_Partnership')}"> 
+                                        <ui:outputText class="slds-align--absolute-center" value="Joint Holder"/>     
+                                    </aura:if>
+                                </td>
+                                <td role="gridcell" class="tabCol">
+                                    <ui:outputText class="slds-align--absolute-center" value="{!record.No_of_Licences__c}"/> 
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</aura:component>

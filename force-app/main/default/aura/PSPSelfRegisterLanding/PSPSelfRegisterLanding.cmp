@@ -1,0 +1,31 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    <div class="body">
+        <center>Welcome applicants for a<br/>
+            <h2>Authorised Service Provider</h2><br/>
+            Applications for TSP or BSP and combined applications.<br/><br/>
+            The application has the following parts<br/>
+            <br/></center>
+        <div style="padding-left: 30%;">
+            <ul>
+                <li>Part A - Applicant details</li>
+                <li>Part B - Authorisation details </li>
+                <li>Part C - Nominated Managers/Directors(for corporations only)</li>
+                <li>Part D - Registration for Levy </li>
+                <li>Part E - Review application and pay fee</li>
+            </ul><br/>
+            Takes approximately 30 minutes to complete.<br/>
+            <br/>
+            The following information required to complete your application<br/><br/>
+            <ul>
+                <li>1. POI for each contact</li>
+                <li>2. Banking details for application</li>
+                <li>3. </li>
+                <li>4. Criminal history</li>
+            </ul><br/>
+        </div>
+        <div style="float:right;padding-right=20%;">
+            <ui:button class="slds-button slds-button-neutral">Apply Now</ui:button>
+            <ui:button class="slds-button slds-button-neutral">Learn More</ui:button>
+        </div>
+    </div>
+</aura:component>

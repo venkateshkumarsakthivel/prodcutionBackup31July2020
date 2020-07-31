@@ -1,0 +1,41 @@
+.THIS .formbox{
+    width:25%;
+    text-align: left;
+}
+.THIS .slds-input{ 
+    width:100%;
+}
+
+.THIS .btn-arrow{
+    background-color: #003577;
+    color: #ffffff;
+    padding: 15px 60px 15px 60px;
+    outline: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    bottom: 105px;
+}
+.THIS .btn-arrow:after {
+    content: "";
+    display: inline-block;
+   
+    position: absolute;
+    right: 8px;
+    top: 0;
+    bottom: 0;
+    width: 28px;
+    background: url('http://pointtopoint.stage6.ogilvy.com.au/sites/all/themes/pointtopoint/images/icon-circle-arrow.png') center no-repeat;
+}
+
+.THIS .uiInput--default .form-element__label {
+    color: #696969;
+    line-height: 1.375;
+    margin-bottom: .25rem;
+    float: left; 
+}
+
+.THIS .requiredField {
+    
+    color: red;
+    font-weight: bold;
+}

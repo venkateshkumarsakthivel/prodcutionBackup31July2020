@@ -1,0 +1,1089 @@
+<apex:page showHeader="false" sidebar="false" renderAs="PDF" applyBodyTag="false" controller="AuditSurveyPDFController">
+    
+    <head>
+        
+        <style type="text/css">
+            
+            <!-- Generic Styles -->
+            
+            body {
+            font-size: 10pt;
+            font-family:Sans-Serif;
+            }
+                      
+            @page {
+            size:A4;
+            margin: 1.5cm 0 1.5cm 0;
+            
+            @bottom-center {
+            content: counter(page);
+            color: #FFFFFF;
+            font-weight: bold;
+            font-family:Sans-Serif;
+            display: block;
+            height: 100%;
+            width: 100%;
+            background-image:url('{!$Resource.AuditPDFFooter}');
+            background-position: right;
+            background-repeat: no-repeat;
+            background-size: contain;
+            }
+            }
+            
+            @page:first {
+            size:A4;
+            margin: 0 0 1.5cm 0;
+            
+            @bottom-left {
+            content: "V004/ October 2018";
+            font-family:Sans-Serif;
+            font-weight:normal;
+            font-size:10px;
+            padding: 0 0 1.5cm 1.5cm;
+            }
+            
+            @bottom-center { 
+            content: "pointtopoint.nsw.gov.au";
+            font-family:Sans-Serif;
+            font-weight:normal;
+            font-size:14px;
+            }
+            }
+            
+            .page {
+            page-break-before: always;
+            margin: 0 1.5cm 0 1.5cm;
+            }
+            
+            <!--table {
+            page-break-inside: avoid;
+            }-->
+            
+            <!-- Cover Page -->
+            
+            .coverPageMargin {
+            margin: 1.5cm 1.5cm 0 1.5cm;
+            }
+            
+            .coverLogo {
+            width="8.75cm"
+            }
+            
+            .coverTitle {
+            font-weight:bold;
+            font-size:34px;
+            text-transform: uppercase;
+            }
+            
+            .coverSubTitle {
+            font-weight:normal;
+            font-size:18px;
+            color:#133172;
+            text-transform: uppercase;
+            margin: 1cm 1.5cm 0 1.5cm!important;
+            }
+            
+            .coverImage {
+            margin: 2.20cm 0 0 0;
+            padding: 0 !important;
+            }
+            
+            <!-- Audit Summary Page -->
+            
+            .summaryPageHeader {
+            font-weight:bold;
+            text-align: center;
+            }
+            
+            table#summaryPageTable {
+            border-collapse: separate;
+            border-spacing: 10px;
+            float:left;
+            }
+            
+            table#summaryPageTable th {
+            font-weight:bold;
+            font-size:10px;
+            text-align: left;
+            padding: 0.3cm;
+            }
+            
+            table#summaryPageTable th:first-child {
+            width:3.5cm;
+            padding: 0 !important;
+            }
+            
+            table#summaryPageTable th:first-child + th {
+            width:5.60cm;
+            }
+            
+            table#summaryPageTable th:first-child + th + th {
+            width:9.55cm;
+            }
+            
+            table#summaryPageTable td {
+            font-weight:bold;
+            text-align: left;
+            
+            word-wrap:break-word;
+            }
+            
+            table#summaryPageTable td:first-child + td + td {
+            border: thin solid #000000;
+            padding: 5px;
+            min-height:10px;
+            font-weight:normal;
+            }
+            
+            .childSummaryItem {
+            text-align:center;
+            }
+            
+            .summaryPageDeclaration {
+            margin-top: 50px !important;
+            font-weight:bold;
+            }
+            
+            .summaryPageDeclarationHeader {
+            text-decoration: underline; 
+            text-transform: uppercase;
+            }
+            
+            .summaryPageDeclarationText {
+            font-weight:normal !important;
+            }
+            
+            .clear {
+            clear: both;
+            }
+            
+            div#summaryPageDeclarationTableDiv {
+            margin-left:-10px;
+            margin-right:-10px;
+            }
+            
+            table.summaryPageDeclarationTable td {
+            word-wrap:break-word;
+            }
+            
+            table.summaryPageDeclarationTable {
+            border-collapse: separate;
+            border-spacing: 10px;
+            width:50%;
+            float:left;
+            }
+            
+            table.summaryPageDeclarationTable td:first-child {
+            width:90%;
+            }
+            
+            table.summaryPageDeclarationTable td:first-child + td {
+            width:10%;
+            }
+            
+            .tdWithBorder {
+            border: thin solid #000000;
+            padding: 5px;
+            min-height:10px;
+            font-size:16px;
+            }
+            
+            .tdWithBorderNormalFont {
+            border: thin solid #000000;
+            padding: 5px;
+            min-height:10px;
+            font-weight:normal;
+            }
+            
+            <!-- Content Page -->
+            
+            .contentPageHeader {
+            font-weight:bold;
+            font-size:18px;
+            color:#133172;
+            text-align:left;
+            }
+            
+            ul.toc {
+            list-style: none;
+            margin:0.3cm 0 0 0;
+            padding: 0;
+            width:100%;
+            }
+            
+            ul.toc li {
+            text-align: left;
+            font-weight:bold;
+            
+            padding-top: .5em;
+            padding-bottom: .5em;
+            }
+            
+            li em{
+            float: left;
+            width: 0.5em;
+            text-align: right;
+            font-style: normal;
+            }
+            
+            <!--ul.toc li a {
+            text-decoration: none;
+            }
+            
+            a {
+            color: #000;
+            }-->
+            
+            ul.toc li span::after{
+            margin-right:20px;
+            content: ".";
+            }
+            
+            <!-- Audit Details Table -->
+            
+            table.auditDetailsTable {
+            border-collapse: separate;
+            border-spacing: 7px 5px;
+            width:100%;
+            margin-left:-10px;
+            }
+            
+            table.auditDetailsTable td {
+            font-size:13px;
+            font-weight:bold;
+            text-align: left;
+            
+            word-wrap:break-word;
+            }
+            
+            <!-- Audit Details Page -->
+            
+            .outputLabelstyle{
+            font-weight: bold; 
+            font-size: 10px; 
+            text-align: left;
+            }
+            
+            .outputTextWithBorder {
+            border: thin solid #000000;
+            padding: 5px;
+            }
+            
+            .col1 {width:20%; text-align:left;}
+            .col2 {width:20%; text-align:left;}
+            .col3 {width:60%; text-align:left;}       
+            
+            .colStyle1 { width: 10%;    text-align:left;    padding-left:5px;                       padding-top:3px;    padding-bottom:3px}
+            .colStyle2 { width: 10%;    text-align:left;    padding-left:5px;                       padding-top:3px;    padding-bottom:3px}
+            .colStyle3 { width: 10%;    text-align:left;    padding-left:5px;   padding-right:10px; padding-top:3px;    padding-bottom:3px}
+            .colStyle4 { width: 10%;    text-align:left;    padding-left:5px;   padding-right:10px; padding-top:3px;    padding-bottom:3px}
+            
+            .outputTextWithoutBorder{
+            font-size:8px;
+            }
+            
+            .outputTextWithBorderstyle{
+            font-size:8px;
+            font-weight:bold;
+            word-wrap:break-word;
+            
+            border-style: solid;
+            border-width:thin;
+            border-collapse: separate;
+            border-spacing: 10px;
+            border: thin solid #000000;
+            
+            padding-right: 40px;
+            padding: 5px;
+            text-align: left;
+            min-width:100px  !important;
+            }
+            
+            .outputTextWithMediumBorderstyle{
+            font-weight:bold;
+            word-wrap:break-word;
+            
+            border-style: solid;
+            border-width:thin;
+            border-collapse: separate;
+            border-spacing: 10px;
+            border: thin solid #000000;
+            
+            padding-right: 40px;
+            padding: 5px;
+            text-align: left;
+            min-width:100px !important;
+            }
+            
+            .outputTextWithLongBorderstyle{
+            font-size:14px;
+            font-weight:bold;
+            word-wrap:break-word;
+            color:#000000;
+            
+            border-style: solid;
+            border-width:thin;
+            border-collapse: separate;
+            border-spacing: 10px;
+            border: thin solid #000000;
+            
+            padding-right: 40px;
+            padding: 5px;
+            text-align: left;
+            width:90%
+            }
+            
+            .rectangle {
+            height: 10px;
+            width: 650px;
+            border-style: solid;
+            border-width:thin;
+            }
+            
+            <!-- Audit Questions Answers Pages-->
+            
+            table#questionsAnswersTable {
+            width:100%;
+            page-break-inside: avoid;
+            }
+            
+            table#questionsAnswersTable td {
+            vertical-align:top;
+            text-align: left;
+            font-weight:normal !important;
+            font-size:14px;
+            
+            padding: .2em .2em .2em 0;
+            }
+            
+            table#questionsAnswersTable td:first-child {
+            width:8.7%;
+            }
+            
+            table#questionsAnswersTable td:first-child + td {
+            width:67%;
+            }
+            
+            table#questionsAnswersTable td:first-child + td + td {
+            width:23%;
+            }
+            
+            .sectionHeader {
+            font-weight: bold; 
+            font-size: 12pt; 
+            text-align: left;
+            margin-top:10px !important;
+            margin-bottom:0px !important;
+            }
+            
+            .sectionSubHeader{
+            font-weight: bold;
+            text-align: left;
+            margin-top:10px !important;
+            margin-bottom:10px !important;
+            }
+            
+            .textAreaQuestionAnswer {
+            vertical-align:top;
+            font-size:8pt !important; 
+            font-weight: normal  !important;
+            }
+            
+            .textAreaQuestionAnswerPersonsInvolved {
+            vertical-align:top;
+            font-size:14px !important; 
+            font-weight: normal  !important;
+            }
+                        
+            .textAreaAnswer {
+            border: thin solid #000000;
+            padding: 5px;
+            margin-top:5px;
+            margin-bottom:5px;
+            min-height:10px;
+            }
+            
+            .textAreaAnswerPersonsInvolved {
+            border: thin solid #000000;
+            padding: 5px;
+            margin-top:5px;
+            margin-bottom:5px;
+            min-height:10px;
+            font-size:8pt !important; 
+            }
+            
+            .checkboxQuestionAnswer {
+            vertical-align:top;
+            font-weight: normal  !important;
+            }
+            
+            .endOfAuditText {
+            font-size: 12pt; 
+            font-weight: bold;
+            text-align: center;
+            }
+            
+            <!-- Audit Findings Table -->
+            div#auditFindingsTableDiv {
+            margin-left:-10px;
+            margin-right:-10px;
+            }
+            
+            table.auditFindingsTable td {
+            word-wrap:break-word;
+            font-weight:bold;
+            font-size:12px;
+            }
+            
+            table.auditFindingsTable {
+            border-collapse: separate;
+            border-spacing: 10px;
+            width:100%;
+            }
+            
+        </style>
+        
+    </head>
+    
+    <body>
+        
+        <div id="coverPage">
+            <div>
+                <img src="{!$Resource.P2P_PortalLogo}" alt="Cover Page Image" class="coverPageMargin coverLogo" />
+                <div class="coverPageMargin coverTitle">
+                    SAFETY AUDIT TOOL
+                </div>
+                <div class="coverSubTitle">
+                    TO BE COMPLETED BY AUTHORISED OFFICERS OF <br/>THE POINT TO POINT TRANSPORT COMMISSIONER
+                </div>
+            </div>
+            <div>
+                <img src="{!$Resource.AuditCoverPageImage}" alt="Cover Page Image" width="100%" class="coverImage"/>
+            </div>
+        </div>
+        
+        <div id="auditSummaryPage" class="page">
+            
+            <div class="summaryPageHeader">Audit Summary</div>   
+            
+            <table id="summaryPageTable">
+                <thead>
+                    <tr>
+                        <th>Section</th>
+                        <th>Description</th>
+                        <th>Summary Result (Conforming or Non-conforming)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="childSummaryItem">3-5</td>
+                        <td>Details</td>
+                        <td></td>
+                    </tr>
+                    <apex:repeat value="{!initialFindingsTaskSurveysForAuditSummaryPage}" var="taskSurvey">  
+                        <apex:outputText rendered="{!taskSurvey.taskSubject == 'Initial Findings'}">
+                            <apex:repeat value="{!taskSurvey.taskSurveyAnswers}" var="taskSurveyAns">
+                                
+                                <apex:outputText rendered="{!IF(CONTAINS(taskSurveyAns.questionText, 'Element 1'), true, false)}">
+                                    <tr>    
+                                        <td>10</td>                                        
+                                        <td>Safety Management System (SMS)</td>
+                                    </tr>
+                                </apex:outputText>
+                                
+                                <tr>
+                                    <td class="childSummaryItem">
+                                        <apex:outputText rendered="{!taskSurveyAns.isDisplayQuestionNumber}">
+                                            {!taskSurveyAns.customQuestionNumber}
+                                        </apex:outputText>
+                                    </td>
+                                    <td>{!taskSurveyAns.questionText}</td>
+                                    <td>
+                                        <apex:outputText >
+                                            {!IF(taskSurveyAns.answer == 'No', 'N/A', taskSurveyAns.answer)}
+                                        </apex:outputText>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </apex:outputText>
+                    </apex:repeat>
+                </tbody>
+            </table>
+            
+	        <div class="clear"/>
+            
+            <div class="summaryPageDeclaration" style="display: table;page-break-inside: avoid !important;">
+                <apex:repeat value="{!initialFindingsTaskSurveysForAuditSummaryPage}" var="taskSurvey">  
+                    <apex:outputText rendered="{!IF(CONTAINS(taskSurvey.taskSubject, 'Declaration'), true, false)}">
+                        <div>
+                            <span class="summaryPageDeclarationHeader">{!taskSurvey.taskSubject}</span> – <span class="summaryPageDeclarationText">{!taskSurvey.instruction}</span>
+                        </div>
+                    </apex:outputText>
+                </apex:repeat>
+                
+                <apex:repeat value="{!initialFindingsTaskSurveysForAuditSummaryPage}" var="taskSurvey">  
+                    <apex:outputText rendered="{!IF(CONTAINS(taskSurvey.taskSubject, 'Declaration'), true, false)}">
+                        
+                        <div id="summaryPageDeclarationTableDiv">
+                            
+                            <apex:variable value="{!1}" var="rowNum"/>
+                            
+                            <table class="summaryPageDeclarationTable">
+                                
+                                <apex:repeat value="{!taskSurvey.taskSurveyAnswers}" var="taskSurveyAnsQuestion">
+                                    
+                                    <apex:outputText rendered="{!(rowNum == 1)}">
+                                        <tr>
+                                            <apex:repeat value="{!taskSurvey.taskSurveyAnswers}" var="taskSurveyAnsQuestion">
+                                                <apex:outputText rendered="{!IF(CONTAINS(taskSurveyAnsQuestion.questionText, 'Name of Auditor'), true, false)}">
+                                                    <td class="tdWithoutPadding">
+                                                        {!taskSurveyAnsQuestion.questionText}
+                                                    </td>
+                                                </apex:outputText>  
+                                                <apex:outputText rendered="{!IF(CONTAINS(taskSurveyAnsQuestion.questionText, 'Name of Auditor'), true, false)}">
+                                                    <td class="tdWithoutPadding">
+                                                        Date
+                                                    </td>
+                                                </apex:outputText>  
+                                            </apex:repeat>
+                                        </tr>
+                                        <tr>
+                                            <apex:repeat value="{!taskSurvey.taskSurveyAnswers}" var="taskSurveyAnsQuestion">
+                                                <apex:outputText rendered="{!IF(CONTAINS(taskSurveyAnsQuestion.questionText, 'Name of Auditor'), true, false)}">
+                                                    <td class="tdWithBorderNormalFont">
+                                                        {!taskSurveyAnsQuestion.answer}
+                                                    </td>
+                                                </apex:outputText>    
+                                                <apex:outputText rendered="{!IF(CONTAINS(taskSurveyAnsQuestion.questionText, 'Name of Auditor'), true, false)}">
+                                                    <td class="tdWithBorderNormalFont">
+                                                        {!taskSurveyAnsQuestion.createdDate}
+                                                    </td>
+                                                </apex:outputText>    
+                                            </apex:repeat>
+                                        </tr>
+                                    </apex:outputText>
+                                    
+                                    <apex:outputText rendered="{!(rowNum == 2)}">
+                                        <tr>
+                                            <td colspan="2">
+                                                <apex:outputText rendered="{!IF(CONTAINS(taskSurveyAnsQuestion.questionText, 'Signature'), true, false)}">
+                                                    {!taskSurveyAnsQuestion.questionText}
+                                                </apex:outputText>    
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <apex:repeat value="{!taskSurvey.taskSurveyAnswers}" var="taskSurveyAnsQuestion">
+                                                <apex:outputText rendered="{!IF(CONTAINS(taskSurveyAnsQuestion.questionText, 'Signature'), true, false)}">
+                                                    <td class="tdWithBorderNormalFont" colspan="2">
+                                                        {!taskSurveyAnsQuestion.answer}
+                                                        <apex:outputPanel rendered="{!taskSurveyAnsQuestion.displayImage}">
+                                                            <apex:image url="/servlet/servlet.FileDownload?file={!taskSurveyAnsQuestion.imageId}" height="100px" width="100%" style="margin-top: 2px;object-fit:contain;" />    
+                                                        </apex:outputPanel>
+                                                    </td>
+                                                </apex:outputText>  
+                                            </apex:repeat>
+                                        </tr>
+                                    </apex:outputText>
+                                    <apex:variable var="rowNum" value="{!rowNum + 1}"/>        
+                                </apex:repeat>
+                            </table>
+                            
+                        </div>
+                    </apex:outputText>
+                </apex:repeat>
+                
+                <apex:repeat value="{!initialFindingsTaskSurveysForAuditSummaryPage}" var="taskSurvey">  
+                    <apex:outputText rendered="{!IF(CONTAINS(taskSurvey.taskSubject, 'Service Provider Signature'), true, false)}">
+                        
+                        <div id="summaryPageDeclarationTableDiv">
+                            
+                            <apex:variable value="{!1}" var="rowNum"/>
+                            
+                            <table class="summaryPageDeclarationTable">
+                                
+                                <apex:repeat value="{!taskSurvey.taskSurveyAnswers}" var="taskSurveyAnsQuestion">
+                                    
+                                    <apex:outputText rendered="{!(rowNum == 1)}">
+                                        <tr>
+                                            <apex:repeat value="{!taskSurvey.taskSurveyAnswers}" var="taskSurveyAnsQuestion">
+                                                <apex:outputText rendered="{!IF(CONTAINS(taskSurveyAnsQuestion.questionText, 'Name of Service Provider'), true, false)}">
+                                                    <td class="tdWithoutPadding">
+                                                        {!taskSurveyAnsQuestion.questionText}
+                                                    </td>
+                                                </apex:outputText>    
+                                                <apex:outputText rendered="{!IF(CONTAINS(taskSurveyAnsQuestion.questionText, 'Name of Service Provider'), true, false)}">
+                                                    <td class="tdWithoutPadding">
+                                                        Date
+                                                    </td>
+                                                </apex:outputText>    
+                                            </apex:repeat>
+                                        </tr>
+                                        <tr>
+                                            <apex:repeat value="{!taskSurvey.taskSurveyAnswers}" var="taskSurveyAnsQuestion">
+                                                <apex:outputText rendered="{!IF(CONTAINS(taskSurveyAnsQuestion.questionText, 'Name of Service Provider'), true, false)}">
+                                                    <td class="tdWithBorderNormalFont">
+                                                        {!taskSurveyAnsQuestion.answer}
+                                                    </td>
+                                                </apex:outputText>    
+                                                <apex:outputText rendered="{!IF(CONTAINS(taskSurveyAnsQuestion.questionText, 'Name of Service Provider'), true, false)}">
+                                                    <td class="tdWithBorderNormalFont">
+                                                        {!taskSurveyAnsQuestion.createdDate}
+                                                    </td>
+                                                </apex:outputText>    
+                                            </apex:repeat>
+                                        </tr>
+                                    </apex:outputText>
+                                    
+                                    <apex:outputText rendered="{!(rowNum == 2)}">
+                                        <tr>
+                                            <td colspan="2">
+                                                <apex:outputText rendered="{!IF(CONTAINS(taskSurveyAnsQuestion.questionText, 'Signature'), true, false)}">
+                                                    {!taskSurveyAnsQuestion.questionText}
+                                                </apex:outputText>    
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <apex:repeat value="{!taskSurvey.taskSurveyAnswers}" var="taskSurveyAnsQuestion">
+                                                <apex:outputText rendered="{!IF(CONTAINS(taskSurveyAnsQuestion.questionText, 'Signature'), true, false)}">
+                                                    <td class="tdWithBorder" colspan="2">
+                                                        {!taskSurveyAnsQuestion.answer}
+                                                        <apex:outputPanel rendered="{!taskSurveyAnsQuestion.displayImage}">
+                                                            <apex:image url="/servlet/servlet.FileDownload?file={!taskSurveyAnsQuestion.imageId}" height="100px" width="100%" style="margin-top: 2px;object-fit:contain;" />    
+                                                        </apex:outputPanel>
+                                                    </td>
+                                                </apex:outputText>  
+                                            </apex:repeat>
+                                        </tr>
+                                    </apex:outputText>
+                                    
+                                    <apex:variable var="rowNum" value="{!rowNum + 1}"/>
+                                    
+                                </apex:repeat>
+                            </table>
+                            
+                        </div>
+                    </apex:outputText>
+                </apex:repeat>
+                
+            </div>
+            
+        </div>
+        
+        <div class="clear"/>
+
+        <div id="contentPage" class="page">
+            
+            <div class="contentPageHeader">Contents</div> 
+            
+            <ul class="toc">
+                <li>
+                    <span>1</span>Audit Details
+                </li>
+                <li>
+                    <span>2</span>Auditor details
+                </li>
+                <li>
+                    <span>3</span>Service Provider details
+                </li>
+                <li>
+                    <span>4</span>Persons involved in audit
+                </li>
+                <li>
+                    <span>5</span>General Details
+                </li>
+                <apex:repeat value="{!initialFindingsTaskSurveysForAuditSummaryPage}" var="taskSurvey">  
+                    <apex:outputText rendered="{!taskSurvey.taskSubject == 'Initial Findings'}">
+                        <apex:repeat value="{!taskSurvey.taskSurveyAnswers}" var="taskSurveyAns">
+                            <apex:outputText rendered="{!taskSurveyAns.isDisplayQuestionNumber}">
+                                <li>
+                                    <span>{!taskSurveyAns.customQuestionNumber}</span>{!taskSurveyAns.questionText}
+                                </li>
+                            </apex:outputText>
+                        </apex:repeat>
+                    </apex:outputText>
+                </apex:repeat>
+                <li>
+                    <span><em>10</em></span>Safety Management System (SMS)
+                </li>
+                
+                <apex:outputText rendered="{!headerInformation.auditSubStatus != 'Findings Pending'}">
+                    <li>
+                        <span><em>11</em></span>Audit findings – Closing meeting
+                    </li>
+                </apex:outputText>
+                
+            </ul>
+            
+        </div>
+        
+        <div id="auditDetailsPage" class="page">
+            
+            <div class="sectionHeader">
+                <div id="Audit Details"><b>1.&nbsp;&nbsp;Audit Details</b></div>
+                <hr/>
+            </div>
+            
+            <table class="auditDetailsTable">
+                <tbody>
+                    <tr>
+                        <td width="25%">Date of Audit</td>
+                        <td width="25%">Time of Audit</td>
+                        <td width="55%">Audit Location</td>
+                    </tr>
+                    <tr>
+                        <td class="tdWithBorder" style="font-weight:normal">{!headerInformation.actualEndDate}</td>
+                        <td class="tdWithBorder" style="font-weight:normal">{!headerInformation.actualEndTime}</td>
+                        <td class="tdWithBorder" style="font-weight:normal">{!headerInformation.accountBillingStreet} {!headerInformation.accountBillingCity} {!headerInformation.accountBillingState} {!headerInformation.accountBillingPostalCode} {!headerInformation.accountBillingCountry}</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="sectionHeader">
+                <div id="Auditor details"><b>2.&nbsp;&nbsp;Auditor Details</b></div>
+                <hr/>
+            </div>
+            
+            <table class="auditDetailsTable">
+                <tbody>
+                    <tr>
+                        <td width="50%">Name of auditor</td>
+                        <td width="25%">Company</td>
+                        <td width="25%">Phone Number</td>
+                    </tr>
+                    <tr>
+                        <td class="tdWithBorder" style="font-weight:normal">{!headerInformation.auditorName}</td>
+                        <td class="tdWithBorder" style="font-weight:normal">{!headerInformation.auditGroup}</td>
+                        <td class="tdWithBorder" style="font-weight:normal">{!headerInformation.auditorPhone}</td>
+                    </tr>
+                    <tr>
+                        <td width="50%">Email address</td>
+                    </tr>
+                    <tr>
+                        <td class="tdWithBorder" style="font-weight:normal">{!headerInformation.auditorEmail}</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="sectionHeader">
+                <div id="Service Provider details"><b>3.&nbsp;&nbsp;Service Provider details</b></div>
+                <hr/>
+            </div>
+            
+            <table class="auditDetailsTable">
+                <tbody>
+                    <tr>
+                        <td width="50%">Name on Authorisation</td>
+                        <td width="25%">Authorisation number/s</td>
+                        <td width="25%">Phone Number</td>
+                    </tr>
+                    <tr>
+                        <td class="tdWithBorder" style="font-weight:normal">{!headerInformation.accountName}</td>
+                        <td class="tdWithBorder" style="font-weight:normal">{!headerInformation.accountAuthDetails}</td>
+                        <td class="tdWithBorder" style="font-weight:normal">{!headerInformation.accountPhone}</td>
+                    </tr>
+                    <tr>
+                        <td width="50%">Email address</td>
+                        <td width="25%">Mobile number</td>
+                        <td width="25%">Fax number</td>
+                    </tr>
+                    <tr>
+                        <td class="tdWithBorder" style="font-weight: normal;">{!headerInformation.accountEmail}</td>
+                        <td class="tdWithBorder" style="font-weight: normal;"></td>
+                        <td class="tdWithBorder" style="font-weight: normal;">{!headerInformation.accountFax}</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <table class="auditDetailsTable">
+                <tbody>
+                    <tr>
+                        <td width="70%">Office address</td>
+                        <td width="30%">Postcode</td>
+                    </tr>
+                    <tr>
+                        <td class="tdWithBorder" style="font-weight: normal;">{!headerInformation.street} {!headerInformation.city} {!headerInformation.state} {!headerInformation.code} {!headerInformation.country}</td>
+                        <td class="tdWithBorder" style="font-weight: normal;">{!headerInformation.code}</td>
+                    </tr>
+                    <tr>
+                        <td width="70%">Depot address (if different to above)</td>
+                        <td width="30%">Postcode</td>
+                    </tr>
+                    <tr>
+                        <td class="tdWithBorder" style="font-weight: normal;">{!headerInformation.accountBillingStreet} {!headerInformation.accountBillingCity} {!headerInformation.accountBillingState} {!headerInformation.accountBillingPostalCode} {!headerInformation.accountBillingCountry}</td>
+                        <td class="tdWithBorder" style="font-weight: normal;">{!headerInformation.accountBillingPostalCode}</td>
+                    </tr>
+                    <tr>
+                        <td width="70%">Postal address (if different to above)</td>
+                        <td width="30%">Postcode</td>
+                    </tr>
+                    <tr>
+                        <td class="tdWithBorder" style="font-weight: normal;">{!headerInformation.accountPostalAddress}</td>
+                        <td class="tdWithBorder" style="font-weight: normal;">{!headerInformation.accountPostalAddressCode}</td>
+                    </tr>
+                    <tr>
+                        <td width="70%">Records held address (if different to above) </td>
+                        <td width="30%">Postcode</td>
+                    </tr>
+                    <tr>
+                        <td class="tdWithBorder" style="font-weight: normal;">{!headerInformation.accountBillingStreet} {!headerInformation.accountBillingCity} {!headerInformation.accountBillingState} {!headerInformation.accountBillingPostalCode} {!headerInformation.accountBillingCountry}</td>
+                        <td class="tdWithBorder" style="font-weight: normal;">{!headerInformation.accountBillingPostalCode}</td>
+                    </tr>
+                </tbody>
+            </table><br/>
+            
+            <apex:form >
+                <apex:pageBlock >
+                   
+                    <apex:variable var="previousSectionSubHeader" value="" />
+                    
+                    <apex:repeat value="{!taskSurveys}" var="taskSurvey">
+                        
+                        <apex:outputText rendered="{!taskSurvey.taskSubject == 'Confirmation of Service Provider details'}">
+                            <apex:repeat value="{!taskSurvey.taskSurveyAnswers}" var="taskSurveyAns">
+                                
+                                <tr style="display:{!IF(taskSurveyAns.customSectionSubHeader != ''
+                                           && taskSurveyAns.customSectionSubHeader != previousSectionSubHeader, 'block', 'none')}" 
+                                    class="sectionSubHeader">
+                                    <td style="font-weight:bold !important;">
+                                        <apex:outputtext value="{!taskSurveyAns.customSectionSubHeader}" escape="false" />
+                                    </td>
+                                </tr>
+                                
+                               	<apex:variable var="previousSectionSubHeader" value="{!taskSurveyAns.customSectionSubHeader}"/>
+                                
+                                <apex:outputText style="padding: .2em .2em .2em 0;" rendered="{!IF(CONTAINS(taskSurveyAns.answerFieldType, 'Text Area'), true, false)}">
+                                    <br/><apex:outputText escape="false" value="{!taskSurveyAns.questionText}"></apex:outputText>
+                                    <div class="textAreaAnswer">
+                                        <apex:outputText value="{!SUBSTITUTE(JSENCODE(taskSurveyAns.answer),'\n','<br/>')}" escape="false"/>
+                                    </div>    
+                                </apex:outputText>
+                                
+                                <apex:outputText style="padding: .2em .2em .2em 0;" rendered="{!IF(CONTAINS(taskSurveyAns.answerFieldType, 'Radio Button'), true, false)}">
+                                    <td style="display:inline-block;width:70%">
+                                        <apex:outputText escape="false" value="{!taskSurveyAns.questionText}"></apex:outputText>
+                                    </td>
+                                    <td style="display:inline-block;width:28%">
+                                        <div id="surveyAnswers" style="text-align:right">
+                                            <apex:repeat value="{!taskSurveyAns.questionValues}" var="value">      
+                                                {!value}&nbsp;<apex:image id="theImage" value="{!If(taskSurveyAns.answer == value, $Resource.checkBoxWithTick, $Resource.checkBoxWithoutTick)}" width="15" height="15" />
+                                            </apex:repeat>
+                                        </div> 
+                                    </td>
+                                </apex:outputText>
+                                
+                                <apex:outputText style="padding-bottom: .2em; padding-top:.2em;" rendered="{!IF(CONTAINS(taskSurveyAns.answerFieldType, 'Number'), true, false)}">
+                                    <table style="width:100%">
+                                        <tr>
+                                            <td style="display:inline-block;width:70%">{!taskSurveyAns.questionText}</td>
+                                            <td style="display:inline-block;width:28%;text-align:right">{!taskSurveyAns.answer}</td>
+                                        </tr>
+                                    </table>
+                                </apex:outputText>
+                                
+                            </apex:repeat>  
+                        </apex:outputText>
+                    </apex:repeat>
+                </apex:pageBlock>
+            </apex:form>
+        </div>      
+        
+        <div id="auditQuestionsPage" class="page">
+            <apex:form >
+                <apex:repeat value="{!taskSurveys}" var="taskSurvey">
+                    <apex:outputText rendered="{!taskSurvey.taskSubject != 'Confirmation of Service Provider details'}">  
+                        <div class="sectionHeader">
+                            <b>{!taskSurvey.sectionNumber}.&nbsp;&nbsp;{!taskSurvey.taskSubject}</b>
+                            <hr/>
+                        </div>
+                        
+                        <table id="questionsAnswersTable">
+                            <tbody>
+                                
+                                <apex:variable var="previousSectionSubHeader" value="" />
+                                
+                                <apex:repeat value="{!taskSurvey.taskSurveyAnswers}" var="taskSurveyAns">
+                                    
+                                    <tr style="display:{!IF(taskSurveyAns.customSectionSubHeader != ''
+                                               && taskSurveyAns.customSectionSubHeader != previousSectionSubHeader, 'block', 'none')}" 
+                                        class="sectionSubHeader">
+                                        
+                                        <td style="font-weight:bold !important;">
+                                            <apex:outputtext style="white-space:pre-wrap;" value="{!taskSurveyAns.customSectionSubHeader}" escape="false" />
+                                        </td>
+                                    </tr>
+                                    
+                                    <apex:variable var="previousSectionSubHeader" value="{!taskSurveyAns.customSectionSubHeader}"/>
+                                    
+                                    <tr style="display:{!IF(taskSurveyAns.answerFieldType == 'Radio Button', 'block', 'none')}">
+                                        <td style="display:inline-block;font-weight:bold !important;">
+                                            <apex:outputText value="{!taskSurveyAns.customQuestionNumber}"></apex:outputText>
+                                        </td>
+                                        <td style="display:inline-block">
+                                            <apex:outputText escape="false" value="{!taskSurveyAns.questionText}"></apex:outputText>
+                                        </td>
+                                        <td style="display:inline-block">
+                                            <div id="surveyAnswers" style="text-align:right">
+                                                <apex:repeat value="{!taskSurveyAns.questionValues}" var="value">      
+                                                    {!value}&nbsp;<apex:image id="theImage" value="{!If(taskSurveyAns.answer == value, $Resource.checkBoxWithTick, $Resource.checkBoxWithoutTick)}" width="15" height="15" />
+                                                </apex:repeat>
+                                            </div> 
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr style="display:{!IF(taskSurveyAns.answerFieldType == 'Text Area', 'block', 'none')}">
+                                        <td colspan="3" 
+                                            class="{!IF(CONTAINS(taskSurveyAns.questionText, 'person(s) involved in audit'), 
+                                                   'textAreaQuestionAnswerPersonsInvolved', 'textAreaQuestionAnswer')}" >
+                                            
+                                            <apex:outputText style="display:inline-block;font-weight:bold !important; padding-right:40px;" rendered="{!taskSurvey.taskSubject == 'Persons involved in audit'}" value="{!taskSurveyAns.customQuestionNumber}"></apex:outputText>
+                                            
+                                            <apex:outputText escape="false" value="{!taskSurveyAns.questionText}"></apex:outputText>
+                                            
+                                            <div class="{!IF(CONTAINS(taskSurveyAns.questionText, 'person(s) involved in audit'), 
+                                                   'textAreaAnswerPersonsInvolved', 'textAreaAnswer')}" >
+                                                <apex:outputText value="{!SUBSTITUTE(JSENCODE(taskSurveyAns.answer),'\n','<br/>')}" escape="false"/>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr style="display:{!IF(taskSurveyAns.answerFieldType == 'Checkbox', 'block', 'none')}">
+                                        <td colspan="2" class="checkboxQuestionAnswer">
+                                            <apex:outputText escape="false" value="{!taskSurveyAns.questionText}"></apex:outputText>
+                                            <div id="surveyAnswers" style="text-align:left">
+                                                <apex:repeat value="{!taskSurveyAns.questionValues}" var="value">   
+                                                    <div style="width:100%;">
+                                                        <div style="float:left;">
+                                                            {!value}
+                                                        </div>
+                                                            <apex:image id="theImage" value="{!IF(CONTAINS(taskSurveyAns.answer, value), $Resource.checkBoxWithTick, $Resource.checkBoxWithoutTick)}" width="15" height="15" style="float:right;"/>	
+                                                            <br/>
+                                                    </div>
+                                                </apex:repeat>
+                                            </div> 
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr style="display:{!IF(taskSurveyAns.answerFieldType == 'Currency', 'block', 'none')}">
+                                        <td colspan="3" class="textAreaQuestionAnswer">
+                                            <apex:outputText escape="false" value="{!taskSurveyAns.questionText}"></apex:outputText>
+                                            <div class="textAreaAnswer">
+                                                <apex:outputText value="{!taskSurveyAns.answer}" escape="false"/>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </apex:repeat>
+                            </tbody>
+                        </table>
+                    </apex:outputText>
+                </apex:repeat>
+            </apex:form>
+            
+            <div class="endOfAuditText">
+                End of Audit – Proceed to Section 11 – Audit findings
+            </div>
+            
+        </div>
+
+        <apex:outputText rendered="{!headerInformation.auditSubStatus != 'Findings Pending'}">
+            <div id="auditFindingsPage" class="page">
+                
+                <img src="{!$Resource.P2P_PortalLogo}" alt="Cover Page Image" height="100px;" class="coverPageMargin coverLogo" style="margin-left:0!important;margin-top:0!important;margin-bottom:0!important;padding-bottom:0!important" />
+                <hr/>
+                
+                <div class="sectionHeader">
+                    <b>11.&nbsp;&nbsp;&nbsp;Audit Findings - Closing meeting</b>
+                    <hr/>
+                </div>
+                
+                <div id="auditFindingsTableDiv">
+                    <table class="auditFindingsTable">
+                        <tbody>
+                            <tr>
+                                <td width="60%">Name of Authorisation</td>
+                                <!--<td width="30%">Authorisation number</td>-->
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="tdWithBorder" style="font-weight:normal;">{!headerInformation.accountAuthDetails}</td>
+                                <!--<td class="tdWithBorder"></td>-->
+                            </tr>
+                            <tr>
+                                <td width="60%">Name of auditor</td>
+                                <td width="40%">Company</td>
+                            </tr>
+                            <tr>
+                                <td class="tdWithBorder" style="font-weight:normal;">{!headerInformation.auditorName}</td>
+                                <td class="tdWithBorder" style="font-weight:normal;">{!headerInformation.auditGroup}</td>
+                            </tr>    
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="auditFindingsTableDiv">
+                    <table class="auditFindingsTable">
+                        <tbody>
+                            <tr>
+                                <td width="20%">Audit date</td>
+                                <td width="40%">Audit location</td>
+                                <td width="20%">Audit start time</td>
+                                <td width="20%">Audit finish time</td>
+                            </tr>
+                            <tr>
+                                <td class="tdWithBorder" style="font-weight:normal;">{!headerInformation.actualStartDate}</td>
+                                <td class="tdWithBorder" style="font-weight:normal;">{!headerInformation.accountBillingStreet} {!headerInformation.accountBillingCity} {!headerInformation.accountBillingState} {!headerInformation.accountBillingPostalCode} {!headerInformation.accountBillingCountry}</td>
+                                <td class="tdWithBorder" style="font-weight:normal;">{!headerInformation.actualStartTime}</td>
+                                <td class="tdWithBorder" style="font-weight:normal;">{!headerInformation.actualEndTime}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br/>
+                
+                <div class="summaryPageHeader">DETAILED FINDINGS</div>
+                
+                <div class="clear"/>
+                
+                <table id="summaryPageTable" style="float:none;">
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>Description</th>
+                            <th>Identified deficiencies / comments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="childSummaryItem">3-5</td>
+                            <td>Details</td>
+                            <td height="60"></td>
+                        </tr>
+                        <apex:repeat value="{!detailedFindingsTaskSurveys}" var="detailFindingsTaskSurvey">
+                            <apex:repeat value="{!detailFindingsTaskSurvey.taskSurveyAnswers}" var="detailFinidingsTaskSurveyAns">
+                                
+                                <apex:outputText rendered="{!IF(CONTAINS(detailFinidingsTaskSurveyAns.questionText, 'Element 1'), true, false)}">
+                                    <tr>    
+                                        <td>10</td>                                        
+                                        <td>Safety Management System (SMS)</td>
+                                    </tr>
+                                </apex:outputText>
+                                
+                                <tr>
+                                    <td class="childSummaryItem">
+                                        <apex:outputText rendered="{!detailFinidingsTaskSurveyAns.isDisplayQuestionNumber}">
+                                            {!detailFinidingsTaskSurveyAns.customQuestionNumber}
+                                        </apex:outputText>
+                                    </td>
+                                    <td>{!detailFinidingsTaskSurveyAns.questionText}</td>
+                                    <td height="60">
+                                        {!detailFinidingsTaskSurveyAns.detailedFindingAnswer}
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </apex:repeat>
+                    </tbody>
+                </table>
+            </div>
+        </apex:outputText>
+        
+    </body>
+    
+</apex:page>

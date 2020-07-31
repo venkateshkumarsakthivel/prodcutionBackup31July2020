@@ -1,0 +1,106 @@
+.THIS .sectionTitleNote {
+    color: #000000;
+}
+
+.THIS .slds-form-element__label {
+    color: #000000;
+    font-weight: bold;
+    font-size: 15px;
+    margin-top: .25rem;
+}
+
+.THIS .slds-col{
+    padding:2%;
+    width:50%;
+}
+
+.THIS .CamelCaseInput {
+    text-transform: capitalize;
+}
+
+.THIS .upperCaseInput{
+    text-transform: uppercase;
+}
+
+.THIS .toggleDisplay {
+    display: none;
+}
+
+.THIS .requiredField {
+    color: red;
+    font-weight: bold;
+}
+
+.THIS .customErrorMsg {
+    color: rgb(194, 57, 52);
+    font-weight:bold;
+    font-size: .875rem;
+}
+
+.THIS .form-element__help {
+    color: rgb(194, 57, 52);
+    font-weight:bold;
+    font-size: .875rem;
+}
+
+.THIS .customCheckBox{
+    display: inline-block;
+    float: left;    
+}
+
+.THIS select.has-error {
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgb(194, 57, 52) 0px 0px 0px 1px inset;
+    background-clip: padding-box;
+    border-color: rgb(194, 57, 52);
+}
+
+.THIS input.has-error {
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgb(194, 57, 52) 0px 0px 0px 1px inset;
+    background-clip: padding-box;
+    border-color: rgb(194, 57, 52);
+}
+
+.THIS input.uiInput--checkbox[type=checkbox][disabled] {
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+
+.THIS input[type=checkbox][disabled]:checked {
+    background-color: rgb(21, 137, 238) !important;
+}
+
+.THIS .slds-input[type=checkbox][disabled]{
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+
+.THIS .slds-input[type=textarea][disabled]{
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+
+.THIS .uiInput--textarea.textarea[disabled] {
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+
+.THIS .uiInput--checkbox input[type=checkbox][disabled] {
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+.THIS .slds-icon-standard-contact{
+    background-color: #34becd;
+}
+.THIS .slds-icon-standard-document{
+    background-color: #34becd;
+}
+.THIS .slds-input[disabled] {
+    background-color: #f3f3f3!important;
+    border-color: rgb(208, 208, 208)!important;
+}
+.THIS select[disabled]{
+    background-color: #f3f3f3!important;
+    border-color: rgb(208, 208, 208)!important;
+}

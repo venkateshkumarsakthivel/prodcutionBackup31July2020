@@ -1,0 +1,48 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiRenewalPaymentController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="isReviewOnly" type="Boolean" access="public" default="false"/>
+    <aura:attribute name="caseId" type="String" access="public"/>
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="entityType" type="String" access="public"/>
+    <aura:attribute name="paymentPending" type="Boolean" default="true"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="cssStyle" type="String" />
+    
+    <style>
+        /* css style added dynamically to hack style of global header*/
+        {!v.cssStyle}
+    </style>
+    
+        <c:LicenceRenewalProgressIndicator currentSection="review" isReviewOnly="{!not(v.paymentPending)}"/>
+        <br/>
+    
+	<c:TaxiRenewalApplication entityType="{!v.entityType}" displayNextSection="false" aura:id="licence-details" caseId="{!v.caseId}" readOnly="true"/>
+	
+	<c:TaxiRenewalPrivacy caseId="{!v.caseId}" isReview="true" entityType="{!v.entityType}" readOnly="true"/>
+	
+	<div class="slds-card__footer">
+        
+		<aura:if isTrue="{!not(v.isReviewOnly)}">
+		<ui:button class="slds-button slds-button--neutral" press="{!c.renderPrevSection}"> 
+			<i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+		</ui:button>
+        </aura:if>
+        <aura:if isTrue="{!v.paymentPending}">
+        <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+			<i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+		</ui:button>
+		</aura:if>
+	</div>
+    <p>{!v.body}</p>
+</aura:component>

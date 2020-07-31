@@ -1,0 +1,21 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+     <div class="Container" >
+        <center>
+       
+            <c:NavigationCard title="Apply for WAT Licence" 
+                              description="(Release Planned)Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"
+                              buttontext="Apply"
+                              buttonhref="/taxilicence/s?src=myApplicationMenu"
+                              image="{!$Resource.p2p300x200 + '/p2p300x200/CityTraffic-300x200.jpg'}"
+                              hovertext="Apply for WAT Licence"/>
+            <c:NavigationCard title="Help" 
+                              description="Get help to register yourself for Taxi. Access and maintain your information up to date using Help button."
+                              buttontext="Help"
+                              buttonhref="/taxilicence/s/topic/0TOO00000008mAmOAI/safety-checks?src=helpMenu"
+                              image="{!$Resource.p2p300x200 + '/p2p300x200/PassingTaxi-300x200.jpg'}"
+                              hovertext="Help"/>
+            
+         
+       </center>
+    </div>
+</aura:component>

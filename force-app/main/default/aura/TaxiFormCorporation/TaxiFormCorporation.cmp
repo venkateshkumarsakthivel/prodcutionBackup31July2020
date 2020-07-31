@@ -1,0 +1,175 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiFormSectionDataController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="caseId" type="String" default=""/>
+    <aura:attribute name="entityType" type="String" default=""/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="isCopyAddress" type="Boolean" />
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="withdrawnCase" type="Boolean" default="false"/>
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="false" />
+    <aura:attribute name="isFromPortal" type="Boolean" default="false" />
+    <aura:attribute name="isWAT" type="Boolean" default="false" />
+    
+    <aura:attribute name="corporationSectionData" type="String" default=""/>
+    
+    <aura:attribute name="CorporationName" type="String"/>
+    <aura:attribute name="CorporationACN" type="String"/>
+    <aura:attribute name="CorporationARBN" type="String"/>
+    <aura:attribute name="CorporationState" type="String"/>
+    <aura:attribute name="CorporationPhone" type="String"/>
+    <aura:attribute name="CorporationEmail" type="String"/>
+    <aura:attribute name="CorporationBusinessName" type="String"/>
+    <aura:attribute name="CorporationBusinessNumber" type="String"/>
+    <aura:attribute name="CorporationABN" type="String"/>
+    
+    <aura:attribute name="noticeEmail" type="String"/>
+    <aura:attribute name="noticeStreet" type="String"/>
+    <aura:attribute name="noticeCity" type="String"/>
+    <aura:attribute name="noticeState" type="String"/>
+    <aura:attribute name="noticePostcode" type="String"/>
+    <aura:attribute name="noticeUnitType" type="String"/>
+    <aura:attribute name="noticeCountry" type="String"/>
+  
+    <aura:attribute name="noticeType" type="String" default="Email"/>
+    
+    <aura:attribute name="baseUrl" type="String" default="$A.get('$Label.c.Community_Base_Url')" />
+    <aura:attribute name="aspCase" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="c:CompanyNameForACNEvent" action="{!c.getCompanyName}"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:if isTrue="{!and(and(not(v.readOnly), not(v.reviewEdit)), and(not(v.withdrawnCase), not(v.isWAT)))}">
+        <c:TaxiFormSectionProgressIndicator isFromPortal="{!v.isFromPortal}" currentSection="{!$Label.c.Corporation_Header}" entityType="{!v.entityType}"/>
+        <br/>
+    </aura:if>
+    
+    <aura:if isTrue="{!and(and(not(v.readOnly), not(v.reviewEdit)), and(not(v.withdrawnCase), v.isWAT))}">
+        <c:TaxiFormWATSectionProgressIndicator currentSection="{!$Label.c.Corporation_Header}" entityType="{!v.entityType}"/>
+        <br/>
+    </aura:if>
+    
+    <article class="slds-card" id="formPartC">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#contact'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">       
+                        {!$Label.c.Corporation_Header}
+                    </h2>
+                    <b>Note:</b>{!$Label.c.Taxi_Form_Corporation_Note}
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with&nbsp;<span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!and(v.readOnly == true, v.withdrawnCase == false)}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                    <div style="float:right">   
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                            <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                        </ui:button>
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        <hr style="margin: 0 auto;"/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>
+                
+                <fieldset>
+                    
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <c:ACNComponent isReadOnly="{!v.readOnly}" aura:id="ACN-Input" uniqueIdentifier="ACN-Input" 
+                                            fieldLabel="ACN Or ARBN"
+                                            isRequired="false" acn="{!v.CorporationACN}"/>
+                        </div>
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">{!$Label.c.Corporation_Corporation_name}&nbsp;<span class="requiredField">*</span></label>
+                            <ui:inputText disabled="true" aura:id="Corporation-Name-Input" class="CamelCaseInput slds-input" value="{!v.CorporationName}"/>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                               <c:ABNComponent isReadOnly="{!v.readOnly}" aura:id="ABN-Input" uniqueIdentifier="ABN-Input" 
+                                            fieldLabel="{!$Label.c.Corporation_ABN}" businessName="{!v.CorporationBusinessName}"
+                                            isRequired="false" abn="{!v.CorporationABN}"/>
+                        </div>
+                        <div class="slds-col">
+                             <label class="slds-form-element__label">{!$Label.c.Corporation_Registered_Business_Name}</label>
+                            <ui:inputText maxlength="255" disabled="true" aura:id="Business-Name-Input" class="CamelCaseInput slds-input" value="{!v.CorporationBusinessName}"/>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                              <c:PhoneComponent isReadOnly="{!v.readOnly}" aura:id="Daytime-Phone-Input" uniqueIdentifier="Daytime-Phone-Input-Identifier" fieldLabel="{!$Label.c.Corporation_Daytime_phone_number}" isRequired="true" phoneNumber="{!v.CorporationPhone}" /> 
+                        </div>
+                        <div class="slds-col">
+                             
+                        </div>
+                    </div>
+                   
+                </fieldset>
+            </div>
+        </div>
+        <div class="slds-card__footer">
+            
+            <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveFormState}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Finish Later
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+            <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                </ui:button>
+            </aura:if>
+            
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

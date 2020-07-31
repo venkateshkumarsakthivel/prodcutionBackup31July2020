@@ -1,0 +1,13 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <aura:attribute name="invokeFlow" type="boolean" default="true"/>
+    <lightning:card class="slds-p-around_xxx-small">
+        <lightning:buttonGroup class="slds-p-left_medium">
+            <lightning:button label="Create Notice" title="Create Notice" onclick="{! c.handleClickNotice }" disabled="{!!v.invokeFlow}"/>
+            <lightning:button label="Manage Legislation" title="Manage Legislation" onclick="{! c.handleClickLegislation }" disabled="{!!v.invokeFlow}"/>
+        </lightning:buttonGroup>
+        <lightning:flow aura:id="flowData" />
+        <aura:set attribute="footer">
+            <lightning:button label="Finish" onclick="{! c.reloadClick }" title="Finish" disabled="{!v.invokeFlow}" variant="brand"/>
+        </aura:set>
+    </lightning:card>
+</aura:component>

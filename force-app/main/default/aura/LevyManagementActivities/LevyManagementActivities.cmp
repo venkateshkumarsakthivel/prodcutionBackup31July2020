@@ -1,0 +1,176 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPManageAccountCases">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}" afterScriptsLoaded="{!c.doInit}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    <ltng:require scripts="{!$Resource.momentJS}"/>
+    
+    <aura:attribute name="customerNumber" type="String" access="private" />
+    <aura:attribute name="body" type="String"/>
+    <aura:attribute name="currentNoticeSortOrderASC" type="Boolean" default="false" />
+    <aura:attribute name="casesList" type="Case[]"/>
+    
+    <aura:dependency resource="markup://c:WithdrawApplicationConfirmBox" />
+    
+    <aura:attribute name="noticeList" type="Notice_Record__c[]"/>
+    
+    <aura:attribute name="accountName" type="String" />
+    <aura:attribute name="isApplicationTab" type="Boolean" default="false"/>
+    <aura:attribute name="baseUrl" type="String" default="$A.get('$Label.c.Community_Base_Url')" />
+    <aura:method name="withdrawApp" action="{!c.createWithdrawnComponent}"/>
+    <aura:method name="cancelApp" action="{!c.createCancellationComponent}"/>
+    <aura:handler name="confirmWithdrawApplication" event="c:ConfirmWithdrawApplicationEvent" action="{!c.confirmWithdrawApplicaion}"/>
+    <lightning:spinner variant="brand" aura:id="spinner"  size="large" ></lightning:spinner>
+    <article class="slds-card" id="caseComponent">
+        <div class="slds-page-header">
+            <div class="slds-grid">
+                <div class="slds-col slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="fleet">
+                            </c:svgIcon>
+                        </div>
+                        <div class="slds-media__body" style="text-align:left;">
+                            <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.ASP_ACCT_MGMT_Header} - {!v.customerNumber}</p>
+                            <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Account">{!v.accountName}</h2>
+                        </div>
+                        <!-- This was for Case Creation -->
+                        <!--<a href="{!baseUrl + 'contactsupport?src=helpMenu'}" target="_blank"> -->
+                        <a href="{!baseUrl + 'article/Help-and-Support?src=helpMenu'}" target="_blank">
+                            <ui:button class="slds-button slds-button--neutral headerButtons"> 
+                                <i style="color:#54698d !important;" class="fa fa-question-circle" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;&nbsp;{!$Label.c.ASP_ACCT_MGMT_Request_Help_Btn}
+                            </ui:button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-tabs--scoped" style="padding-top:10px;">
+            <ul class="slds-tabs--scoped__nav" role="tablist" style="float:left;" aura:id="caseSubmenu">
+                <li class="slds-tabs--scoped__item  casesTab" title="Notice Records" role="presentation" aura:id="notice__item">
+                    <a class="slds-tabs--scoped__link " href="javascript:void(0);" role="tab" onclick="{!c.filterShowAllNotices}" tabindex="0" aria-selected="true" aria-controls="tab-scoped-1">Notices</a>
+                </li>
+                <li class="slds-tabs--scoped__item casesTab" title="Application" role="presentation" aura:id="application__item">
+                    <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" onclick="{!c.filterApplication}" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-2">Requests</a>
+                </li>
+            </ul>
+            <div style="clear:both;"></div>
+            <div class="slds-grid slds-grid--vertical">
+                <div class="slds-grow">
+                    <div id="caseTableScrollContainer" style="height:400px;overflow-x:hidden;display:block;">
+                        <aura:if isTrue="{!!v.isApplicationTab}">
+                            <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered  slds-no-row-hover" style="background-color: #003577;">
+                                <thead style="background: #003577;">
+                                    <tr class="slds-line-height--reset">
+                                        <th scope="col"  class="tabCol" style="width:10%" onclick="" id="noticeName">
+                                            <div class="slds-text-title--caps slds-text-align--center" title="Notice Number">
+                                                <span class=" tableheader" id="Notice Number">
+                                                #
+                                                </span>
+                                            </div>
+                                        </th>
+										<th scope="col" class="tabCol" style="width:20%">
+                                            <div class="slds-text-title--caps" title="Type of notice">
+                                                <span class=" tableheader" title="Type of notice">Notice Type</span>
+                                            </div>
+                                        </th>
+                                        <th scope="col"  class="tabCol" style="width:15%">
+                                            <div class="slds-text-title--caps" title="Person to whom the notice was served">
+                                                <span class="tableheader" title="Person to whom the notice was served" id="servedTo">
+                                                Served To
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th scope="col" style="width:15%"  class="tabCol">
+                                            <div class="slds-text-title--caps" title="Method by which the notice was served">
+                                                <span class=" tableheader" title="Method by which the notice was served" id="methodOfService">
+                                                Method of Service
+                                                </span>
+                                            </div>
+                                        </th>
+										<th scope="col" class="tabColSort" onclick="{!c.sortNoticeByIssueDate}">
+                                            <div class="slds-text-title--caps slds-text-align--center" title="Date the notice was issued">
+                                                <span class=" tableheader" title="Date the notice was issued">
+                                                    Date Issued
+                                                    <span>
+                                                        <aura:if isTrue="{!v.currentNoticeSortOrderASC}">
+                                                            &#8593;
+                                                            <aura:set attribute="else">
+                                                                &#8595;
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </th>
+                                        
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody id="noticeTableBody">
+                                </tbody>
+                            </table>
+                            <aura:set attribute="else">
+                                <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered  slds-no-row-hover" style="background-color: #003577;">
+                                    <thead style="background: #003577;">
+                                        <tr class="slds-line-height--reset">
+                                            <th scope="col"  class="tabCol" style="width:10%">
+                                                <div class="slds-text-title--caps slds-text-align--center" title="Application Number">
+                                                    <span class=" tableheader" title="Application Number" id="caseNumber">
+                                                    #
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="tabCol" style="width:20%">
+                                                <div class="slds-text-title--caps" title="Application Type">
+                                                    <span class=" tableheader" title="Application Type">Application Type</span>
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="tabCol" style="width:10%">
+                                                <div class="slds-text-title--caps" title="Service Type">
+                                                    <span class=" tableheader" title="Service Type">Type</span>
+                                                </div>
+                                            </th>
+                                            <th scope="col"  class="tabCol" style="width:10%">
+                                                <div class="slds-text-title--caps" title="Status">
+                                                    <span class=" tableheader" title="Status" id="Status">
+                                                    Status
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <th scope="col"  class="tabCol" style="width:20%">
+                                                <div class="slds-text-title--caps" title="Payment Status">
+                                                    <span class=" tableheader" title="Payment Status" id="Status">
+                                                    Payment Status
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="tabCol" style="width:15%">
+                                                <div class="slds-text-title--caps" title="Created By">
+                                                    <span class=" tableheader" title="Created By">Created By</span>
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="tabCol" style="width:15%">
+                                                <div class="slds-text-title--caps slds-text-align--center" title="Date Lodged">
+                                                    <span class="tableheader" title="Date Lodged">Date Lodged</span>
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="tabCol">
+                                                <div class="slds-text-title--caps slds-text-align--center" title="Action">
+                                                    <span class="tableheader" title="Action">Action</span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="casesTableBody">
+                                    </tbody>
+                                </table>
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

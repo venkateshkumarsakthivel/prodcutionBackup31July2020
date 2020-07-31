@@ -1,0 +1,56 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global" controller="TaxiLicenceTrasferInviteBuyerController">
+    
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    <ltng:require styles="{!$Resource.AppStyles}" />
+    
+    <aura:attribute name="inviteBuyerErrorText" type="String" />
+    <aura:attribute name="newBuyerName" type="String" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <div aura:id="sendInviteConfirmation">
+        <p style="font-weight: bold;">
+            Invitation will be sent to {!v.newBuyerName}, click 'Send Invite' button to continue.
+        </p>
+        <div class="slds-card__footer">
+            <ui:button class="slds-button slds-button--neutral marginleft" press="{!c.sendInvite}">
+                <i style="color:#54698d !important;" class="fa fa-check" aria-hidden="true"></i>&nbsp;&nbsp;Send Invite
+            </ui:button>
+        </div>
+    </div>
+    
+    <div aura:id="inviteBuyerConfirmation" class="slds-notify slds-notify--alert slds-theme_success slds-theme--alert-texture toggle" role="alert">
+        <span style="color: #ffffff;font-weight: bold;">
+            <i class="fa fa-check" aria-hidden="true"></i>
+            &nbsp;Invitation sent to Taxi Proposed Owner successfully.
+        </span>
+    </div>
+    
+    <div aura:id="inviteBuyerError" class="slds-notify slds-notify--alert slds-theme_error slds-theme--alert-texture toggle" role="alert">
+        <span style="color: #ffffff;font-weight: bold;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            &nbsp;{!v.inviteBuyerErrorText}
+        </span>
+    </div>
+    
+    <div aura:id="inviteBuyerMailResend" class="slds-notify slds-notify--alert slds-theme_error slds-theme--alert-texture toggle" role="alert">
+        <span style="color: #ffffff;font-weight: bold;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            &nbsp;{!v.inviteBuyerErrorText}
+        </span>
+        
+        <ui:button class="slds-button slds-button--neutral marginleft" press="{!c.resendInvite}">
+                <i style="color:#54698d !important;" class="fa fa-check" aria-hidden="true"></i>&nbsp;&nbsp;Re-Send Invite
+        </ui:button>
+    </div>
+    
+     <div aura:id="inviteBuyerFailure" class="slds-notify slds-notify--alert slds-theme_error slds-theme--alert-texture toggle" role="alert">
+        <span style="color: #ffffff;font-weight: bold;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            &nbsp;Failed to invite proposed owner. Please contact System Adminstrator for more details.
+        </span>
+    </div>
+    
+</aura:component>

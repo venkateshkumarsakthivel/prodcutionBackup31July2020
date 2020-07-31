@@ -1,0 +1,9 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    <div style="margin:0 auto;">
+        <div class="HeaderP2PTransport">
+			<div class="landing-header-wrapper" 
+                 style="{!'height:164px;background: url('+$Resource.p2p1200x165 + '/p2p1200x165/NightRoad1200x165-2.png'+ ') no-repeat center center; background-size:cover;'}"> 
+            </div>
+        </div>
+    </div>
+</aura:component>

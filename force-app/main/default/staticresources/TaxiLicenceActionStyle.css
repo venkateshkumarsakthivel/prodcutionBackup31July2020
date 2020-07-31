@@ -1,0 +1,9 @@
+.cuf-publisherCancelButton {
+
+    display: none !important;
+}
+
+.slds-modal__container{
+    width:90% !important;
+    max-width:80rem !important;
+}

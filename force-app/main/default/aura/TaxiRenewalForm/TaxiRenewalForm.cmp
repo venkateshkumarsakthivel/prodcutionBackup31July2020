@@ -1,0 +1,35 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <aura:attribute name="displayNextSection" type="Boolean" default="true" />
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="caseId" type="String"/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="entityType" type="String" access="private"/>        
+    <aura:attribute name="sectionNameToRender" type="String" default="licenceDetails" access="public"/>
+    
+    <aura:handler name="loadSection" event="c:ASPFormSectionEvent" action="{!c.updateSectionHandlers}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <br/>
+    <h2 style="width: 100%;margin: 0;padding: 0;text-align: center;">
+        <hr style="display: inline-block;margin: 0 20px 8px 0;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr> 
+         Taxi Licence Renewal Application         
+        <hr style="display: inline-block;margin: 0 0 8px 20px;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr>
+    </h2>
+    <br/>
+    <aura:If isTrue="{!v.sectionNameToRender == 'licenceDetails'}">
+        <c:TaxiRenewalApplication displayNextSection="{!v.displayNextSection}" aura:id="licence-details" caseId="{!v.caseId}" readOnly="{!v.readOnly}"/>
+    </aura:If>
+    <aura:If isTrue="{!v.sectionNameToRender == 'privacy'}">
+        <c:TaxiRenewalPrivacy caseId="{!v.caseId}" entityType="{!v.entityType}"/>
+    </aura:If>
+    <aura:if isTrue="{!v.sectionNameToRender == 'review'}">
+        <c:TaxiRenewalReview caseId="{!v.caseId}" entityType="{!v.entityType}"/>
+    </aura:if>
+    <aura:if isTrue="{!v.sectionNameToRender == 'payment'}">
+        <c:TaxiRenewalPayment caseId="{!v.caseId}" />
+    </aura:if>
+    
+</aura:component>

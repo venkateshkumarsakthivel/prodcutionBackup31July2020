@@ -1,0 +1,17 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,forceCommunity:profileMenuInterface" access="global" controller="LoggedInUserController">
+	
+      <div style="margin:0 auto;max-width:1024px;">
+        <div class="custom-Header" style="background: white;width: 100%;">
+            <div class="LogoAndSearchP2PTransport" style="display:inline; position:relative;">
+                <a href="/industryportal/s/secure-portal-home"  title="Point to Point Transport Commissioner"> 
+                    <img src="{!$Resource.P2P_PortalLogo}" style="width:312px;"/>
+                </a>
+            </div>
+            <div class="open-search" style="display:inline;">
+                <div id='cssmenu' style="margin-right: -42px;">
+                   <a style="text-decoration: underline;" href='#' onclick = '{!c.gotoHelp}' title="Help"><span>Help</span></a>
+                </div>
+            </div>
+        </div>
+      </div>
+</aura:component>

@@ -1,0 +1,468 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPFormSectionDataController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <aura:attribute name="applicationType" type="String" default="New"/>
+    <aura:attribute name="applicationSource" type="String" default="PSP"/>
+    
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="false" />
+    <aura:attribute name="licenceType" type="String" default="" />
+    <aura:attribute name="currentLicenceType" type="Boolean"/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="withdrawnCase" type="Boolean" default="false"/>
+    
+    <aura:attribute name="caseId" type="String" default=""/>
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="entityType" type="String" default=""/>
+    
+    <aura:attribute name="businessUnitType" type="String" default=""/>
+    <aura:attribute name="businessStreet" type="String" />
+    <aura:attribute name="businessCity" type="String" />
+    <aura:attribute name="businessState" type="String"/>
+    <aura:attribute name="businessPostalCode" type="String" />
+    <aura:attribute name="businessCountry" type="String" default="AUSTRALIA"/>
+    <aura:attribute name="businessInternational" type="String"/>
+    <aura:attribute name="businessIsAustralian" type="Boolean" default="false"/>
+    <aura:attribute name="businessIsInternational" type="Boolean" default="false"/>
+    
+    <aura:attribute name="noticeUnitType" type="String" default=""/>
+    <aura:attribute name="noticeStreet" type="String" />
+    <aura:attribute name="noticeCity" type="String" />
+    <aura:attribute name="noticeState" type="String" default="NSW"/>
+    <aura:attribute name="noticePostalCode" type="String" />
+    <aura:attribute name="noticeCountry" type="String" default="AUSTRALIA"/>
+    <aura:attribute name="noticeType" type="String" default="Email"/>
+    
+    <aura:attribute name="recordKeepingUnitType" type="String" default=""/>
+    <aura:attribute name="recordKeepingStreet" type="String" />
+    <aura:attribute name="recordKeepingCity" type="String" />
+    <aura:attribute name="recordKeepingState" type="String" default="NSW"/>
+    <aura:attribute name="recordKeepingPostalCode" type="String" />
+    <aura:attribute name="recordKeepingCountry" type="String" default="AUSTRALIA"/>
+    
+    <aura:attribute name="noticeEmail" type="String" />
+    
+    <aura:attribute name="businessName" type="String" />
+    <aura:attribute name="businessEmail" type="String" />
+    <aura:attribute name="businessPhoneNumber" type="String" />
+    <aura:attribute name="businessWebsite" type="String" />
+    <aura:attribute name="businessSocialMedia" type="String" />
+    <aura:attribute name="businessOther" type="String" />
+    <aura:attribute name="businessContactType" type="String" />
+    
+    <aura:attribute name="businessEmailInput" type="Boolean" default="false"/>
+    <aura:attribute name="businessPhoneNumberInput" type="Boolean" default="false"/>
+    <aura:attribute name="businessWebsiteInput" type="Boolean" default="false"/>
+    <aura:attribute name="businessSocialMediaInput" type="Boolean" default="false"/>
+    <aura:attribute name="businessOtherInput" type="Boolean" default="false"/>
+    
+    <aura:attribute name="isCopyAddress" type="Boolean" />
+    <aura:attribute name="isCopyAddressToRecordKeeping" type="Boolean" />
+    
+    <aura:attribute name="internationalAddress" type="String" />
+    <aura:attribute name="isAuthorisedApplicant" type="Boolean" default="false" />
+    
+    <aura:attribute name="partnershipName" type="String"/>
+    <aura:attribute name="partnershipHoldABN" type="String"/>
+    <aura:attribute name="individualBusinessName" type="String"/>
+    <aura:attribute name="individualBusinessNumber" type="String"/>
+    
+    <aura:attribute name="aspCase" type="String"/>
+    
+    <aura:attribute name="latitude" type="String"/>
+    <aura:attribute name="longitude" type="String"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="notifyBussinessAddressType" event="c:BussinessAddressTypeEvent" action="{!c.handleBussinessAddressType}"/>
+    
+    <aura:method name="fetchApplicationDetails" action="{!c.fetchApplicationDetails}" access="PUBLIC"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:if isTrue="{!and(and(not(v.readOnly), not(v.reviewEdit)), not(v.withdrawnCase))}">
+      <aura:if isTrue="{!not(or(v.entityType == 'Individual Partner', v.entityType == 'Company Partner'))}">
+        <c:ASPFormSectionProgressIndicator currentSection="{!$Label.c.Business_Details_Header}" entityType="{!v.entityType}"/>
+      </aura:if>
+      <aura:if isTrue="{!or(v.entityType == 'Individual Partner', v.entityType == 'Company Partner')}">
+        <c:ASPFormSectionProgressIndicator currentSection="{!$Label.c.Partnership_Account_Details}" entityType="{!v.entityType}"/>
+      </aura:if>
+      <br/>
+    </aura:if>
+    
+    <article class="slds-card" id="formPartA">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#account'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">   
+                      <aura:if isTrue="{!and(and(v.entityType != undefined, v.entityType != 'Individual Partner'), v.entityType != 'Company Partner')}"> 
+                        {!$Label.c.Business_Details_Header}
+                       </aura:if>
+                       <aura:if isTrue="{!or(v.entityType == 'Individual Partner', v.entityType == 'Company Partner')}">
+                        {!$Label.c.Partnership_Account_Details} 
+                       </aura:if>
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!and(and(v.readOnly, not(v.reviewEdit)), not(v.withdrawnCase))}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                    <div style="float:right">
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                            <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                        </ui:button>
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <div class="slds-section" aura:id="sectiontitle">
+                    <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Click to expand or collapse">
+                        <button class="slds-button slds-section__title-action" onclick="{!c.toggleSectionContent}" style="background-color: #003577;color: #ffffff;">
+                            <aura:if isTrue="{!v.isSectionExpanded}">
+                                <i class="fa fa-minus" style="font-size: 0.875rem;color:#ffffff !important" aria-hidden="true"></i>
+                                <aura:set attribute="else">
+                                    <i class="fa fa-plus" style="font-size: 0.875rem;color:#ffffff !important" aria-hidden="true"></i>
+                                </aura:set>
+                            </aura:if>
+                            &nbsp;&nbsp;{!$Label.c.All_Applicant_Application_Checklist}
+                        </button>
+                    </h5>
+                    <div class="slds-section__content" style="border-width: 1px;border-style: solid;border-color: rgb(208, 208, 208);border-top: 0;">
+                        
+                        <aura:if isTrue="{!v.entityType == 'Company'}">
+                            <p class="slds-form- -stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+                                
+                                <p>
+                                    This application form is for a corporation applying for <a href="http://www.pointtopoint.nsw.gov.au/glossary-terms" target="_blank">authorisation</a> as a Point to Point Transport Service Provider. Only a Nominated Director or Manager can apply on behalf of a Corporation.
+                                </p>
+                                <br/>
+                                <p>
+                                    Where more than one director or manager is being nominated with this application, the second and subsequent director or manager will be required to complete a separate <a href="http://www.pointtopoint.nsw.gov.au/how-become-authorised" target="_blank">Appointment of Director or Manager Notice</a>. This notice should be uploaded in section C of this application. Alternatively additional directors or managers can be nominated through your account on the industry portal once authorised.
+                                </p>
+                                <br/>
+                                <p>
+                                    The fee payable for this application depends on whether you are applying for one authorisation $120 (taxi or booking service provider) or for two authorisations both a taxi and booking service provider in a combined application $160. A surcharge of 0.04% applies if you pay by credit card.
+                                </p>
+                                <br/>
+                                <p><!-- 04/07/2019 text added -->
+                                    All authorised service providers are subject to an annual authorisation fee in August each year. More information about authorisation fees is available on the Point to Point Transport Commissioner’s website at: <a href="https://www.pointtopoint.nsw.gov.au/apply-authorisation#Authorisation_fees" target="_blank">https://www.pointtopoint.nsw.gov.au/apply-authorisation#Authorisation_fees</a>.
+                                </p>
+                                <br/>
+                                <p>
+                                    If you (the nominated director or manager) have not resided in Australia for at least the last 5 years, you will need to provide a Police Check from your former country of residence.
+                                </p>
+                                <br/>
+                                <p>
+                                    Complete all applicable questions. If information is missing, we can ask you to supply the required information and/or documents to support the application. Failure to supply information can delay a decision on the application.
+                                </p>
+                                <br/>
+                                <p>
+                                    Once your application has been submitted it will be assessed for eligibility. Applications which have not been finalised within 90 days from the date of submission are taken to have been refused.
+                                </p>
+                                <br/>
+                                <p>
+                                    Copies of proof of identity documents certified by a Justice of the Peace, person on the approved list of occupations or a solicitor are acceptable. Further information can be found on the <a href="{!$Label.c.Industry_Site_URL}" target="_blank">Industry website</a>.
+                                </p>
+                            </p>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.entityType == 'Individual'}">
+                            <p class="slds-form- -stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+                                <p>
+                                    This application form is for a person applying for <a href="http://www.pointtopoint.nsw.gov.au/glossary-terms" target="_blank">authorisation</a> as a Point to Point Transport Service Provider.
+                                </p>
+                                <br/>
+                                <p>
+                                    The fee payable for this application depends on whether you are applying for one authorisation $120 (taxi or booking service provider) or for two authorisations (both a taxi and booking service provider) in a combined application $160. A surcharge of 0.04% applies if you pay by credit card.
+                                </p>
+                                <br/>
+                                <p><!-- 04/07/2019 text added -->
+                                    All authorised service providers are subject to an annual authorisation fee in August each year. More information about authorisation fees is available on the Point to Point Transport Commissioner’s website at: <a href="https://www.pointtopoint.nsw.gov.au/apply-authorisation#Authorisation_fees" target="_blank">https://www.pointtopoint.nsw.gov.au/apply-authorisation#Authorisation_fees</a>.
+                                </p>
+                                <br/>
+                                <p>
+                                    If you have not resided in Australia for at least the last 5 years, you will need to provide a Police Check from your former country of residence.
+                                </p>
+                                <br/>
+                                <p>
+                                    Complete all applicable questions. If information is missing, we can ask you to supply the required information and/or documents to support the application. Failure to supply information can delay a decision on the application.
+                                </p>
+                                <br/>
+                                <p>
+                                    Once your application has been submitted it will be assessed for eligibility. Applications which have not been finalised within 90 days from the date of submission are taken to have been refused.
+                                </p>
+                                <br/>
+                                <p>
+                                    Copies of proof of identity documents certified by a Justice of the Peace, person on the approved list of occupations or a solicitor are acceptable Further information can be found on the <a href="{!$Label.c.Industry_Site_URL}" target="_blank">Industry website</a>.
+                                </p>
+                            </p>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!or(v.entityType == 'Company Partner', v.entityType == 'Individual Partner')}">
+                            <p class="slds-form- -stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+                                <p>
+                                    This application form is for 2 or more persons under a partnership or other agreement applying for <a href="http://www.pointtopoint.nsw.gov.au/glossary-terms" target="_blank">authorisation</a> as a Point to Point Transport Service Provider. 
+                                </p>
+                                <br/>
+                                <p>
+                                    The application should be completed by one of the partners, each subsequent partner will be required to complete a separate <a href="http://www.pointtopoint.nsw.gov.au/how-become-authorised" target="_blank">Partner Declaration Notice</a>. This notice should be uploaded in Part B of this application.
+                                </p>
+                                <br/>
+                                <p>
+                                    The fee payable for this application depends on whether you are applying for one authorisation $120 (taxi or booking service provider) or for two authorisations both a taxi and booking service provider in a combined application $160. A surcharge of 0.04% applies if you pay by credit card.
+                                </p>
+                                <br/>
+                                <p><!-- 04/07/2019 text added -->
+                                    All authorised service providers are subject to an annual authorisation fee in August each year. More information about authorisation fees is available on the Point to Point Transport Commissioner’s website at: <a href="https://www.pointtopoint.nsw.gov.au/apply-authorisation#Authorisation_fees" target="_blank">https://www.pointtopoint.nsw.gov.au/apply-authorisation#Authorisation_fees</a>.
+                                </p>
+                                <br/>
+                                <p>
+                                    If any of the partners have not resided in Australia for at least the last 5 years, they will need to provide a Police Check from their former country of residence.
+                                </p>
+                                <br/>
+                                <p>
+                                    Complete all applicable questions. If information is missing, we can ask you to supply the required information and/or documents to support the application. Failure to supply information can delay a decision on the application.
+                                </p>
+                                <br/>
+                                <p>
+                                    Once your application has been submitted it will be assessed for eligibility. Applications which have not been finalised within 90 days from the date of submission are taken to have been refused.
+                                </p>
+                                <br/>
+                                <p>
+                                    Copies of proof of identity documents certified by a Justice of the Peace, person on the approved list of occupations or a solicitor are acceptable. Further information can be found on the <a href="{!$Label.c.Industry_Site_URL}" target="_blank">Industry website</a>. 
+                                </p>
+                            </p>
+                        </aura:if>
+                    </div>
+                </div>
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>      
+                
+                
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <label class="slds-form-element__label">{!$Label.c.All_Applicant_Service_Type}&nbsp;<span class="requiredField">*</span></label>
+                        <br/>
+                        <input disabled="{!or(v.readOnly, v.applicationType == 'Renewal')}" type="radio" name="servicetype" aura:id="Taxi" id="Taxi" onchange="{!c.setLicenceType}" /> Taxi Service
+                        &nbsp;
+                        <input disabled="{!or(v.readOnly, v.applicationType == 'Renewal')}" type="radio" name="servicetype" aura:id="Booking" id="Booking" onchange="{!c.setLicenceType}" /> Booking Service
+                        &nbsp;
+                        <input disabled="{!or(v.readOnly, v.applicationType == 'Renewal')}" type="radio" name="servicetype" aura:id="Taxi-and-Booking" id="Taxi and Booking" onchange="{!c.setLicenceType}" /> <div style="display: inline-flex;width: 158px;margin-left:5px;">Combined (Taxi and Booking Service)</div>
+                        <br/>
+                        <span id="servicetypeError" class="customErrorMsg"></span>
+                    </div>
+                    <div class="slds-col">
+                        <label class="slds-form-element__label">Entity Type</label>
+                        <br/>
+                        <input type="radio" name="entityType" id="Company" checked="{!v.entityType == 'Company'}" disabled="disabled"/>&nbsp;Company
+                        &nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="entityType" id="Individual" checked="{!v.entityType == 'Individual'}" disabled="disabled"/>&nbsp;Individual
+                        &nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="entityType" id="Partnership" checked="{!or(v.entityType == 'Company Partner', v.entityType == 'Individual Partner')}" disabled="disabled"/>&nbsp;Partnership
+                    </div>
+                </div>
+                
+                <aura:if isTrue="{!or(v.entityType == 'Company Partner', v.entityType == 'Individual Partner')}">
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <legend class="slds-form-element__label">
+                                {!$Label.c.All_Applicant_Partnership_Name}
+                            </legend>
+                            <ui:inputText maxlength="255" disabled="{!v.readOnly}" aura:id="Partnership-Name-Input" class="CamelCaseInput slds-input" value="{!v.partnershipName}"/>
+                        </div>
+                        
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">{!$Label.c.All_Applicant_Partnership_Hold_ABN}</label>
+                            <ui:inputSelect class="slds-input" disabled="{!v.readOnly}" aura:id="Partnership-Hold-ABN" value="{!v.partnershipHoldABN}">
+                                <ui:inputSelectOption text="" label="Please Select"/>
+                                <ui:inputSelectOption text="Yes"/>
+                                <ui:inputSelectOption text="No"/>
+                            </ui:inputSelect>
+                        </div>
+                    </div>
+                </aura:if>  
+                
+                <aura:if isTrue="{!or(v.entityType == 'Company Partner', v.entityType == 'Individual Partner')}">
+                    <div class="slds-grid">
+                        
+                        <div class="slds-col">                            
+                            <c:ABNComponent isReadOnly="{!v.readOnly || v.partnershipHoldABN != 'Yes'}" aura:id="ABN-Input" uniqueIdentifier="ABN-Input" 
+                                            fieldLabel="{!$Label.c.	Individual_ABN}" businessName="{!v.individualBusinessName}"
+                                            isRequired="false" abn="{!v.individualBusinessNumber}"/>
+                        </div>
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">{!$Label.c.Individual_Registered_Business_Name}</label>
+                            <ui:inputText maxlength="255" disabled="true" aura:id="Registered-Business-Name-Input" class="sentenceCaseInput slds-input" value="{!v.individualBusinessName}"/>
+                        </div>
+                    </div>
+                </aura:if>
+                
+                <!-- Address component-->
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <div style="display:inline;">
+                            <legend class="slds-form-element__label">
+                                {!$Label.c.All_Applicant_Business_Address}&nbsp;<span class="requiredField">*</span>&nbsp;<i class="fa fa-question-circle" aria-hidden="true" title="Must be a physical street address"></i>
+                            </legend>
+                            <div>The premises where the business is operated.</div>
+                            <c:AddressInputComponent reviewReadOnly="{!v.readOnly}" aura:id="Business-Address" unitType="{!v.businessUnitType}" street="{!v.businessStreet}" city="{!v.businessCity}" 
+                                                     state="{!v.businessState}" postalcode="{!v.businessPostalCode}" country="{!v.businessCountry}" addressType="BusinessAddress"
+                                                     internationalAddress="{!v.businessInternational}"
+                                                     isInternationalAddress="{!v.businessIsInternational}"
+                                                     isAustraliaAddress="{!v.businessIsAustralian}"
+                                                     fullStreet="{!v.businessStreet}"/>
+                        </div>
+                        
+                    </div>
+                    <div class="slds-col">
+                        <div style="display:inline;">   
+                            <legend class="slds-form-element__label">
+                                {!$Label.c.All_Applicant_Record_Keeping_Address}&nbsp;<span class="requiredField">*</span>&nbsp;<i class="fa fa-question-circle" aria-hidden="true" title="Must be a physical street address"></i>
+                                <div style="display:inline-block;font-weight:normal;float:right;">
+                                    <ui:inputcheckbox aura:id="recordKeepingSameAsBusiness" disabled="{#v.readOnly}" class="customCheckBox" label="&nbsp;Same as Business Address" value="{!v.isCopyAddressToRecordKeeping}" change="{!c.copyBusinessAddressToRecordKeeping}"/>
+                                </div>
+                            </legend>
+                            <a style="font-weight: normal;" target="_blank" href="https://www.legislation.nsw.gov.au/#/view/act/2016/34/part3/div3/sec43">Availability of documents</a>
+                            <c:AddressInputComponent reviewReadOnly="{!v.readOnly}" aura:id="Record-Keeping-Address" unitType="{!v.recordKeepingUnitType}" street="{!v.recordKeepingStreet}" city="{!v.recordKeepingCity}" 
+                                                     state="{!v.recordKeepingState}" postalcode="{!v.recordKeepingPostalCode}" addressType="Record_Keeping_Address"
+                                                     isAustraliaAddress="true" isInternationalAddress="false" isReadOnly="{!v.isCopyAddressToRecordKeeping}"
+                                                     fullStreet="{!v.recordKeepingStreet}"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <div style="display:inline;">
+                            <legend class="slds-form-element__label">{!$Label.c.All_Applicant_Notice_Address}&nbsp;<span class="requiredField">*</span></legend>
+                            <div class="radiobuttonClass">
+                                <ui:inputRadio disabled="{!v.readOnly}" aura:id="r0" change="{!c.setNoticeAddressType}" name="noticeAddressType" label="" value="{!v.noticeType == 'Email' ? true : false}"/> Via Email &nbsp;&nbsp;&nbsp;
+                                <ui:inputRadio disabled="{!v.readOnly}" aura:id="r1" change="{!c.setNoticeAddressType}" name="noticeAddressType" label="" value="{!v.noticeType == 'Postal' ? true : false}"/> Via Post
+                                
+                                
+                                <div class="same_as_business_address">
+                                    <ui:inputcheckbox aura:id="noticeSameAsBusiness" disabled="{#v.readOnly}" class="customCheckBox" label="&nbsp;Same as Business Address" value="{!v.isCopyAddress}" change="{!c.copyBusinessAddress}"/>
+                                </div>
+                            </div>
+                            
+                            <br/>
+                            <c:EmailAddressComponent isReadOnly="{!v.readOnly}" aura:id="Notice-Email" uniqueIdentifier="Notice-Email" 
+                                                     fieldLabel="Notice Email" isRequired="false" email="{!v.noticeEmail}"/>
+                            
+                            <br/>
+                            <legend class="slds-form-element__label">{!$Label.c.Notice_Address}&nbsp;<aura:if isTrue="{!v.noticeType == 'Postal' ? true : false}">&nbsp;<span class="requiredField">*</span></aura:if>&nbsp;<i class="fa fa-question-circle" aria-hidden="true" title="Must be a physical street address"></i></legend>
+                            <c:AddressInputComponent reviewReadOnly="{!v.readOnly}" aura:id="Notice-Address" unitType="{!v.noticeUnitType}" street="{!v.noticeStreet}" city="{!v.noticeCity}" 
+                                                     state="{!v.noticeState}" postalcode="{!v.noticePostalCode}" addressType="Notice_Address"
+                                                     isAustraliaAddress="true" isInternationalAddress="false" isReadOnly="{!v.isCopyAddress}"
+                                                     fullStreet="{!v.noticeStreet}" latitude="{!v.latitude}" longitude="{!v.longitude}" />  
+                        </div>
+                    </div>
+                    <div class="slds-col" style="background-color: #E8E8E8;">
+                        <legend class="slds-form-element__label">
+                            {!$Label.c.All_Applicant_Public_Contact_Details}
+                        </legend>
+                        <p style="font-size: 14px;">
+                            {!$Label.c.All_Applicant_Public_Contact_Details_Description}
+                        </p>
+                        <legend class="slds-form-element__label">{!$Label.c.All_Applicant_Business_Name}&nbsp;<span class="requiredField">*</span></legend>
+                        <ui:inputText maxlength="255" disabled="{!v.readOnly}" aura:id="Business-Name-Input" class="CamelCaseInput slds-input" value="{!v.businessName}"/>
+                        <br/><br/>
+                        
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <ui:inputCheckbox class="customCheckBox" disabled="{!v.readOnly}" aura:id="b0" label="" value="{!v.businessEmailInput}" change="{!c.businessEmailChange}"/>&nbsp;Email
+                            </div>
+                            <aura:if isTrue="{!v.businessEmailInput}">
+                                <c:EmailAddressComponent isReadOnly="{!v.readOnly}" aura:id="Business-Email-Input" uniqueIdentifier="Business-Email-Input" 
+                                                         fieldLabel="" isRequired="true" email="{!v.businessEmail}"/>
+                            </aura:if>
+                        </div>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <ui:inputCheckbox disabled="{!v.readOnly}" class="customCheckBox" aura:id="b1" label="" value="{!v.businessWebsiteInput}" change="{!c.businessWebsiteChange}"/>&nbsp;Website
+                            </div>
+                            <aura:if isTrue="{!v.businessWebsiteInput}">
+                                <ui:inputText maxlength="255" disabled="{!v.readOnly}" aura:id="Business-Website" value="{!v.businessWebsite}"/>
+                            </aura:if>
+                        </div>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <ui:inputCheckbox disabled="{!v.readOnly}" class="customCheckBox" aura:id="b2" label="" value="{!v.businessPhoneNumberInput}" change="{!c.businessPhoneChange}"/>&nbsp;Daytime Phone Number (mobile or landline)
+                            </div>
+                            <aura:if isTrue="{!v.businessPhoneNumberInput}">
+                                <c:PhoneComponent isReadOnly="{!v.readOnly}" aura:id="Business-Daytime-Phone-Input" uniqueIdentifier="Business-Daytime-Phone-Input" fieldLabel="" isRequired="true" phoneNumber="{!v.businessPhoneNumber}" />
+                            </aura:if>
+                        </div>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <ui:inputCheckbox disabled="{!v.readOnly}" class="customCheckBox" aura:id="b3" label="" value="{!v.businessSocialMediaInput}" change="{!c.businessSocialMediaChange}"/>&nbsp;Social media or application
+                            </div>
+                            <aura:if isTrue="{!v.businessSocialMediaInput}">
+                                <ui:inputText maxlength="255" disabled="{!v.readOnly}" aura:id="Business-SocialMedia" value="{!v.businessSocialMedia}"/>
+                            </aura:if>
+                        </div>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <ui:inputCheckbox disabled="{!v.readOnly}" class="customCheckBox" aura:id="b4" label="" value="{!v.businessOtherInput}" change="{!c.businessOtherChange}"/>&nbsp;Other
+                            </div>
+                            <aura:if isTrue="{!v.businessOtherInput}">
+                                <ui:inputText maxlength="255" disabled="{!v.readOnly}" aura:id="Business-Other" value="{!v.businessOther}"/>
+                            </aura:if>
+                            <span id="publicContactDetailsError" class="customErrorMsg"></span>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <!-- Footer component-->
+        <div class="slds-card__footer">
+            
+            <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+            <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                </ui:button>
+            </aura:if>
+            
+        </div>
+    </article>
+</aura:component>

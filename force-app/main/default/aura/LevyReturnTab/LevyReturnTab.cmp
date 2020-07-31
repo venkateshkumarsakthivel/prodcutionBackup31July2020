@@ -1,0 +1,206 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="LevyReturnTabController">
+    
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="returnLastDate" type="String" access="private" />
+    <aura:attribute name="levyStartDateForApprovedRebate" type="String" access="private" />
+    <aura:attribute name="levyEndDateForApprovedRebate" type="String" access="private" />
+    
+    <aura:attribute name="acc" type="Account" />
+    <aura:attribute name="tax_Payer_Reg" type="Tax_Payer_Registration__c" default="[]" access="public"/> 
+    <aura:attribute name="assessmentObj" type="Assessment__c" default="[]" access="public"/> 
+    <aura:attribute name="authorisations" type="Authorisation__c[]" access="public"/>
+    
+    <aura:attribute name="bspAuth" type="Authorisation__c" access="public" default="null"/>
+    <aura:attribute name="tspAuth" type="Authorisation__c" access="public" default="null"/>
+    
+    <aura:attribute name="hadTSP" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="hadBSP" type="Boolean" default="false" access="public"/>
+    
+    <aura:attribute name="errorMsg" type="String" default=""/>
+    
+    <aura:attribute name="preventLevyReturn" type="Boolean" default="true"/>
+    <aura:attribute name="hasAppliedForRebate" type="Boolean" default="false"/>
+    <aura:attribute name="hasApprovedRebateBeforeLevyEndPeriod" type="Boolean" default="false"/>
+    <aura:attribute name="readOnly" type="Boolean" default="true" access="public"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <article class="slds-card" id="levyReturnComponent">
+        <div class="slds-page-header">
+            
+            <div class="slds-grid">
+                <div class="slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                       svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="account">
+                            </c:svgIcon>
+                        </div>
+                        <div class="slds-media__body"> 
+                            <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.ASP_ACCT_MGMT_Header} - {!v.acc.Customer_Number__c}</p>
+                            <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Customer name">{!v.acc.Name}</h2>
+                        </div>
+                        <aura:if isTrue="{!and(not(v.preventLevyReturn), v.readOnly)}">  
+                            <ui:button class="slds-button slds-button--neutral" press="{!c.editReturn}"> 
+                                <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true" ></i>&nbsp;&nbsp;Edit
+                            </ui:button>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            
+            <aura:if isTrue="{!v.preventLevyReturn}">
+                
+                <aura:unescapedHTML value="{!v.errorMsg}"></aura:unescapedHTML>
+                
+                <div class="slds-card__footer">
+                    <aura:if isTrue="{!v.tax_Payer_Reg == null}">
+                        <br/>
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.registerLevy}"> 
+                            <i style="color:#54698d !important;" class="fa fa-file-text" aria-hidden="true"></i>&nbsp;&nbsp;Register Now
+                        </ui:button>
+                    </aura:if>
+                </div>
+                
+            </aura:if>
+            
+            <aura:if isTrue="{!not(v.preventLevyReturn)}">
+                
+                <label class="slds-form-element__legend">
+                    <aura:if isTrue="{!not(v.hasAppliedForRebate)}">  
+                        Passenger Service Levy Return <ui:outputDate value="{!v.assessmentObj.Period_Start_Date__c}" format="dd-MMM-yyyy"/> to <b><ui:outputDate value="{!v.assessmentObj.Period_End_Date__c}" format="dd-MMM-yyyy"/></b>
+                    </aura:if>
+                    <aura:if isTrue="{!v.hasAppliedForRebate}">
+                        Passenger Service Levy Return {!v.levyStartDateForApprovedRebate} to {!v.levyEndDateForApprovedRebate}
+                    </aura:if>
+                </label>
+                <div class="box">
+                    
+                    <div class="slds-form--stacked" style="padding: 20px">
+                        
+                        <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                            <span style="color: #ffffff;">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                            </span>
+                        </div>
+                        
+                        <label class="slds-form-element__label">Lodgement</label>
+                        <br/>
+                        This return must be lodged on or before <b>{!v.returnLastDate}</b>.
+                        
+                        <br/><br/>
+                        <label class="slds-form-element__label">Assessment period</label>
+                        <br/>
+                        
+                        <aura:if isTrue="{!v.hasAppliedForRebate}">
+                            This annual return covers the number of passenger service transactions carried out between 
+                            <b>{!v.levyStartDateForApprovedRebate}</b> to <b>{!v.levyEndDateForApprovedRebate}</b>.
+                            <aura:set attribute="else">
+                                This return is for the <b><ui:outputDate value="{!v.assessmentObj.Period_Start_Date__c}" format="MMMM YYYY"/></b> assessment period,
+                                and covers the number of passenger service transactions you carried out from 
+                                <b><ui:outputDate value="{!v.assessmentObj.Period_Start_Date__c}" format="dd-MMM-yyyy"/></b> to <b><ui:outputDate value="{!v.assessmentObj.Period_End_Date__c}" format="dd-MMM-yyyy"/></b>.
+                            </aura:set>
+                        </aura:if>
+                        
+                        <br/><br/>
+                        <label class="slds-form-element__label">Number of passenger service transactions</label>
+                        <br/>
+                        <aura:unescapedHtml value="{!$Label.c.Levy_Return_Passenger_Service_Transaction_Description}"/>
+                        
+                        <br/><br/>
+                        
+                        <aura:if isTrue="{!or(v.hadTSP, v.hadBSP)}"> 
+                            <div class="slds-grid">
+                                
+                                <aura:if isTrue="{!v.hadBSP}"> 
+                                    <div class="slds-col" style="padding-left: 0%;">
+                                        <label class="slds-form-element__label">{!$Label.c.Levy_Return_Booked_Services}&nbsp;{!v.bspAuth.Name}&nbsp;<span class="requiredField">*</span></label>
+                                        <ui:inputNumber updateOn="keyup" paste="{!c.validateBspCount}" blur="{!c.validateBspCount}" aura:id="bspCount" disabled="{!v.readOnly}" value="{!v.assessmentObj.BSP_Transaction_Count__c}" maxlength="10" class="slds-input"/>
+                                    </div>
+                                </aura:if> 
+                                
+                                <aura:if isTrue="{!v.hadTSP}">
+                                    <div class="slds-col" style="padding-left: 0%;">
+                                        <label class="slds-form-element__label">{!$Label.c.Levy_Return_Taxi_Services}&nbsp;{!v.tspAuth.Name}&nbsp;<span class="requiredField">*</span></label>
+                                        <ui:inputNumber updateOn="keyup" paste="{!c.validateTspCount}" blur="{!c.validateTspCount}" aura:id="tspCount" disabled="{!v.readOnly}" value="{!v.assessmentObj.TSP_Transaction_Count__c}" maxlength="10" class="slds-input"/>
+                                    </div>
+                                </aura:if>
+                                
+                                <aura:if isTrue="{!not(and(v.hadBSP, v.hadTSP))}"> 
+                                    <div class="slds-col" style="padding-left: 0%;">
+                                    </div>
+                                </aura:if>
+                                
+                            </div>
+                            <br/>
+                        </aura:if>
+                        
+                        <label class="slds-form-element__label">Privacy Statement</label>
+                        <br/>
+                        <aura:unescapedHtml value="{!$Label.c.Levy_Return_Privacy_Statement_Paragraph_1}"/>
+                        <br/><br/>
+                        <aura:unescapedHtml value="{!$Label.c.Levy_Return_Privacy_Statement_Paragraph_2}"/>
+                        <br/><br/>
+                        <aura:unescapedHtml value="{!$Label.c.Levy_Return_Privacy_Statement_Paragraph_3}"/>
+                        
+                        <br/><br/>
+                        <div class="slds-grid">
+                            
+                            <div class="slds-col" style="padding-top: 0%">
+                                <p>
+                                    <legend class="slds-form-element__label">Declaration</legend> 
+                                </p>
+                                <br/>
+                                <div class="slds-form-element">
+                                    <div class="slds-form-element__control">
+                                        
+                                        <ui:inputCheckbox disabled="{!v.readOnly}" aura:id="levyReturnCheckbox" label="" value="{!v.assessmentObj.Privacy_Declaration__c}" class="declarationCheckBox"/>
+                                        <aura:if isTrue="{!v.hasApprovedRebateBeforeLevyEndPeriod}">  
+                                            <aura:unescapedHtml value="{!$Label.c.Levy_Return_Rebate_Declaration}"></aura:unescapedHtml>
+                                        </aura:if>
+                                        
+                                        <aura:if isTrue="{!not(v.hasApprovedRebateBeforeLevyEndPeriod)}">  
+                                            <aura:unescapedHtml value="{!$Label.c.Levy_Return_Over_600_Declaration}"></aura:unescapedHtml>
+                                        </aura:if>
+                                        
+                                        <span id="declarationAcceptanceError" class="customErrorMsg"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-card__footer">
+                            
+                            <aura:if isTrue="{!not(v.readOnly)}">
+                                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                                </ui:button>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!not(v.readOnly)}">  
+                                <ui:button class="slds-button slds-button--neutral" press="{!c.submitReturn}"> 
+                                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true" ></i>&nbsp;&nbsp;Submit
+                                </ui:button>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.readOnly}">  
+                                <ui:button class="slds-button slds-button--neutral" press="{!c.editReturn}"> 
+                                    <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true" ></i>&nbsp;&nbsp;Edit
+                                </ui:button>
+                            </aura:if>
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+            </aura:if>
+            
+        </div>
+        
+    </article>
+</aura:component>

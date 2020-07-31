@@ -1,0 +1,163 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="LevyAssessmentTabController">
+    
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:attribute name="acc" type="Account" />
+    <aura:attribute name="assessmentMap" type="Map" default="{}"/>
+    <aura:attribute name="assessmentList" type="Assessment__c[]"/>
+    <aura:attribute name="assessmentRecord" type="Assessment__c" default="null"/>
+    
+    <aura:handler name="closeObjectionModal" event="c:LevyRaiseObjectionCancellationEvent" action="{!c.handleObjectionCancellation}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-show"/>
+    
+    <div id="assessmentTable" class="slds-grid slds-grid--vertical scrollable tableTop slds-border_top slds-card">
+        <div class="slds-scrollable slds-grow">
+            
+            <div class="slds-page-header">
+                <div class="slds-grid">
+                    <div class="slds-col slds-has-flexi-truncate">
+                        <div class="slds-media slds-no-space slds-grow">
+                            <div class="slds-media__figure">
+                                <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                           svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="fleet">
+                                </c:svgIcon>
+                            </div>
+                            <div class="slds-media__body" style="text-align:left;"> 
+                                <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.ASP_ACCT_MGMT_Header} - {!v.acc.Customer_Number__c}</p>
+                                <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Customer name">{!v.acc.Name}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="height: 450px;overflow-x:hidden;display: block;">
+                
+                    <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered " style="background-color: #eef1f6;">
+                        <thead style="{!v.authorisationList.length > 20 ? 'display:block; width: calc(100% - 17px);background: #003577;' : 'background: #003577;'}">
+                            <tr class="slds-line-height--reset">
+                                <th aria-label="Period" class="tabCol" scope="col">
+                                    <span class="slds-align--absolute-center tableheader" title="Period">
+                                        PERIOD
+                                    </span> 
+                                </th>
+                                <th aria-label="Type" class="tabCol" scope="col">
+                                    <span class="slds-float_left tableheader" title="Type">
+                                        TYPE
+                                    </span> 
+                                </th>
+                                <th aria-label="Issued" class="tabCol" scope="col">
+                                    <span class="slds-align--absolute-center tableheader" title="Issued">
+                                        ISSUED
+                                    </span> 
+                                </th>                    
+                                <th aria-label="Assessed Liability" class="tabCol" scope="col">
+                                    <span class="slds-float_right tableheader" title="Assessed Liability">
+                                        ASSESSED LIABILITY
+                                    </span>
+                                </th>
+                                <th aria-label="Status" class="tabCol" scope="col">
+                                    <span class="slds-float_left tableheader" title="Status">
+                                        STATUS
+                                    </span>
+                                </th>
+                                <th aria-label="Raise an objection" class="tabCol" scope="col">
+                                    <span class="slds-align--absolute-center tableheader" title="Raise an objection">
+                                        RAISE AN OBJECTION
+                                    </span> 
+                                </th>            
+                            </tr>
+                        </thead> 
+                        <tbody>
+                            <aura:iteration var="record" items="{!v.assessmentList}">
+                                <tr class="slds-line-height--reset">
+                                    
+                                    <td role="gridcell" class="selectCol">
+                                        <a href="javascript:void(0)" data-RecId="{!record.Id}" onclick="{!c.viewAssessmentDetails}"> 
+                                            <ui:outputDate class="slds-align--absolute-center" value="{!record.Period_Start_Date__c}" format="MMM YY"/>
+                                        </a>
+                                    </td>
+                                    <td role="gridcell" class="tabCol">
+                                        <aura:if isTrue="{!record.Assessment_Type__c == 'Reassessment-Compromise'}"> 
+                                         <ui:outputText class="slds-float_left" value="Reassessment"/>
+                                        </aura:if>
+                                        <aura:if isTrue="{!record.Assessment_Type__c != 'Reassessment-Compromise'}">
+                                         <ui:outputText class="slds-float_left" value="{!record.Assessment_Type__c}"/>
+                                        </aura:if>
+                                    </td>
+                                    <td role="gridcell" class="tabCol">
+                                        <ui:outputDate class="slds-align--absolute-center" value="{!record.Issue_Date__c}" format="dd-MMM-YYYY"/>
+                                    </td>
+                                    <td role="gridcell" class="tabCol">
+                                        <ui:outputCurrency currencySymbol="$" class="slds-float_right" value="{!record.Total_Levy_Amount__c}"/>
+                                    </td>
+                                    <td role="gridcell" class="tabCol">
+                                        <aura:if isTrue="{!record.Status__c == 'Closed'}"> 
+                                            <ui:outputText class="slds-float_left" value="Finalised"/>
+                                        </aura:if>
+                                        <aura:if isTrue="{!record.Status__c != 'Closed'}"> 
+                                            <ui:outputText class="slds-float_left" value="Pending"/>
+                                        </aura:if>
+                                    </td>
+                                    <td role="gridcell" class="tabCol" style="text-align: center;">
+                                        <aura:if isTrue="{!record.Can_Raise_An_Objection__c}">
+                                            <a href="javascript:void(0)" style="display: inline-block;" data-RecId="{!record.Id}" onclick="{!c.raiseAnObjection}"> 
+                                                <lightning:icon class="slds-align--absolute-center dashboard_icon" iconName="utility:edit_form" size="small" title="Raise an objection" alternativeText="Raise an objection"/>
+                                            </a>
+                                        </aura:if>
+                                    </td>
+                                    
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+    </div>    
+    
+    <div role="dialog" tabindex="-1" class="slds-modal" aura:id="messageBox">
+        <div class="slds-modal__container" style="width:50%;">
+            <div class="slds-modal__header">
+                <h2 id="header43" class="slds-text-heading--medium">
+                    <aura:if isTrue="{!v.assessmentRecord.Assessment_Type__c == 'Assessment'}">  
+                        Assessment Details
+                    </aura:if>
+                    <aura:if isTrue="{!v.assessmentRecord.Assessment_Type__c != 'Assessment'}">  
+                        Reassessment Details
+                    </aura:if>
+                </h2>
+            </div>        
+            <div class="slds-modal__content slds-p-around--medium">
+                
+                <aura:if isTrue="{!v.assessmentRecord != null}">
+                    <c:LevyAssessmentRecordDetails assessmentRecord="{!v.assessmentRecord}"/>
+                </aura:if>
+            </div>
+            <div class="slds-modal__footer">
+                
+                <ui:button class="slds-button slds-button--neutral headerButtons" press="{!c.closeAssessmentDetails}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Close
+                </ui:button>
+            </div>
+        </div>
+    </div>
+    <div role="dialog" tabindex="-1" class="slds-modal" aura:id="objectionMessageBox">
+        <div class="slds-modal__container" style="width:80%;">
+            <div class="slds-modal__header">
+                <h2 id="header43" class="slds-text-heading--medium">
+                     Raise an Objection
+                </h2>
+            </div>        
+            <div class="slds-modal__content slds-p-around--medium">
+                <aura:if isTrue="{!v.assessmentRecord != null}">
+                    <c:LevyRaiseObjection assessmentObj="{!v.assessmentRecord}"></c:LevyRaiseObjection>
+                </aura:if>
+            </div>
+            <div class="slds-modal__footer">
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop" aura:id="backdrop"></div>
+</aura:component>

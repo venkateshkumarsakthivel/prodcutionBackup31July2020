@@ -1,0 +1,49 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiFormSectionDataController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <aura:attribute name="tenderNumber" type="String"/>
+    <aura:attribute name="licenceTerm" type="String"/>
+    <aura:attribute name="licenceClass" type="String"/>
+    <aura:attribute name="operationArea" type="String"/>
+    <aura:attribute name="operatingLocation" type="String"/>
+    <aura:attribute name="platePickupLocation" type="String"/>
+    <aura:attribute name="noticeCity" type="String"/>
+    <aura:attribute name="noticeState" type="String" default="NSW"/>
+    <aura:attribute name="noticePostcode" type="String"/>
+    <aura:attribute name="noticeStreet" type="String"/>
+    <aura:attribute name="noticeCountry" type="String" default="AUSTRALIA"/>
+    <aura:attribute name="noticeType" type="String" default="Email"/>
+    <aura:attribute name="noticeUnitType" type="String" default=""/>
+    <aura:attribute name="noticeEmail" type="String" />
+    
+    <aura:attribute name="applicationFeeDue" type="Integer" default="0"/>
+    <aura:attribute name="licenceFeeDue" type="Integer"/>
+    <aura:attribute name="totalAmountDue" type="Integer"/>
+    
+    <aura:attribute name="authorisationId" type="String" default=""/>
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="caseId" type="String" default=""/>
+    <aura:attribute name="entityType" type="String" default=""/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="aspCase" type="String"/>
+    <aura:attribute name="withdrawnCase" type="Boolean" default="false"/>
+    
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="false" />
+    <aura:attribute name="isFromPortal" type="Boolean" default="false" />
+    
+    <aura:attribute name="licenceConditions" type="Condition__c[]" />
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+    
+    
+    
+    
+</aura:component>

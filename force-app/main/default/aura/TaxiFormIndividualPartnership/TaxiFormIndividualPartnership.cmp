@@ -1,0 +1,326 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiFormSectionDataController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <aura:attribute name="uploadStatus" type="List" />
+    <aura:attribute name="individualPOIUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="caseId" type="String" default=""/>
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="entityType" type="String" default=""/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="withdrawnCase" type="Boolean" default="false"/>
+    <aura:attribute name="isFromPortal" type="Boolean" default="false" />
+    <aura:attribute name="isWAT" type="Boolean" default="false" />
+    <aura:attribute name="aspCase" type="String"/>
+    
+    <aura:attribute name="askUserChoiceForPartnershipData" type="Boolean" default="true"/>
+    <aura:attribute name="partnershipDataProvided" type="Boolean"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    
+    <aura:attribute name="aspIndividualContacts" type="Related_Contact__c[]" />
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:if isTrue="{!and(and(not(v.readOnly), not(v.reviewEdit)), and(not(v.withdrawnCase), not(v.isWAT)))}">
+        <c:TaxiFormSectionProgressIndicator isFromPortal="{!v.isFromPortal}" currentSection="{!$Label.c.Individual_Partnership_Header}" entityType="{!v.entityType}"/>
+        <br/>
+    </aura:if>
+    
+    <aura:if isTrue="{!and(and(not(v.readOnly), not(v.reviewEdit)), and(not(v.withdrawnCase), v.isWAT))}">
+        <c:TaxiFormWATSectionProgressIndicator currentSection="{!$Label.c.Individual_Partnership_Header}" entityType="{!v.entityType}"/>
+        <br/>
+    </aura:if>
+    
+    <article class="slds-card" id="formPartC_IndividualPartnership">
+        
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#contact'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">       
+                        {!$Label.c.Individual_Partnership_Header}
+                    </h2>
+                    <b>Note:</b> If granted, the authorisation will be in the name of partners.
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!and(v.readOnly == true, v.withdrawnCase == false)}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                    <div style="float:right">   
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                            <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                        </ui:button>
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <form>
+            <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+                <div class="slds-form--stacked">
+                    
+                    <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                        <span style="color: #ffffff;">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                        </span>
+                    </div>
+                    <br/>
+                    
+                    <aura:if isTrue="{!v.askUserChoiceForPartnershipData}">
+                        <div class="slds-grid">
+                            <div class="slds-col" style="width: 50% !important;">
+                                <label class="slds-form-element__label">
+                                    {!$Label.c.Individual_Partnership_Info_Provided}&nbsp;<span class="requiredField">*</span>
+                                </label>
+                                <br/>
+                            </div>
+                            <div class="slds-col" style="width: 50% !important;">
+                                <ui:inputRadio value="{!if(v.partnershipDataProvided == false, true, false)}" 
+                                               disabled="{!v.readOnly}" 
+                                               aura:id="NoPartnershipData" 
+                                               name="partnershipDataGroup" label="" 
+                                               change="{!c.partnershipDataChange}"/>&nbsp;No
+                                &nbsp;&nbsp;
+                                <ui:inputRadio value="{!if(v.partnershipDataProvided == true, true, false)}" 
+                                               disabled="{!v.readOnly}" 
+                                               aura:id="YesPartnershipData" 
+                                               name="partnershipDataGroup" label="" 
+                                               change="{!c.partnershipDataChange}"/>&nbsp;Yes, provide details
+                                <br/>
+                                <span id="PartnershipInfoError" class="customErrorMsg"></span>
+                            </div>
+                        </div>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!or(and(v.askUserChoiceForPartnershipData, v.partnershipDataProvided) , not(v.askUserChoiceForPartnershipData) )}">
+                        <table>
+                            <aura:iteration items="{!v.aspIndividualContacts}" var="individualContact" indexVar="index">
+                                <tr>
+                                    <td>
+                                        
+                                        <!-- Individual Partnership Form Start -->
+                                        
+                                        <h2 style="width: 100%;margin: 15px 0px;padding: 0;text-align: center;font-size: 1.5em;">
+                                            <hr style="display: inline-block;margin: 0 20px 8px 0;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr> 
+                                            Individual Partner {!index+1} Details
+                                            <hr style="display: inline-block;margin: 0 0 8px 20px;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr>
+                                        </h2>
+                                        
+                                        <div class="slds-grid">
+                                            <div class="slds-col">
+                                                <label class="slds-form-element__label">{!$Label.c.Individual_Title}</label>
+                                                <ui:inputSelect disabled="{!v.readOnly}" 
+                                                                aura:id="Individual-Title-Input" 
+                                                                value="{!individualContact.Title__c}">
+                                                    <ui:inputSelectOption text="" label="Please Select"/>
+                                                    <ui:inputSelectOption text="Mr."/>
+                                                    <ui:inputSelectOption text="Mrs."/>
+                                                    <ui:inputSelectOption text="Ms."/>
+                                                    <ui:inputSelectOption text="Miss."/>
+                                                    <ui:inputSelectOption text="Other"/>
+                                                </ui:inputSelect>
+                                            </div>
+                                            <div class="slds-col">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="slds-grid">
+                                             <div class="slds-col">
+                                                <label class="slds-form-element__label">{!$Label.c.Individual_First_given_name}&nbsp;<span class="requiredField">*</span></label>
+                                                <ui:inputText maxlength="255" disabled="{!v.readOnly}" class="sentenceCaseInput"
+                                                              aura:id="Individual-First-Given-Name-Input"  
+                                                              value="{!individualContact.First_Given_Name__c}"/>
+                                            </div>
+                                            <div class="slds-col">
+                                                <label class="slds-form-element__label">{!$Label.c.Individual_Family_Name}&nbsp;<span class="requiredField">*</span></label>
+                                                <ui:inputText maxlength="255" disabled="{!v.readOnly}" class="upperCaseInput"
+                                                              aura:id="Individual-Family-Name-Input"  
+                                                              value="{!individualContact.Family_Name__c}"/>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="slds-grid">
+                                            <div class="slds-col">
+                                                <label class="slds-form-element__label">{!$Label.c.Individual_Other_Given_Name}</label>
+                                                <ui:inputText maxlength="255" disabled="{!v.readOnly}" class="sentenceCaseInput"
+                                                              aura:id="Individual-Other-Given-Name-Input"  
+                                                              value="{!individualContact.Other_Given_Name__c}"/>
+                                            </div>
+                                            <div class="slds-col">
+                                                <c:DateOfBirthComponent isReadOnly="{!v.readOnly}" 
+                                                                        aura:id="Individual-DOB-Input" 
+                                                                        uniqueIdentifier="{!'Individual-DOB-Input' + index}"
+                                                                        fieldLabel="{!$Label.c.Individual_Birthdate}"
+                                                                        isRequired="true" DOB="{!individualContact.Date_of_Birth__c}"/>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="slds-grid">
+                                            <div class="slds-col">
+                                                
+                                                <c:DriverLicenceComponent isReadOnly="{!v.readOnly}" 
+                                                                          aura:id="Individual-Driver-Licence-Number-Input" 
+                                                                          uniqueIdentifier="{!'Driver-Licence-Number-Input' + index}"
+                                                                          fieldLabel="Australian driver licence number, if applicable"
+                                                                          isRequired="false" 
+                                                                          licence="{!individualContact.Australian_Driver_Licence__c}"/>
+                                            </div>
+                                            <div class="slds-col">
+                                                <label class="slds-form-element__label">{!$Label.c.Individual_Australian_Driver_Licence_State}</label>
+                                                <ui:inputSelect disabled="{!v.readOnly}" 
+                                                                aura:id="{!'Individual-Driver-Licence-Number-State-Input' + index}"
+                                                                value="{!individualContact.Australian_Driver_Licence_State__c}">
+                                                    <ui:inputSelectOption text="" label="Please Select"/>
+                                                    <ui:inputSelectOption text="NSW"/>
+                                                    <ui:inputSelectOption text="ACT"/>
+                                                    <ui:inputSelectOption text="VIC"/>
+                                                    <ui:inputSelectOption text="QLD"/>
+                                                    <ui:inputSelectOption text="SA"/>
+                                                    <ui:inputSelectOption text="NT"/>
+                                                    <ui:inputSelectOption text="TAS"/>
+                                                    <ui:inputSelectOption text="WA"/>
+                                                </ui:inputSelect>
+                                            </div>
+                                        </div>
+                                        
+										<div class="slds-grid">
+                                            <div class="slds-col">
+                                                <c:PhoneComponent isReadOnly="{!v.readOnly}" 
+                                                                  aura:id="Individual-Daytime-Phone-Input" 
+                                                                  uniqueIdentifier="{!'Individual-Daytime-Phone-Input' + index}"
+                                                                  fieldLabel="Daytime Phone Number" 
+                                                                  isRequired="true" 
+                                                                  phoneNumber="{!individualContact.Daytime_Phone__c}" />
+                                            </div>
+                                            <div class="slds-col">
+												<c:EmailAddressComponent isReadOnly="{!v.readOnly}" 
+																			 aura:id="Individual-Email-Input" 
+																			 uniqueIdentifier="{!'Individual-Email-Input' + index}"
+																			 fieldLabel="Email" 
+																			 isRequired="true" 
+																			 email="{!individualContact.Email__c}"/>
+											</div>
+                                        </div>
+										
+                                        <div class="slds-grid">
+                                            <div class="slds-col">
+                                                <label class="slds-form-element__label">{!$Label.c.Individual_Residential_Address}&nbsp;<span class="requiredField">*</span></label>
+                                                <br/>
+                                                <c:AddressInputComponent reviewReadOnly="{!v.readOnly}" 
+                                                                         aura:id="Individual-Residential-Address-Input" 
+                                                                         unitType="{!individualContact.residentialUnitType}" 
+                                                                         street="{!individualContact.residentialStreet}" 
+                                                                         city="{!individualContact.Residential_Address_City__c}" 
+                                                                         state="{!individualContact.Residential_Address_State__c}"
+                                                                         postalcode="{!individualContact.Residential_Address_Postcode__c}" 
+                                                                         country="{!individualContact.Residential_Address_Country__c}"
+                                                                         addressType="{!'Residential_Address' + index}"
+                                                                         internationalAddress="{!individualContact.Residential_International_Address__c}"
+                                                                         fullStreet="{!individualContact.residentialStreet}"/>
+                                                <span id="ResidentialAddressError" class="customErrorMsg"></span>
+                                            </div>
+                                            <div class="slds-col">
+                                            </div>
+                                        </div>
+                                        
+                                        <aura:if isTrue="{!v.readOnly == false}">
+                                            <fieldset>
+                                                <aura:iteration var="fileStatus" items="{!v.uploadStatus}" indexVar="fileIndex">
+                                                    <aura:if isTrue="{!index == fileIndex}">
+                                                        <div class="slds-grid">
+                                                            <div class="slds-col">
+                                                                <c:P2POTAttachment category="POI" uploadStatus="{!fileStatus.poiUploadStatus}" 
+                                                                           uniqueIdentifier="{!'individual-poi-' + index}" FileUploadChecked="{!individualContact.Proof_Of_Identity_Documents__c}" 
+                                                                           FileCheckLabel="Proof of identity" 
+                                                                           UniqueClass="{!index}" 
+                                                                           aura:id="Identity-Document-Upload"
+                                                                           ParentRecordId="{!v.caseId}" 
+                                                                           acceptedFileTypes=".pdf" 
+                                                                           FileInputLabel="Attach copies of your proof of identity document" 
+                                                                           AllowMultiple="true" section="TAXI_INDV_PART" index="{!index}"  isRequired="{!or(v.isFromPortal, v.isWAT)}"/>
+                                                            </div>                                                            
+                                                        </div>
+                                                    </aura:if>
+                                                </aura:iteration>
+                                                
+                                            </fieldset>
+                                        </aura:if>
+                                        
+                                        <!-- Individual Partnership Form End -->
+                                        
+                                        <!-- Add more / Remove buttons-->	
+                                        <div class="slds-card__footer" style="margin-top: 0px;">
+                                            <aura:if isTrue="{!and(not(v.readOnly), index != 0)}">
+                                                <button type="button" onclick="{!c.removeRow}" id="{!index}" class="slds-button slds-button--neutral">
+                                                    <i style="color:#54698d !important;" class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Remove Individual Joint Holder
+                                                </button>
+                                            </aura:if>
+                                            
+                                            <aura:if isTrue="{!and(not(v.readOnly), index == (v.aspIndividualContacts.length - 1))}">
+                                                <ui:button class="slds-button slds-button--neutral" press="{!c.addRow}"> 
+                                                    <i style="color:#54698d !important;" class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add Individual Joint Holder
+                                                </ui:button>
+                                            </aura:if>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </table>
+                    </aura:if>
+                    
+                </div>
+            </div>
+        </form>
+        
+        <div class="slds-card__footer">
+            
+            <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveFormState}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Finish Later
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+            <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                </ui:button>
+            </aura:if>
+            
+        </div>
+        
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

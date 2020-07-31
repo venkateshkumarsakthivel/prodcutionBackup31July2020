@@ -1,0 +1,22 @@
+<aura:component controller="RetryPaymentController" implements="force:lightningQuickAction,force:hasRecordId" access="global" >
+	<ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    <ltng:require styles="{!$Resource.AppStyles}" />
+    
+    <aura:attribute name="message" type="String" access="private" />
+    <aura:attribute name="isEligibleForResend" default="false" type="Boolean" access="private"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div aura:id="resendConfirmation">
+        <p style="font-weight: bold;">
+            {!v.message}
+        </p>
+        <aura:if isTrue="{!v.isEligibleForResend}">
+            <div class="slds-card__footer">
+                <ui:button class="slds-button slds-button--neutral marginleft" press="{!c.resendPayment}">
+                    <i style="color:#54698d !important;" class="fa fa-check" aria-hidden="true"></i>&nbsp;&nbsp;Confirm
+                </ui:button>
+            </div>
+        </aura:if>
+        
+    </div>
+</aura:component>

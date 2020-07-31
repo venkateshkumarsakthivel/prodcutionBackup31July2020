@@ -1,0 +1,74 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiWatFormReviewController">
+	
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="caseId" type="String" default=""/>
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="entityType" type="String"/>
+    <aura:attribute name="withdrawnCase" type="Boolean" default="false"/>
+    <aura:attribute name="profileName" type="String" default=""/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:handler name="confirmApplicationSubmission" event="c:ConfirmApplicationSubmission" action="{!c.submitApplication}"/>
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="cssStyle" type="String" />
+    
+    <aura:if isTrue="{!v.withdrawnCase == false}">
+        <c:TaxiFormWATSectionProgressIndicator currentSection="review" entityType="{!v.entityType}"/>
+        <br/>
+    </aura:if>
+    
+    <c:TaxiFormWATLicenceDetails aura:id="fetchLicenceDetails" readOnly="true" withdrawnCase="{!v.withdrawnCase}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormWATLicenceDetails>
+    
+    <aura:if isTrue="{!v.entityType == 'Individual'}">
+        <c:TaxiFormIndividual isFromPortal="{!v.isFromPortal}" caseId="{!v.caseId}" entityType="{!v.entityType}" readOnly="true" withdrawnCase="{!v.withdrawnCase}"></c:TaxiFormIndividual>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.entityType == 'Company'}">
+        <c:TaxiFormCorporation isFromPortal="{!v.isFromPortal}" caseId="{!v.caseId}" entityType="{!v.entityType}" readOnly="true" withdrawnCase="{!v.withdrawnCase}"></c:TaxiFormCorporation>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.entityType == 'Company Partner'}">
+        <c:TaxiFormCorporatePartnership caseId="{!v.caseId}" entityType="{!v.entityType}" readOnly="true" withdrawnCase="{!v.withdrawnCase}"></c:TaxiFormCorporatePartnership>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.entityType == 'Company Partner'}">
+        <c:TaxiFormIndividualPartnership caseId="{!v.caseId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="true" readOnly="true" withdrawnCase="{!v.withdrawnCase}"></c:TaxiFormIndividualPartnership>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.entityType == 'Individual Partner'}">
+        <c:TaxiFormIndividualPartnership caseId="{!v.caseId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="false" readOnly="true" withdrawnCase="{!v.withdrawnCase}"></c:TaxiFormIndividualPartnership>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.entityType == 'Company'}">
+        <c:TaxiFormNominatedDirector isFromPortal="{!v.isFromPortal}" caseId="{!v.caseId}" entityType="{!v.entityType}" readOnly="true" withdrawnCase="{!v.withdrawnCase}"></c:TaxiFormNominatedDirector>
+    </aura:if>
+    
+    <c:P2POTAttachments aura:id="fetchAttachmentFiles" parent="{!v.caseId}" />
+    
+    <c:TaxiFormPrivacyStatement aura:id="fetchPrivacyStatementDetails" isFromPortal="{!v.isFromPortal}" caseId="{!v.caseId}" entityType="{!v.entityType}" readOnly="true" withdrawnCase="{!v.withdrawnCase}"></c:TaxiFormPrivacyStatement>
+    
+    <aura:if isTrue="{!v.withdrawnCase == false}">
+        <div class="slds-card__footer">
+            
+            <ui:button class="slds-button slds-button--neutral" press="{!c.finishLater}"> 
+                <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Finish Later
+            </ui:button>
+            <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+            </ui:button>
+            <ui:button class="slds-button slds-button--neutral" press="{!c.confirmApplicationSubmission}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Lodge
+            </ui:button>
+            
+        </div>
+    </aura:if>
+    <p>{!v.body}</p>
+</aura:component>

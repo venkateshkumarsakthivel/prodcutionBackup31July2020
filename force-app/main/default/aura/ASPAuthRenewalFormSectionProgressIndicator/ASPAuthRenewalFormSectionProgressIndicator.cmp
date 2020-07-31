@@ -1,0 +1,38 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <aura:attribute name="currentSection" type="String" default="{!$Label.c.ASP_Auth_Renewal_Header_Auth_Details}"/>
+    
+    <div class="slds-grid" >
+        <div class="slds-tabs--path" role="application">
+            <ul class="slds-tabs--path__nav" role="tablist">
+                
+                <li title="{!$Label.c.ASP_Auth_Renewal_Header_Auth_Details}" 
+                    class="{!v.currentSection != $Label.c.ASP_Auth_Renewal_Header_Auth_Details ? 'slds-tabs--path__item  slds-is-current' : 'slds-tabs--path__item  slds-is-customcomplete'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-96" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.ASP_Auth_Renewal_Header_Auth_Details}</span>
+                    </a>
+                </li>
+                
+                <li title="{!$Label.c.ASP_Auth_Renewal_Header_Privacy_Statement}" 
+                    class="{!v.currentSection == $Label.c.ASP_Auth_Renewal_Header_Auth_Details 
+                           ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.ASP_Auth_Renewal_Header_Privacy_Statement ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.ASP_Auth_Renewal_Header_Privacy_Statement}</span>
+                    </a>
+                </li>
+                
+                <li title="{!$Label.c.ASP_Auth_Renewal_Header_Payment}" 
+                    class="{!v.currentSection == $Label.c.ASP_Auth_Renewal_Header_Auth_Details 
+                           || v.currentSection == $Label.c.ASP_Auth_Renewal_Header_Privacy_Statement
+                           || v.currentSection == $Label.c.ASP_Auth_Renewal_Header_Review_Details
+                           ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.ASP_Auth_Renewal_Header_Payment ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.ASP_Auth_Renewal_Header_Payment}</span>
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+    
+</aura:component>

@@ -1,0 +1,325 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiFormSectionDataController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <aura:attribute name="directorPOIUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="caseId" type="String"/>
+    <aura:attribute name="entityType" type="String" default=""/>
+    <aura:attribute name="isFromPortal" type="Boolean" default="false" />
+    <aura:attribute name="isWAT" type="Boolean" default="false" />
+    
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="withdrawnCase" type="Boolean" default="false"/>
+    
+    <aura:attribute name="residentialUnitType" type="String" default=""/>
+    <aura:attribute name="residentialStreet" type="String" />
+    <aura:attribute name="residentialCity" type="String" />
+    <aura:attribute name="residentialState" type="String" />
+    <aura:attribute name="residentialPostalCode" type="String" />
+    <aura:attribute name="residentialCountry" type="String" />
+    
+    <aura:attribute name="nominateDirectorTitle" type="string" default="" /> 
+    <aura:attribute name="firstName" type="string" default="" />
+    <aura:attribute name="familyName" type="string" default="" />
+    <aura:attribute name="otherName" type="string" default="" />
+    <aura:attribute name="nominatedDOB" type="string" default="" />
+    <aura:attribute name="nominatedDirectorLicenceNumber" type="String"/>
+    <aura:attribute name="nominatedDirectorState" type="string" default="" />
+    <aura:attribute name="phoneNumber" type="string" default="" />
+    <aura:attribute name="emailAddress" type="string" default="" />
+    
+    <aura:attribute name="residentialUnitType2" type="String" default=""/>
+    <aura:attribute name="residentialStreet2" type="String" />
+    <aura:attribute name="residentialCity2" type="String" />
+    <aura:attribute name="residentialState2" type="String" />
+    <aura:attribute name="residentialPostalCode2" type="String" />
+    <aura:attribute name="residentialCountry2" type="String" />
+    
+    <aura:attribute name="nominateDirector2Title" type="string" default="" />
+    <aura:attribute name="firstName2" type="string" default="" />
+    <aura:attribute name="familyName2" type="string" default="" />
+    <aura:attribute name="otherName2" type="string" default="" />
+    <aura:attribute name="nominated2DOB" type="string" default="" />
+    <aura:attribute name="nominatedDirector2LicenceNumber" type="String"/>
+    <aura:attribute name="nominatedDirector2State" type="string" default="" />
+    <aura:attribute name="phoneNumber2" type="string" default="" />
+    <aura:attribute name="emailAddress2" type="string" default="" />
+    
+    <aura:attribute name="hasFirstDirector" type="Boolean" default="true"/>
+    <aura:attribute name="hasSecondDirector" type="Boolean" default="false"/>
+    <aura:attribute name="hasThirdDirector" type="Boolean" default="false"/>
+    
+    <aura:attribute name="applicantIdentityCheck" type="Boolean" default="false"/>
+    <aura:attribute name="applicantIdentityCheck2" type="Boolean" default="false"/>
+    
+    <aura:attribute name="aspCase" type="String"/>
+    <aura:attribute name="aspDirector" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:if isTrue="{!and(and(not(v.readOnly), not(v.reviewEdit)), and(not(v.withdrawnCase), not(v.isWAT)))}">
+        <c:TaxiFormSectionProgressIndicator isFromPortal="{!v.isFromPortal}" currentSection="{!$Label.c.Nominated_Director_Header}" entityType="{!v.entityType}"/>
+        <br/>
+    </aura:if>
+    
+    <aura:if isTrue="{!and(and(not(v.readOnly), not(v.reviewEdit)), and(not(v.withdrawnCase), v.isWAT))}">
+        <c:TaxiFormWATSectionProgressIndicator currentSection="{!$Label.c.Nominated_Director_Header}" entityType="{!v.entityType}"/>
+        <br/>
+    </aura:if>
+    
+    <article class="slds-card" id="taxiformNominatedDirectorPage">
+        
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#contact'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">       
+                        {!$Label.c.Nominated_Director_Header}
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with&nbsp;<span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!and(v.readOnly == true, v.withdrawnCase == false)}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                    <div style="float:right">
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                            <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                        </ui:button>
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>  
+                
+                
+                <aura:if isTrue="{!v.hasFirstDirector}">
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">{!$Label.c.Nominated_Director_Title}</label>
+                            <ui:inputSelect class="slds-input" disabled="{!v.readOnly}" aura:id="InputSelectTitle" value="{!v.nominateDirectorTitle}">
+                                <ui:inputSelectOption text="" label="Please Select"/>
+                                <ui:inputSelectOption text="Mr."/>
+                                <ui:inputSelectOption text="Mrs."/>
+                                <ui:inputSelectOption text="Ms."/>
+                                <ui:inputSelectOption text="Miss."/>
+                                <ui:inputSelectOption text="Other"/>
+                            </ui:inputSelect>
+                        </div>
+                        <div class="slds-col">
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="firstGivenFamilyName">{!$Label.c.Nominated_Director_First_given_name}&nbsp;<span class="requiredField">*</span></label>
+                                <ui:inputText disabled="{!v.readOnly}" value="{!v.firstName}" required="true" maxlength="40" class="slds-input" aura:id="firstGivenFamilyName" />
+                            </div>
+                        </div>
+                        <div class="slds-col">
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="familyName">{!$Label.c.Nominated_Director_Family_name}&nbsp;<span class="requiredField">*</span></label>
+                                <ui:inputText disabled="{!v.readOnly}" value="{!v.familyName}" required="true" maxlength="80" class="slds-input upperCaseInput" aura:id="familyName" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="otherGivenFamilyName">{!$Label.c.Nominated_Director_Other_given_name}</label>
+                                <ui:inputText disabled="{!v.readOnly}" value="{!v.otherName}" required="true" maxlength="255" class="slds-input" aura:id="otherGivenFamilyName" />
+                            </div>
+                        </div>
+                        <div class="slds-col">
+                            <div class="slds-form-element__control">
+                                <c:DateOfBirthComponent isReadOnly="{!v.readOnly}" aura:id="DOB" uniqueIdentifier="DOB" 
+                                                        fieldLabel="{!$Label.c.Nominated_Director_Birth_date}"
+                                                        isRequired="true" DOB="{!v.nominatedDOB}"/> 
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <div class="slds-form-element">
+                                <c:DriverLicenceComponent isReadOnly="{!v.readOnly}" aura:id="Driver-Licence-Number-Input" uniqueIdentifier="Driver-Licence-Number-Input" 
+                                                          fieldLabel="{!$Label.c.Nominated_Director_Australian_Driver_Licence_Number}"
+                                                          isRequired="false" licence="{!v.nominatedDirectorLicenceNumber}"/>
+                            </div>
+                        </div>
+                        <div class="slds-col">
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label label" for="state">{!$Label.c.Nominated_Director_Australian_Driver_Licence_State}</label>
+                                <ui:inputSelect disabled="{!v.readOnly}" label="" aura:id="state" value="{!v.nominatedDirectorState}" class="slds-input" required="false">
+                                    <ui:inputSelectOption text="" label="Please Select"/>
+                                    <ui:inputSelectOption text="NSW" label="NSW"/>
+                                    <ui:inputSelectOption text="ACT" label="ACT"/>
+                                    <ui:inputSelectOption text="VIC" label="VIC"/>
+                                    <ui:inputSelectOption text="QLD" label="QLD"/>
+                                    <ui:inputSelectOption text="SA" label="SA"/>
+                                    <ui:inputSelectOption text="NT" label="NT"/>
+                                    <ui:inputSelectOption text="TAS" label="TAS"/>
+                                    <ui:inputSelectOption text="WA" label="WA"/>
+                                </ui:inputSelect>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">    
+                            <div class="slds-form-element">
+                                <legend class="slds-form-element__legend slds-form-element__label">{!$Label.c.Nominated_Director_Residential_Address}&nbsp;<span class="requiredField">*</span></legend>
+                                <c:AddressInputComponent reviewReadOnly="{!v.readOnly}" aura:id="Residential-Address-Input" unitType="{!v.residentialUnitType}" street="{!v.residentialStreet}"
+                                                         city="{!v.residentialCity}" state="{!v.residentialState}"
+                                                         postalcode="{!v.residentialPostalCode}" country="{!v.residentialCountry}"
+                                                         addressType="NominatedDirector_Residential_Address" 
+                                                         fullStreet="{!v.residentialStreet}"/>
+                                
+                            </div>
+                        </div>
+                        <div class="slds-col">
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <div class="slds-form-element">
+                                <c:PhoneComponent isReadOnly="{!v.readOnly}" aura:id="phoneNumber" uniqueIdentifier="phoneNumber" fieldLabel="{!$Label.c.Nominated_Director_Daytime_phone_number}" isRequired="true" phoneNumber="{!v.phoneNumber}" />
+                            </div>
+                        </div>
+                        <div class="slds-col">
+                            <div class="slds-form-element">
+                                <c:EmailAddressComponent isReadOnly="{!v.readOnly}" aura:id="emailAddress" uniqueIdentifier="emailAddress" 
+                                                         fieldLabel="{!$Label.c.Nominated_Director_Email}" isRequired="true" email="{!v.emailAddress}"/>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <aura:if isTrue="{!v.readOnly == false}">
+                        <fieldset>
+                            <div class="slds-grid">
+                                <div class="slds-col">
+                                    <c:P2POTAttachment category="POI" uploadStatus="{!v.directorPOIUploadStatus}" uniqueIdentifier="director-poi" section="ND1" FileUploadChecked="{!v.applicantIdentityCheck}" FileCheckLabel="Proof of identity" aura:id="Applicant-Identity-Document-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of your proof of identity document" AllowMultiple="true" index="2"  isRequired="{!or(v.isFromPortal, v.isWAT)}" />
+                                </div>
+                                <div class="slds-col"></div>
+                            </div>
+                        </fieldset>
+                    </aura:if>
+                    
+                    <div class="slds-card__footer" style="margin-top: 0px;">
+                        <aura:if isTrue="{!and(v.hasSecondDirector, not(v.readOnly), v.hasFirstDirector)}">
+                            <ui:button class="slds-button slds-button--neutral" press="{!c.removeFirstRow}"> 
+                                <i style="color:#54698d !important;" class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Remove Director/Manager
+                            </ui:button>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!and(not(v.hasSecondDirector), not(v.readOnly))}">
+                            <ui:button class="slds-button slds-button--neutral" press="{!c.addMore}"> 
+                                <i style="color:#54698d !important;" class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add Director/Manager
+                            </ui:button>
+                        </aura:if>
+                    </div>
+                    
+                    <aura:if isTrue="{!v.hasSecondDirector}">
+                        
+                        <c:TaxiFormNominatedDirectorAdditionalDirector residentialUnitType="{!v.residentialUnitType2}" 
+                                                                       residentialStreet="{!v.residentialStreet2}" 
+                                                                       residentialCity="{!v.residentialCity2}"
+                                                                       residentialState="{!v.residentialState2}" 
+                                                                       residentialPostalCode="{!v.residentialPostalCode2}" 
+                                                                       residentialCountry="{!v.residentialCountry2}"
+                                                                       nominateDirectorTitle="{!v.nominateDirector2Title}"
+                                                                       firstName="{!v.firstName2}"
+                                                                       familyName="{!v.familyName2}"
+                                                                       otherName="{!v.otherName2}"
+                                                                       nominatedDOB="{!v.nominated2DOB}"
+                                                                       nominatedDirectorLicenceNumber="{!v.nominatedDirector2LicenceNumber}" 
+                                                                       nominatedDirectorState="{!v.nominatedDirector2State}" 
+                                                                       phoneNumber="{!v.phoneNumber2}" 
+                                                                       emailAddress="{!v.emailAddress2}" 
+                                                                       directorIndex="director2" 
+                                                                       aura:id="director2" 
+                                                                       readOnly="{!v.readOnly}"
+                                                                       hasOneMoreDirectorAbove="{!v.hasFirstDirector}"
+                                                                       caseId="{!v.caseId}"
+                                                                       applicantIdentityCheck="{!v.applicantIdentityCheck2}"
+                                                                       isPOIRequired="{!or(v.isFromPortal, v.isWAT)}"/>
+                        
+                        
+                        <div class="slds-card__footer">
+                            <aura:if isTrue="{!not(v.readOnly)}">
+                                <ui:button class="slds-button slds-button--neutral" press="{!c.removeSecondRow}"> 
+                                    <i style="color:#54698d !important;" class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Remove Director/Manager
+                                </ui:button>
+                            </aura:if>
+                        </div>
+                        
+                    </aura:if>
+                    
+                </aura:if>
+            </div>
+        </div>
+        
+        <div class="slds-card__footer">
+            <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveForm}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Finish Later
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+            <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                </ui:button>
+            </aura:if>
+            
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

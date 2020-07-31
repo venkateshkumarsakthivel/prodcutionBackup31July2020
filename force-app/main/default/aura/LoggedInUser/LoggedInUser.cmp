@@ -1,0 +1,33 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="LoggedInUserController">
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="username" type="String" required="false" description="" access="private"/>
+    <aura:attribute name="loggedIn" type="Boolean" required="false" description="" access="private"/>
+    <aura:attribute name="profileName" type="string" required="false" description="" access="private"/>
+  <!--  <aura:attribute name="options" type="String[]" default="Home, My Profile, Logout "/>   -->
+    <aura:if isTrue="{!(v.loggedIn == true)}">
+       
+            <div class="trigger-link" aria-haspopup="true" aria-label="Test User">
+                <c:svgIcon svgPath="/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#user" category="standard" size="medium" name="user"  />
+                <span class="profileOfUser" ><ui:outputText value="{!v.username}"/></span>
+                <ui:menu >
+                    <ui:menuTriggerLink aura:id="trigger" class="triggerDownArrow" />
+                    <ui:menuList class="actionMenu" aura:id="actionMenu">
+                        <ui:actionMenuItem label="My Profile" click="{!c.updateLabel}"/>
+                        <ui:actionMenuItem label="My Cases" click="{!c.updateLabel}"/>
+                        <ui:actionMenuItem label="Logout" click="{!c.updateLabel}"/>
+                    </ui:menuList>
+                </ui:menu>
+                
+            </div>
+            <!-- <div class="logOut">
+            <a class="logoutLink" href="https://p2pdev1-p2pdev1.cs6.force.com/secur/logout.jsp">Log Out</a>
+        </div> -->
+            
+       
+   	<aura:set attribute="else">
+        <a class="loginLink" href="https://p2pdev1-p2pdev1.cs6.force.com/s/login">Log In</a>
+    </aura:set>
+   
+    </aura:if>    
+    
+</aura:component>

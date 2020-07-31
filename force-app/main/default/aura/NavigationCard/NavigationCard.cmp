@@ -1,0 +1,53 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <aura:registerEvent name="countRecordsConfirmEvent" type="c:NavigationCardEvent"/>
+    <aura:registerEvent name="navigateToDVDEntitiesEvent" type="c:NavigationCardEvent"/>
+    
+    <aura:attribute name="title" type="String" required="true"/>
+    <aura:attribute name="image" type="String"/>
+    <aura:attribute name="description" type="String" required="true"/>
+    <aura:attribute name="buttontext" type="String" required="true"/>
+    <aura:attribute name="buttonhref" type="String" default="#"/>
+    <aura:attribute name="cardeventhandler" type="String"/>
+    <aura:attribute name="hovertext" type="String"/>
+    <aura:attribute name="taxiAgentRegistrationLink" type="String" required="true"/>
+    <aura:attribute name="taxiAgentRegistrationLinkhref" type="String" default="#"/>
+    
+    <aura:attribute name="showDownTimeAlert" type="Boolean" default="false"/>
+    <aura:attribute name="downTimeAlertMessage" type="String" default=""/>
+    
+    <div class="row" style="display: inline-flex;">
+        <div class="col s12 m7">
+            <div class="card">
+                <aura:renderif isTrue="{!v.image != null}">
+                    <div class="card-image">
+                        <a href="{!v.buttonhref}">
+                            <img src="{!v.image}" title="{!v.hovertext}"/>
+                        </a>
+                    </div>
+                </aura:renderif>
+                <div class="card-content">
+                    <div class="promo-tob-bottom-content-wrapper">
+                        <h2 class="rtecenter matchheight-processed">{!v.title}</h2>
+                        <p class="rtecenter matchheight-processed" style="{!showDownTimeAlert ? 'margin-bottom:12px;' : 'margin-bottom:24px;'}">
+                            <aura:unescapedHtml value="{!v.description}"/>
+                        </p>
+                        
+                        <aura:renderif isTrue="{!v.showDownTimeAlert}">
+                            <p class="rtecenter matchheight-processed" style="font-weight:bold;font-size:13px;color: #2574a9;">
+                                <aura:unescapedHtml value="{!v.downTimeAlertMessage}"/> 
+                            </p>
+                        </aura:renderif>
+                    </div>
+                    <p class="rtecenter" style="position: absolute;bottom: 180px;">
+                        <a href="{!v.taxiAgentRegistrationLinkhref}" onclick="{!c.handleTaxiAgentRegistrationClick}" target="_blank">{!v.taxiAgentRegistrationLink}</a>
+                    </p>
+                    <p class="rtecenter" style="position: absolute;bottom: 10px;">
+                        <a class="btn btn-arrow" href="{!v.buttonhref}" onclick="{!c.handleClickEvent}" title="{!v.buttontext}">{!v.buttontext}</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</aura:component>

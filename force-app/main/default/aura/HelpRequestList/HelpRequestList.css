@@ -1,0 +1,24 @@
+.THIS {
+}
+
+.THIS .p2pbutton{
+	background: #003577;    
+}
+
+.THIS .case-actions{
+    float:right;
+    margin-right:20px;
+}
+
+.THIS .pagination-actions{
+    float:right;
+    margin-right:20px;
+}
+
+.THIS .cb{
+    clear:both;
+}
+
+.THIS .slds-table th[scope="row"],  .THIS .slds-table td[role="gridcell"] {
+    font-size: 12px;
+}

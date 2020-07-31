@@ -1,0 +1,21 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="GrantedASPAuthorisations">
+    
+    <aura:attribute name="mydata" type="Object"/>
+    <aura:attribute name="mycolumns" type="List"/>
+    <aura:attribute name="hasGrantedAuthorisations" type="boolean" default="true"/>
+    <aura:handler name="init" value="{! this }" action="{!c.init}"/>
+    
+    <aura:if isTrue="{!v.hasGrantedAuthorisations}">
+        <header class="slds-modal__header" >
+            <span>
+                <div class = 'slds-form-element__label '>
+                    <h5 class="slds-page-header__title slds-text-heading_medium slds-hyphenate" style = "font-size : 19px"><b>Granted ASP Authorisations</b></h5>
+                </div>
+            </span>
+        </header>
+        <lightning:datatable data="{! v.mydata }"
+                             hideCheckboxColumn = "true"
+                             columns="{! v.mycolumns }" 
+                             keyField="id"/>
+    </aura:if>    
+</aura:component>

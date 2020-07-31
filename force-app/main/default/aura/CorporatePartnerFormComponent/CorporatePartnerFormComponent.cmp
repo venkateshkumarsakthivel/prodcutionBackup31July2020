@@ -1,0 +1,32 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="isValidFormData" type="Boolean" default="true" />
+    <aura:attribute name="formIndex" type="Integer" default="0"/>
+    <aura:attribute name="relatedContact" type="Related_Contact__c" />
+    
+    <aura:method name="validateFormData" action="{!c.validateFormData}" access="PUBLIC"/>
+    <aura:method name="resetErrorMessages" action="{!c.resetErrorMessages}" access="PUBLIC"/>
+    
+    <aura:handler event="c:CompanyNameForACNEvent" action="{!c.setCompanyName}"/>
+    
+    <article  id="corporatePartnerForm">
+        
+        <div class="slds-grid">
+            <div class="slds-col" style="width: 50% !important;">
+                <c:ACNComponent isReadOnly="{!v.readOnly}" isRequired="true" fieldLabel="ACN"
+                                aura:id="ACN-Input" 
+                                uniqueIdentifier="{!'ACN-Input' + v.formIndex}"
+                                acn="{!v.relatedContact.ACN__c}"/>
+            </div>
+            <div class="slds-col" style="width: 50% !important;">
+                <label class="slds-form-element__label">{!$Label.c.Corporation_Corporation_name}&nbsp;<span class="requiredField">*</span></label>
+                <ui:inputText maxlength="255" disabled="true" class="CamelCaseInput slds-input" 
+                              aura:id="Corporation-Name-Input" 
+                              value="{!v.relatedContact.Corporation_Name__c}"/>
+            </div>
+        </div>
+        
+    </article>
+    
+</aura:component>

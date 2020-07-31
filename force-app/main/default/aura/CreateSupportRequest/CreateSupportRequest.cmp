@@ -1,0 +1,174 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="SupportRequestController">
+    
+    <aura:attribute name="applicantPOIUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="applicantNationalPoliceUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="applicantCriminalCheckUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="applicantEndorsementCheckUploadStatus" type="Boolean" default="false" />
+    
+    <aura:attribute name="loggedInUserAccountType" type="String" />
+    <aura:attribute name="isContactTypeNominatedDirector" type="Boolean" default="false" />
+    <aura:attribute name="contactType" type="String"/>
+    <aura:attribute name="contactRole" type="String"/>
+    <aura:attribute name="FamilyName" type="String"/>
+    <aura:attribute name="FirstGivenName" type="String"/>
+    <aura:attribute name="DOB" type="String"/>
+    <aura:attribute name="phone" type="String"/>
+    <aura:attribute name="Email" type="String"/>
+    <aura:attribute name="residentialStreet" type="String"/>
+    <aura:attribute name="residentialCity" type="String"/>
+    <aura:attribute name="residentialState" type="String"/>
+    <aura:attribute name="residentialPostalCode" type="String"/>
+    <aura:attribute name="residentialCountry" type="String" default="AUSTRALIA"/>
+    <aura:attribute name="residentialInternationalAddress" type="String"/>
+    <aura:attribute name="residentialIsInternational" type="Boolean" default="false"/>
+    <aura:attribute name="residentialIsAustralian" type="Boolean" default="false"/>
+    <aura:attribute name="isDVDAccessLevelSelected" type="Boolean"/>
+    <aura:attribute name="isAcccountManagerAccessLevelSelected" type="Boolean"/>
+    <aura:attribute name="identityCheck" type="Boolean" default="false"/>
+    <aura:attribute name="nationalPoliceCheck" type="Boolean" default="false"/>
+    <aura:attribute name="endorsementCheck" type="Boolean" default="false"/>
+    <aura:attribute name="criminalHistoryCheck" type="Boolean" default="false"/>
+    <aura:handler name="confirmAddContact" event="c:AddContactEvent" action="{!c.addNewContact}"/>
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" aura:id="modalDiv" id="addContactForm">
+        <div class="slds-modal__container formbox">
+            
+            <div class="slds-modal__header">
+                <h3 id="header43" class="slds-text-heading--medium">Create Contact</h3>
+            </div>    
+            
+            <div class="slds-modal__content slds-p-around--medium">
+                <form class="slds-form" >
+                    <div class="slds-form--stacked">
+                        
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label">Contact Type&nbsp;<span class="requiredField">*</span></label>
+                                
+                                <aura:if isTrue="{!or(v.loggedInUserAccountType == 'Individual', v.loggedInUserAccountType == 'Individual Partnership', v.loggedInUserAccountType == 'Corporate Partnership')}">
+                                    
+                                    <ui:inputText aura:id="Contact-Type" class="slds-input" value="{!v.contactType}" required="true" disabled="true" /> 
+                                    
+                                    <aura:set attribute="else">
+                                        <ui:inputSelect class="ContactType" aura:id="contactTypeInput" value="{!v.contactType}" change="{!c.contactTypeChange}">
+                                            <ui:inputSelectOption text="" label="---Please Select---"/>
+                                            <ui:inputSelectOption text="General Contact"/>
+                                            <!--<ui:inputSelectOption text="Nominated Director/Manager"/> jira 330-->
+                                        </ui:inputSelect> 
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                        </div>
+                        
+                        <aura:if isTrue="{!v.isContactTypeNominatedDirector}">
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control">
+                                    <label class="slds-form-element__label label">Role&nbsp;<span class="requiredField">*</span></label>
+                                    <ui:inputSelect label="" aura:id="contactRoleInput" value="{!v.contactRole}" class="slds-input" required="true" change="{!c.contactRoleChange}">
+                                        <ui:inputSelectOption text="" label="---Please Select---"/>
+                                        <ui:inputSelectOption text="Company Secretary" label="Company Secretary"/>
+                                        <ui:inputSelectOption text="Director" label="Director"/>
+                                        <ui:inputSelectOption text="Manager" label="Manager"/>
+                                    </ui:inputSelect>
+                                </div>
+                            </div>
+                        </aura:if>
+                        
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label">Family Name&nbsp;<span class="requiredField">*</span></label>
+                                <ui:inputText aura:id="familyNameInput" class="slds-input caps" value="{!v.FamilyName}" required="true" change="{!c.familyNameChange}" /> 
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label">First Given Name&nbsp;<span class="requiredField">*</span></label>
+                                <ui:inputText aura:id="firstGivenNameInput" class="slds-input" value="{!v.FirstGivenName}" required="true" change="{!c.firstGivenNameChange}"/>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control"> 
+                                <c:DateOfBirthComponent isReadOnly="false" fieldLabel="Date Of Birth" DOB="{!v.DOB}" aura:id="dob" uniqueIdentifier="dob" isRequired="true" displayDatePicker="true"/>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control"> 
+                                <c:PhoneComponent isReadOnly="false" isRequired="true" fieldLabel="Daytime Phone Number" 
+                                                  aura:id="daytimePhoneInput" uniqueIdentifier="daytimePhoneInputIdentifier" 
+                                                  phoneNumber="{!v.phone}" />
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control"> 
+                                <c:EmailAddressComponent isReadOnly="false" aura:id="emailInput" uniqueIdentifier="Email" 
+                                                         fieldLabel="Email" isRequired="true" email="{!v.Email}"/>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <label class="slds-form-element__label">Residential Address&nbsp;<span class="requiredField">*</span></label>
+                                <c:AddressInputComponent reviewReadOnly="false" aura:id="Residential-Address" 
+                                                         street="{!v.residentialStreet}"
+                                                         city="{!v.residentialCity}" 
+                                                         state="{!v.residentialState}" 
+                                                         postalcode="{!v.residentialPostalCode}" 
+                                                         country="{!v.residentialCountry}"
+                                                         addressType="NominatedDirector_Residential_Address" 
+                                                         internationalAddress="{!v.residentialInternationalAddress}"
+                                                         isInternationalAddress="{!v.residentialIsInternational}"
+                                                         isAustraliaAddress="{!v.residentialIsAustralian}" 
+                                                         fullStreet="{!v.residentialStreet}"/>
+                            </div>
+                        </div>
+                        
+                        <!--<div class="slds-form-element">
+                            <div class="slds-form-element__control">  
+                                <label class="slds-form-element__label">Select The Access Level&nbsp;<span class="requiredField">*</span></label>
+                                <ui:inputSelect class="AccessLevel" aura:id="Access-Level" value="{!v.selectedAccess}" change="{!c.changeAccessLevel}">
+                                    <ui:inputSelectOption text='' label='Please Select'/>
+                                    <ui:inputSelectOption text="DVD user" label='DVD'/>
+                                    <ui:inputSelectOption text="Manage Account user" label='Manage Account'/>
+                                    <ui:inputSelectOption text="Full Access user" label='Full Access'/>
+                                </ui:inputSelect> 
+                            </div>
+                        </div>
+-->
+                        
+                 
+                        <aura:if isTrue="{!v.isContactTypeNominatedDirector}">
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control">
+                                    <c:P2POTAttachment category="POI" uploadStatus="{!v.applicantPOIUploadStatus}" uniqueIdentifier="applicant-poi" FileUploadChecked="{!v.identityCheck}" FileCheckLabel="Proof of identity" aura:id="Identity-Document-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of your proof of identity document" AllowMultiple="true" section="APPLICANT" index="1" />
+                                    <c:P2POTAttachment category="NPC" uploadStatus="{!v.applicantNationalPoliceUploadStatus}" uniqueIdentifier="applicant-national-police-check" FileUploadChecked="{!v.nationalPoliceCheck}" FileCheckLabel="National Police Check" aura:id="Police-Check-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach supporting documents" AllowMultiple="true" section="APPLICANT" index="1" />
+                                    <c:P2POTAttachment category="ECL" uploadStatus="{!v.applicantEndorsementCheckUploadStatus}" uniqueIdentifier="applicant-endorsement-check" FileUploadChecked="{!v.endorsementCheck}" FileCheckLabel="Copy of endorsement by Director or Company Secretary nominating the manager on Company letterhead" aura:id="Endorsement-Check-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach supporting documents" AllowMultiple="true" section="APPLICANT" index="1" />
+                                    <c:P2POTAttachment category="OCC" uploadStatus="{!v.applicantCriminalCheckUploadStatus}" uniqueIdentifier="applicant-criminal-check" FileUploadChecked="{!v.criminalHistoryCheck}" FileCheckLabel="Overseas criminal history check (if applicable)" aura:id="Criminal-Check-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach supporting documents" AllowMultiple="true" section="APPLICANT" index="1" />
+                                </div>
+                            </div>
+                        </aura:if>
+                        
+                    </div>
+                </form>
+            </div>
+            
+            <div class="slds-modal__footer">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.closemodal}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmAddContact}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                </ui:button>
+                
+            </div>
+            
+        </div>
+    </div>
+    <div class="slds-backdrop slds-backdrop--open" aura:id ="backdrop"></div>
+   <p>{!v.body}</p>
+</aura:component>

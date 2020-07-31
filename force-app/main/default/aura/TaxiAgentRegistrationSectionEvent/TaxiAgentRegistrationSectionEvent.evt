@@ -1,0 +1,7 @@
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name="sectionName" type="String" access="global"/>
+    <aura:attribute name="caseRegistrationData" type="Case" default="" access="global"/>
+    <aura:attribute name="primaryRelatedContactData" type="Related_Contact__c" access="global" default="{}"/>
+    <aura:attribute name="secondaryRelatedContactData" type="Related_Contact__c" access="global" default="{}"/>
+    <aura:attribute name="entityTypeData" type="String" default="Individual" access="global" />
+</aura:event>

@@ -1,0 +1,8 @@
+<aura:component implements="flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+	<div class="container"> 
+        <div class="navigation" style="width:14%;Text-align:center;float:left;margin-top:0px;">
+            <c:AccordionAccountManagement />
+        </div>
+        
+    </div>
+</aura:component>

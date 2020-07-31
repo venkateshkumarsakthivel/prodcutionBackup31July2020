@@ -1,0 +1,44 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <aura:attribute name="currentSection" type="String" default="{!$Label.c.Taxi_Agent_Registration_Details}"/>
+    <aura:attribute name="entityType" type="String" default=""/>
+    
+    <div class="slds-grid" >
+        <div class="slds-tabs--path" role="application">
+            <ul class="slds-tabs--path__nav" role="tablist">
+                <li title="{!$Label.c.Taxi_Agent_Registration_Details}" class="{!v.currentSection != $Label.c.Taxi_Agent_Registration_Details ? 'slds-tabs--path__item  slds-is-current' : 'slds-tabs--path__item  slds-is-customcomplete'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-96" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Taxi_Agent_Registration_Details}</span>
+                    </a>
+                </li>
+                <aura:if isTrue="{!v.entityType == 'Corporation'}">
+                    <li title="{!$Label.c.Taxi_Agent_Manager_Details}" class="{!v.currentSection == $Label.c.Taxi_Agent_Registration_Details
+                                                                              ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.Taxi_Agent_Manager_Details ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                        <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                            <span class="slds-tabs--path__title">{!$Label.c.Taxi_Agent_Manager_Details}</span>
+                        </a>
+                    </li>
+                </aura:if>
+                
+                <aura:if isTrue="{!v.entityType == 'Individual'}">
+                    <li title="{!$Label.c.Taxi_Agent_Upload_Document}" class="{!v.currentSection == $Label.c.Taxi_Agent_Registration_Details
+                                                                               ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.Taxi_Agent_Upload_Document ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                        <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                            <span class="slds-tabs--path__title">{!$Label.c.Taxi_Agent_Upload_Document}</span>
+                        </a>
+                    </li>
+                </aura:if>
+                
+                <li title="{!$Label.c.Taxi_Agent_Registration_Privacy_Statement}" class="{!v.currentSection == $Label.c.Taxi_Agent_Registration_Details 
+                                                                                         || v.currentSection == $Label.c.Taxi_Agent_Manager_Details
+                                                                                         || v.currentSection == $Label.c.Taxi_Agent_Upload_Document
+                                                                                         || v.currentSection == 'review' ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.Taxi_Agent_Registration_Privacy_Statement ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Taxi_Agent_Registration_Privacy_Statement}</span>
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</aura:component>

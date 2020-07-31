@@ -1,0 +1,62 @@
+<!-- This component is used in upload drivers using csv functionality -->
+
+<aura:component implements="forceCommunity:availableForAllPageTypes,lightning:actionOverride" access="global" controller="BulkUploadLawPartCodeController">
+    
+    <aura:attribute name="approveErrorMessage" type="String" access="public"/>
+    <aura:attribute name="approveSuccessMessage" type="String" access="public"/>
+    
+    <aura:attribute name="fileToUpload" type="String" />
+    
+    <aura:attribute name="baseUrl" type="String" default="$A.get('$Label.c.CCI_Law_Part_Code_Upload_Template')" />
+    <aura:registerEvent name="CreatLawPartCodes" type="c:CreatLawPartCodesEvent"/> 
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide "/>
+    
+    <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aura:id="modalDiv">
+        <div class="slds-modal__container">
+            <div class="slds-modal__header">
+                
+                <a href="{!$Label.c.CCI_Law_Part_Code_Upload_Template}" style="float:right;" title="Law Part Code template" target="_blank">Upload Law Part Code Template</a>
+                <h2 id="header43" class="slds-text-heading--medium">Upload Law Part Codes</h2>
+                
+            </div>
+            
+            <div class="slds-modal__content slds-p-around--medium">
+                
+                <article class="slds-card" id="approveChangesAction">
+                    
+                    <div class="slds-card__body">
+                        
+                        <div class="slds-form--stacked">
+                            
+                            <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                                <span style="color: #ffffff;">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    &nbsp;{!v.approveErrorMessage}                 
+                                </span>
+                            </div>
+                            <div id="generalSuccessMsgDiv" class="slds-notify slds-notify--alert slds-theme--success slds-theme--alert-texture" role="alert" style="display:none;">
+                                <span style="color: #ffffff;">
+                                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                    &nbsp;<aura:unescapedHtml value="{!v.approveSuccessMessage}"/>
+                                </span>
+                            </div>
+                            <br/>
+                            <center>
+                                <input type="file" class="file" accept=".csv" aura:id="file" value="{!v.fileToUpload}"/>
+                                <ui:button class="slds-button slds-button--neutral" press="{!c.readFile}"> Upload </ui:button>
+                            </center>
+                        </div>
+                    </div>
+                </article>
+            </div>
+            
+            <div class="slds-modal__footer">
+                <Label style="-webkit-text-fill-color:red;padding-right: 170px;">Note: Date format should be "dd-mm-yyyy" e.g. 09-01-2015.</Label>
+                <button class="slds-button slds-button--neutral" onclick="{!c.destroyComponent}">Close</button>
+            </div>
+        </div>
+    </div> 
+    <div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+    
+</aura:component>

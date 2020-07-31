@@ -1,0 +1,33 @@
+.THIS .btn-arrow{
+    background-color: #003577;
+    color: #ffffff;
+    padding: 15px 60px 15px 60px;
+    outline: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    bottom: 105px;
+}
+.THIS .btn-arrow:after {
+    content: "";
+    display: inline-block;
+    
+    position: absolute;
+    right: 8px;
+    top: 0;
+    bottom: 0;
+    width: 28px;
+    background: url('http://pointtopoint.stage6.ogilvy.com.au/sites/all/themes/pointtopoint/images/icon-circle-arrow.png') center no-repeat;
+}
+.THIS.slds-spinner_container{
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index : 10000!important; 
+    background-color: rgba(255,255,255,.75);
+    visibility: visible;
+    opacity: 1;
+    transition: opacity .2s ease,visibility 0s;
+    transition-delay: 0s,.3s;
+}

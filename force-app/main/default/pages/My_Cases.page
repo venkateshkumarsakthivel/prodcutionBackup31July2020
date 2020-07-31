@@ -1,0 +1,3 @@
+<apex:page standardController="Case">
+    <apex:enhancedList type="Case" height="300" rowsPerPage="10" id="MyCases" />
+</apex:page>

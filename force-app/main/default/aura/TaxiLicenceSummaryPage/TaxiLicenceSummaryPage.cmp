@@ -1,0 +1,193 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    <aura:attribute name="licenceRecord" type="Authorisation__c" />
+      <lightning:button label="Print" onclick="{!c.print}" class="slds-no-print" />
+    
+   <div class="slds-section slds-is-open" aura:id="sectiontitle">
+        <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Licence Details">
+            <button class="slds-button slds-section__title-action" style="background-color: #003577;color: #ffffff;">
+          &nbsp;&nbsp;Licence Details
+            </button>
+        </h5>
+        
+    </div>
+    
+    <div class="slds-grid" style="padding-left:5%;">
+        <div class="slds-col slds-text-title_bold" >
+            Licence Number
+             </div>
+        <div class="slds-col" >
+            <ui:outputText class="slds-float_right" value="{!v.licenceRecord.Name}"/>
+        </div>
+    </div>
+    
+    <div class="slds-grid"  style="padding-left:5%;">
+        <div class="slds-col slds-text-title_bold">
+             Registration Plate 
+        </div>
+        <div class="slds-col" >
+            <ui:outputText class="slds-float_right" value="{!v.licenceRecord.Plate_Number__c}"/>
+        </div>
+    </div>
+     <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col slds-text-title_bold" >
+                Licence Category
+            </div>
+            <div class="slds-col" >
+                <ui:outputText class="slds-float_right" value="{!v.licenceRecord.Licence_Type__c}"/>
+            </div>
+        </div>
+     <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col slds-text-title_bold" >
+                Area of Operation
+            </div>
+            <div class="slds-col" >
+                <ui:outputText class="slds-float_right" value="{!v.licenceRecord.Operation_Area__c}"/>
+            </div>
+        </div>
+    <div class="slds-section slds-is-open" aura:id="sectiontitle">
+        <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Licensee(s)">
+            <button class="slds-button slds-section__title-action" style="background-color: #003577;color: #ffffff;">
+              &nbsp;&nbsp;Licensee(s):
+            </button>
+        </h5>
+    </div>
+    <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col slds-text-title_bold" >
+                Name
+            </div>
+            <div class="slds-col" >
+                <ui:outputText class="slds-float_right" value="{!v.licenceRecord.Service_Provider__r.Name}"/>
+            </div>
+        </div>
+     <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col slds-text-title_bold" >
+                Address
+            </div>
+            <div class="slds-col" >
+                <ui:outputText class="slds-float_right" value="{!v.licenceRecord.Service_Provider__r.Notice_Address__c}"/>
+            </div>
+        </div>
+         <div class="slds-section slds-is-open" aura:id="sectiontitle">
+        <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Area of Operation">
+            <button class="slds-button slds-section__title-action" style="background-color: #003577;color: #ffffff;">
+            &nbsp;&nbsp;Area of Operation:
+            </button>
+        </h5>
+    </div>
+    <div class="slds-grid">
+         <div class="slds-col slds-text-title_bold" style="padding-left:5%;" >
+                <ui:outputText class="slds-float_left" value="{!v.licenceRecord.Operating_Locations__c}"/>
+            </div>
+        </div>
+<div style="padding-left:5%;"><p>
+    If a taxi licence specifies the area of operation of a taxi to provide services, the licence is taken to be subject to a condition that the taxi must be used only to provide a taxi service within that area, unless the provision of transport is by a taxi that results from a booking
+    </p></div>
+  <div class="slds-section slds-is-open" aura:id="sectiontitle">
+        <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Issuing details">
+            <button class="slds-button slds-section__title-action" style="background-color: #003577;color: #ffffff;">
+              &nbsp;&nbsp;Issuing details:
+            </button>
+        </h5>
+    </div>
+    <div class="slds-grid" style="padding-left:5%;">
+            
+            <div>
+                <p>
+                This licence is administered under Part 4 of the Point to Point
+             Transport (Taxi and Hire Vehicles) Act 2016 </p>
+    </div>
+        </div>
+     <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col slds-text-title_bold" >
+                Issue Date:
+            </div>
+            <div class="slds-col" >
+                <ui:outputDate class="slds-float_right" value="{!v.licenceRecord.First_Issued_Date__c}" format="dd/MM/YYYY"/>
+
+            </div>
+        </div>
+    <div>
+     <aura:if isTrue="{!v.licenceRecord.Final_Expiry_Date__c != null}">
+    <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col slds-text-title_bold" >
+                Current Licence Start Date 
+            </div>
+            <div class="slds-col" >
+                <ui:outputDate class="slds-float_right" value="{!v.licenceRecord.Start_Date__c}" format="dd/MM/YYYY"/>
+
+            </div>
+        </div>
+    
+    <div class="slds-grid" style="padding-left:5%;">
+        <div class="slds-col slds-text-title_bold" >
+            Current Licence Expiry Date 
+        </div>
+        <div class="slds-col">
+        <aura:if isTrue="{!v.licenceRecord.End_Date__c == null}"> 
+            <ui:outputText class="slds-float_right" value="not applicable" /> 
+         
+        </aura:if>
+        <aura:if isTrue="{!v.licenceRecord.End_Date__c != ''}">
+           <ui:outputDate class="slds-float_right" value="{!v.licenceRecord.End_Date__c}" format="dd/MM/YYYY"/>
+  </aura:if>
+       </div>                                                                                                           
+    </div>
+                                                                                                                                                                                                                 
+    
+  <div class="slds-grid" style="padding-left:5%;">
+        <div class="slds-col slds-text-title_bold" >
+            Renewal Count remaining
+        </div>
+        <div class="slds-col">
+        <aura:if isTrue="{!v.licenceRecord.Renewal_Count_Remaining__c == null}"> 
+            <ui:outputText class="slds-float_right" value="not applicable" /> 
+         
+        </aura:if>
+        <aura:if isTrue="{!v.licenceRecord.Renewal_Count_Remaining__c != ''}">
+           <ui:outputText class="slds-float_right" value="{!v.licenceRecord.Renewal_Count_Remaining__c}" />
+  </aura:if>
+       </div>                                                                                                           
+    </div>
+ <!--   
+<div class="slds-grid" style="padding-left:5%;">
+        <div class="slds-col slds-text-title_bold" >
+            Final Expiry Date 
+        </div>
+        <div class="slds-col">
+        <aura:if isTrue="{!v.licenceRecord.Final_Expiry_Date__c == null}"> 
+            <ui:outputText class="slds-float_right" value="not applicable" /> 
+         
+        </aura:if>
+        <aura:if isTrue="{!v.licenceRecord.Final_Expiry_Date__c != ''}">
+           <ui:outputDate class="slds-float_right" value="{!v.licenceRecord.Final_Expiry_Date__c}" format="dd/MM/YYYY"/>
+  </aura:if>
+       </div>                                                                                                           
+
+    </div> -->
+    </aura:if>
+    </div>     
+       
+         
+         
+    <div class="slds-section slds-is-open" aura:id="sectiontitle">
+        <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Term">
+            <button class="slds-button slds-section__title-action" style="background-color: #003577;color: #ffffff;">
+             &nbsp;&nbsp;Disclaimer:
+            </button>
+        </h5>
+    </div>
+  
+ <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col">
+    <p>
+This document is <b>not</b> a NSW Taxi licence. It is intended only as proof that a NSW <br />
+taxi Licence is held by the licensee named. It does not include the conditions, if <br />
+any, applicable to licence. Any conditions continue to apply for the licence. Please <br />
+refer to Last issued Taxi Licence Certificate for a copy of the conditions applicable <br />
+to this licence.    
+ </p>
+   </div>
+   </div>
+        
+</aura:component>

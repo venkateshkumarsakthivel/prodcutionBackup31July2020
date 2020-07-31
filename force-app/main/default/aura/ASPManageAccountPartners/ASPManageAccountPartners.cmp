@@ -1,0 +1,95 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPManageAccountPartnersController" >
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}" afterScriptsLoaded="{!c.doInit}"/> 
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="customerNumber" type="String"  access="private" />
+    <aura:attribute name="accountName" type="String" />
+    <aura:attribute name="partnerList" type="Object[]"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <!--<lightning:spinner variant="brand" aura:id="spinner" size="large" ></lightning:spinner>-->
+    
+    <article class="slds-card">
+        <div class="slds-page-header">
+            <div class="slds-grid">
+                <div class="slds-col slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                       svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="fleet">
+                            </c:svgIcon>
+                        </div>
+                        <div class="slds-media__body" style="text-align:left;"> 
+                            <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.ASP_ACCT_MGMT_Header} - {!v.customerNumber}</p>
+                            <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Account">{!v.accountName}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered slds-table--striped slds-no-row-hover" style="background-color: #003577;" >
+            <thead style="{!v.partnerList.length > 7 ? 'display:block;width: calc(100% - 17px);background: #003577;' : 'background: #003577;'}">
+                <tr class="slds-line-height--reset">   
+                    
+                    <th scope="col"  class="tabCol">
+                        <span class="slds-align--absolute-center tableheader"  title="Name" style="color:#fff">Name</span> 
+                    </th> 
+                    
+                    <th scope="col"  class="tabCol">
+                        <span class="slds-align--absolute-center tableheader" title="Type" style="color:#fff">Type</span> 
+                    </th>
+                    
+                    <th scope="col"  class="tabCol">
+                        <span class="slds-align--absolute-center tableheader" title="Daytime Phone Number" style="color:#fff">Daytime Phone Number</span>
+                    </th>
+                    
+                    <th scope="col"  class="tabCol">
+                        <span class="slds-align--absolute-center tableheader" title="Email" style="color:#fff">Email</span> 
+                    </th>    
+                    
+                </tr>
+            </thead> 
+        </table>
+        <div style="height:510px;overflow-x:hidden;display: block;">
+            <table class="slds-table slds-table--fixed-layout slds-table--bordered slds-table--striped slds-no-row-hover" style="background-color: #eef1f6;">
+                <tbody >
+                    
+                    <aura:iteration var="partner" items="{!v.partnerList}">
+                        
+                        <tr class="slds-hint-parent"> 
+                            
+                            <td role="gridcell" class="tabCol">
+                                <div class="slds-truncate slds-align--absolute-left wrap">
+                                    <ui:outputText value="{!partner.Name}" />
+                                </div>
+                            </td>
+                            
+                            <td role="gridcell" class="tabCol" >
+                                <div class="slds-truncate slds-align--absolute-center  wrap" >
+                                    <ui:outputText value="{!partner.Contact_Type__c}"/>
+                                </div>
+                            </td>
+                            
+                            <td role="gridcell" class="tabCol" >
+                                <div class="slds-truncate slds-align--absolute-center  wrap" >
+                                    <ui:outputText value="{!partner.Phone}"/>
+                                </div>
+                            </td>
+                            
+                            <td role="gridcell" class="tabCol" >
+                                <div class="slds-truncate slds-align--absolute-center  wrap" >
+                                    <ui:outputText value="{!partner.Email}"/>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                    </aura:iteration>
+                </tbody>
+            </table>
+        </div>
+    </article>
+    
+</aura:component>

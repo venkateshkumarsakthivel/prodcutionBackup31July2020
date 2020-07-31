@@ -1,0 +1,26 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" controller="CancelChangesActionController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="cancleErrorMessage" type="String" access="public"/>
+    <aura:attribute name="lawPartCodeId" type="String" access="public"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-show"/>
+    
+    <article class="slds-card" id="cancleChangesAction">
+        <div class="slds-card__body">
+            <div class="slds-form--stacked">
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!v.cancleErrorMessage}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </article>
+	
+</aura:component>

@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Gotham-Book';
+    src: url(/resource/GothamBookRegular);
+}
+.THIS body {
+    
+    font-family: 'Gotham-Book' !important;
+    font-size: 14px !important;
+}

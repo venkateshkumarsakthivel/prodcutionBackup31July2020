@@ -1,0 +1,28 @@
+@font-face {
+    font-family: 'Gotham-Book';
+    src: url(/industryportal/resource/GothamBookRegular);
+}
+.THIS {
+    
+    font-family: 'Gotham-Book' !important;
+}
+
+.THIS .slds-container--large{
+    padding: 5px;
+    max-width:100%;
+}
+
+.THIS .withdrawlink{
+    display:none;
+}
+
+.THIS .customTableHeader{
+    
+    background: #003577;
+    color: #FFFFFF;
+}
+
+.THIS .slds-table thead th {
+	background-color: #003577;
+    color: #FFFFFF;
+}

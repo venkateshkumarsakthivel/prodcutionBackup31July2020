@@ -1,0 +1,36 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.TaxiLicenceActionStyle}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}"/>
+    
+    <aura:attribute name="caseId" type="String"/>
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="entityType" type="String"/>
+    
+    <aura:attribute name="applicationType" type="String" default="New"/>
+    
+    <aura:attribute name="sectionNameToRender" type="String" default="sectionA"/>
+    
+    <aura:handler name="loadSection" event="c:ASPFormSectionEvent" action="{!c.updateSectionHandlers}"/>
+    <aura:handler name="closeApplication" event="c:TaxiFormModalClosureEvent" action="{!c.closeApplication}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <br/>
+    
+    <div id="taxiFormContainer">
+        <aura:If isTrue="{!v.sectionNameToRender == 'sectionA'}">
+            <c:TaxiTransferPartyBDetails aura:id="transferDetails" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}" />
+        </aura:If>
+        <aura:if isTrue="{!v.sectionNameToRender == 'privacy'}">
+            <c:TaxiTransferPartyBPrivacyStatement caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiTransferPartyBPrivacyStatement>
+        </aura:if>
+        <aura:if isTrue="{!v.sectionNameToRender == 'review'}">
+            <c:TaxiTransferPartyBReview accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}" />
+        </aura:if>
+        <aura:if isTrue="{!v.sectionNameToRender == 'payment'}">
+            <c:TransferPartyBPaymentDetails caseId="{!v.caseId}"  />
+        </aura:if>
+    </div>
+</aura:component>

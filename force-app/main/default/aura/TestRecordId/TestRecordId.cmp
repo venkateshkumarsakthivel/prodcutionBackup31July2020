@@ -1,0 +1,5 @@
+<aura:component implements="force:lightningQuickAction,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome" access="global" >
+    <aura:attribute name="recordId" type="String" default="{!recordId}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    {!v.recordId}
+</aura:component>

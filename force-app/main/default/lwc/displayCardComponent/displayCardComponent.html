@@ -1,0 +1,43 @@
+<template>
+
+    <article class="slds-card child-card">
+        <div class="slds-card__header slds-grid">
+          <header class="slds-media slds-media_center slds-has-flexi-truncate">
+            <div class="slds-media__figure">
+              <span class="slds-icon_container slds-icon-standard-account" title="account">
+                <lightning-icon icon-name={childObjectIcon} 
+                                alternative-text="Approved"
+                                size="small"
+                                title="Approved"
+                                ></lightning-icon>
+              </span>
+            </div>
+            <div class="slds-media__body">
+              <h2 class="slds-card__header-title">
+                  <span>{record.Name}</span>
+              </h2>
+            </div>
+            <div class="slds-no-flex" slot="actions">
+                    <c-display-card-buttons buttons={buttons} 
+                    record={record} onbuttonclick={buttonAction}
+                     container-width={containerWidth}>
+
+                    </c-display-card-buttons>
+              </div>
+          </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+
+                <div class="slds-grid slds-wrap slds-p-horizontal_large gridClass">
+                    <template for:each={fields} for:item="field">
+                        <div key={field.fieldAPIName} class="slds-col slds-p-top_x-small columnClass">
+                            <c-display-field record={record}
+                                             field={field}></c-display-field>
+                        </div>
+                    </template>
+                </div>
+
+        </div>
+      </article>
+
+</template>

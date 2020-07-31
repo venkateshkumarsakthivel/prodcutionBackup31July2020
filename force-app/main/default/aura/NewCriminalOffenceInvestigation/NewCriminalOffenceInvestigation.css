@@ -1,0 +1,35 @@
+.THIS .slds-form-element__label {
+    
+    display: inline-block;
+    color: rgb(105, 105, 105);
+    font-size: 0.875rem;
+    line-height: 1.375;
+    margin-right: 0.75rem;
+    margin-bottom: 0.25rem;
+    text-align: left;
+    
+    /*
+    white-space: normal;
+    font-size: 12px;
+    text-align: center;
+    color: rgb(105, 105, 105); */
+}
+
+.THIS .requiredField {
+    color: red;
+    font-weight: bold;
+}
+
+.THIS .formbox {
+    width:70%;
+    text-align: left;
+}
+
+.THIS .toggleDisplay {
+    display: none;
+}
+
+.THIS .slds-col{
+    padding:2%;
+    width:50%;
+}

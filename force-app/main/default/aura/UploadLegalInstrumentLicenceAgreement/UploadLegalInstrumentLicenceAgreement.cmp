@@ -1,0 +1,73 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="LicenceAgreementRegistrationController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <aura:attribute name="uliUploadStatus" type="Boolean" default="false"/>
+    <aura:attribute name="identityCheck" type="boolean" default="false"/>
+    <aura:attribute name="RelatedContactList" type="Related_Contact__c[]" access="public"/>
+    <aura:attribute name="caseId" type="String" access="public" default=""/>
+    <aura:attribute name="accountId" type="String" default="" access="public"/>
+    
+    <aura:registerEvent name="loadSection" type="c:TaxiAgentLicenceAgreementRegistrationEvent" access="public"/>
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <c:TaxiAgentLicenceAgreementRegistrationProgressIndicator currentSection="{!$Label.c.Upload_Legal_Instrument}"/>
+    <br/>
+	
+    <article class="slds-card" id="uploadLegalInstrumentLicAgr">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/custom-sprite/svg/symbols.svg#custom18'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">   
+                        {!$Label.c.Upload_Legal_Instrument}
+                    </h2>
+                </div>
+            </header>
+        </div>
+        
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+            <span style="color: #ffffff;">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+            </span>
+        </div>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <c:P2POTAttachment category="ULI" uploadStatus="{!v.uliUploadStatus}" uniqueIdentifier="applicant-uli" FileUploadChecked="{!v.identityCheck}" FileCheckLabel="Upload Legal Instrument" aura:id="Upload-Legal-Instrument" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of your legal instrument" AllowMultiple="true" section="INDIVIDUAL" index="1" />
+                    </div>
+                    <div class="slds-col">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slds-card__footer">
+            
+            <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+            </ui:button>
+            <ui:button class="slds-button slds-button--neutral" press="{!c.continueSave}"> 
+                <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Lodge
+            </ui:button>
+            
+        </div>
+        
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

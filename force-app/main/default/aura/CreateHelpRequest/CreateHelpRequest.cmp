@@ -1,0 +1,64 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                controller="HelpRequestListController">
+    
+<aura:attribute name="newCase" type="Case"
+     default="{ 'sobjectType': 'Case', 'Subject': '', 'Description': '' , 'Type': ''}"/>
+
+<aura:registerEvent name="submittedHelpRequestEvent" type="c:HelpRequestSubmitEvent"/>
+<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" aura:id="modalDiv">
+ <div class="slds-modal__container formbox">
+            <div class="slds-modal__header">
+                <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closemodal}">
+                    <c:svgIcon class="dashboard_icon" svgPath="/resource/slds221/assets/icons/utility-sprite/svg/symbols.svg#close"
+                               category="utility" size="x-small" name="close"></c:svgIcon>        
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h3 id="header43" class="slds-text-heading--medium">Send Help Request</h3>
+            </div>      
+             <form>
+                 <div class="slds-form--stacked">
+                     <div class="slds-form-element">
+                         <div class="slds-form-element__control">
+                             <ui:inputSelect aura:id="state" label="State/Territory" value="{!v.newCase.Type}" class="slds-input" >
+                                 <ui:inputSelectOption text="" label="Please Select"/>
+                                 <ui:inputSelectOption text="Feedback"/>
+                                 <ui:inputSelectOption text="Enquiry"/>
+                                 <ui:inputSelectOption text="Complaint"/>
+                                 
+                             </ui:inputSelect>
+                            <!-- <ui:inputText aura:id="type" label="Type"
+                                           class="slds-input"
+                                           labelClass="slds-form-element__label"
+                                           value="{!v.newCase.Type}"
+                                           required="true"/> -->
+                         </div>
+                     </div>
+
+                     <div class="slds-form-element">
+                         <div class="slds-form-element__control">
+                             
+                             <ui:inputText aura:id="subject" label="Subject"
+                                           class="slds-input"
+                                           labelClass="slds-form-element__label"
+                                           value="{!v.newCase.Subject}"
+                                           required="true"/>
+                         </div>
+                     </div>
+                     <div class="slds-form-element">
+                         <div class="slds-form-element__control">
+                             <ui:inputTextArea aura:id="description" label="Description"
+                                               class="slds-input"
+                                               labelClass="slds-form-element__label"
+                                               value="{!v.newCase.Description}"
+                                               required="true"/>
+                         </div>
+                     </div>
+                     <div class="slds-form-element">
+                         <input type="submit" class="slds-button slds-button--neutral" onclick="{!c.createNewHelpRequest}">Submit Request</input>
+                     </div>  
+                 </div>
+             </form>
+    </div>
+    </div>
+      <div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+</aura:component>

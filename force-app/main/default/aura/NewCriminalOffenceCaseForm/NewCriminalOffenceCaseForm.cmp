@@ -1,0 +1,199 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" access="global" controller="CriminalOffenceCaseFormController">
+
+	
+	<lightning:workspaceAPI aura:id="workspace" />
+	<ltng:require scripts="{!$Resource.JqueryLatest}"/>
+	<ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}"/>
+	<!--<ltng:require styles="{!$Resource.TaxiLicenceActionStyle}"/>  -->
+
+    <aura:attribute name="parentCase" type="Object"/>
+    <aura:attribute name="parentCaseError" type="String"/>
+    <aura:attribute name="isAllValid" type="Boolean" default="false"/>
+    <aura:attribute name="message" type="String" default=""/>
+    <aura:attribute name="recordType" type="string"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="render" value="{!this}" action="{!c.onRender}"/>
+
+    <!--<aura:handler event="force:refreshView" action="{!c.doInit}"/> -->
+
+
+
+     <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-show"/>
+
+    <aura:attribute name="accountErrorMsg" type="String" default=""/>
+    <aura:attribute name="licenceErrorMSg" type="String" default=""/>
+    <aura:attribute name="chargeCodeErrorMsg" type="String" default=""/>
+    <aura:attribute name="offenceCodeErrorMsg" type="String" default=""/>
+    <aura:attribute name="editFormVisible" type="Boolean" default="false"/>
+     
+
+     <force:recordData aura:id="recordLoader"
+    	layoutType="FULL"
+        recordId="{!v.recordId}"
+        targetFields="{!v.parentCase}"
+        targetError="{!v.parentCaseError}"
+        recordUpdated="{!c.handleRecordUpdated}"
+        fields="Id,Account.Id,Account.Name,Charge_Code_Identifier__c,CaseNumber,Australian_Driver_Licence_Number_Formula__c,Status"
+    />
+
+    <aura:handler name="closeApplication" event="c:TaxiFormModalClosureEvent" action="{!c.closeMessageBox}"/>
+
+    <br/> 
+    
+     <p style="font-weight: bold;">
+    
+        <a href="" onclick="{!c.openMessageBox}">Click to create new charge case.</a>
+    </p> 
+    <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aura:id = "messageBox">
+    	<div class="slds-modal__container">
+    		<aura:if isTrue="{!v.editFormVisible}">
+				<lightning:recordEditForm aura:id="editForm" objectApiName="Case" 
+					recordTypeId="{!v.recordType}"
+					onload="{!c.showRequiredFields}" 
+					onsuccess="{!c.handleSuccess}" 
+					onerror="{!c.handleError}"
+					onsubmit="{!c.handleSubmitCase}"
+					>
+
+					<article class="slds-card" id="CriminalOffenceCaseInformation">
+			        	<div class="slds-modal__header">
+			        		<lightning:buttonIcon class="customButtonCls" iconName="utility:close" alternativeText="Closing" onclick="{!c.closeMessageBox}" />
+					        <div class="slds-card__header slds-grid">
+					            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+					                <div class="slds-media__figure slds-float_right">
+					                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#case'}" 
+					                               category="standard" size="large" name="case"/>
+					                </div>
+					                <div class="slds-media__body slds-float_left">
+					                    <h2 style="font-size: 1.5em;">   
+					                        Criminal Charge Information
+					                    </h2>
+					                </div>
+					            </header>
+					             
+					        </div>
+					    </div>
+					   
+					    <div class="slds-modal__content slds-p-around--medium">
+					        <!-- Display Lightning Data Service errors, if any -->
+							<aura:if isTrue="{!not(empty(v.parentCaseError))}">
+							    <div class="recordError">
+							        <ui:message title="Error" severity="error" closable="true">
+							            {!v.parentCaseError}
+							        </ui:message>
+							    </div>
+							</aura:if>
+
+					        
+					        
+							<!-- <hr style="margin: 0 auto;"/> -->
+					        <div class="slds-card__body">
+					            <div class="slds-form--stacked"> 
+					                <div class="slds-grid">
+					                	<div class="slds-col">
+					                	</div>
+					                	<div class="slds-col slds-float_right">
+					                		Fields marked with <span class="requiredField">*</span> are mandatory.
+					                	</div>
+					                </div>
+					                 <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+						                    <span style="color: #ffffff;">
+						                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+						                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+						                    </span>
+						             </div>
+						             <div id="offenceCodeErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+						                    <span style="color: #ffffff;">
+						                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+						                        &nbsp;{!v.offenceCodeErrorMsg}
+						                    </span>
+						             </div>
+						             <div id="accountErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+						                    <span style="color: #ffffff;">
+						                    	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+						                        &nbsp;{!v.accountErrorMsg}
+						                    </span>
+						             </div>   
+						             <div id="licenceErrorMSgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+						                    <span style="color: #ffffff;">
+						                    	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+						                        &nbsp;{!v.licenceErrorMSg}
+						                    </span>
+						             </div> 
+						             <div id="chargeCodeErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+						                    <span style="color: #ffffff;">
+						                    	<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+						                        &nbsp;{!v.chargeCodeErrorMsg}
+						                    </span>
+						             </div> 
+					                
+					                
+					                <div class="slds-grid">
+					                    <div class="slds-col none" aura:id = "accountName">
+					                       <label class="slds-form-element__label">Account Name :   </label> 
+					                       <lightning:formattedText  title="Account Name" value="{!v.parentCase.Account.Name}" />
+					                    </div>
+					                    <div class="slds-col none"  aura:id = "chargeCode">
+					                    	<label class="slds-form-element__label">Charge Code Identifier :  </label>
+					                       <lightning:formattedText title="Charge Code Identifier" value="{!v.parentCase.Charge_Code_Identifier__c}" />
+
+					                    </div>
+					                </div> 
+
+					               <div class="slds-grid">
+					                    
+					                    <div class="slds-col">
+					                    	 <lightning:inputField aura:id = "offenceCode" fieldName="Offence_Code__c"  class="none customRequired"/>
+										</div>
+										<div class="slds-col">
+					                       <lightning:inputField aura:id = "decision" fieldName="Decision__c" class="none customRequired"/>
+					                    </div>
+					                </div>
+					                
+					                <div class="slds-grid">
+					                    
+
+					                    <div class="slds-col">
+					                       <lightning:inputField aura:id="lawPartCode" fieldName="Law_Part_Code__c" class="none customRequired"/>
+					                    </div>
+
+					                    <div class="slds-col">
+					                       
+					                        <lightning:inputField aura:id = "decisionReason" fieldName="Correction_Reason__c" class="none customRequired"/>
+										</div>
+					                   
+					                </div>
+					                
+					                <div class="slds-grid">
+					                	 <div class="slds-col">
+					                	 	
+					                	 </div>
+					                	 <div class="slds-col">
+					                	 </div>
+					                </div>
+
+					                <div class="slds-grid">
+					                    <div class="slds-col">
+					      
+					                    	<lightning:button aura:id="Submit" iconName="utility:save" class="slds-m-top_small slds-float_right slds-button slds-button_neutral slds-hide" type="Submit" name="Submit" label="Submit" />
+					                   
+					                    </div>
+					                    <div class="slds-col">
+					                    	
+					                    	<lightning:button aura:id="Cancel" iconName="utility:close" class="slds-m-top_small slds-float_left slds-button slds-button_neutral slds-hide" type="Cancel" name="Cancel" label="Cancel" onclick="{!c.handleCancel}" />
+										</div>
+					                </div>
+					             </div>
+					        </div>
+			        	</div> 
+			    </article>
+
+
+			    </lightning:recordEditForm>
+		   </aura:if>
+		</div>
+	</div>
+	
+	<div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+</aura:component>

@@ -1,0 +1,87 @@
+<!-- add implements="forceCommunity:availableForAllPageTypes" to surface the component in community builder -->
+<aura:component controller="LightningLoginFormController" implements="forceCommunity:availableForAllPageTypes" access="global">
+    
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="showError" type="Boolean" required="true" description="" default="false" access="private"/>
+    <aura:attribute name="errorMessage" type="String" required="false" description="" access="private"/>
+    <aura:attribute name="startUrl" type="String" required="false" description="The url you go to after a successful login" />
+    <aura:attribute name="usernameLabel" type="String" required="false" default="Username"/>
+    <aura:attribute name="passwordLabel" type="String" required="false" default="Password"/>
+    <aura:attribute name="loginButtonLabel" type="String" required="false" default="Log in"/>
+    <aura:attribute name="tAndCMessage" type="String" required="false" description="" access="public" default=""/>
+    
+    <aura:attribute name="forgotPasswordLabel" type="String" required="false" default="Forgot your password?"/>
+    <aura:attribute name="selfRegisterLabel" type="String" required="false" default="Not a member?"/>
+    <aura:attribute name="forgotPasswordUrl" type="String" required="false" default="/ForgotPassword"/>
+    <aura:attribute name="selfRegisterUrl" type="String" required="false" default="/SelfRegister"/>
+    
+    <aura:attribute name="isUsernamePasswordEnabled" type="Boolean" access="private"/>
+    <aura:attribute name="isSelfRegistrationEnabled" type="Boolean" access="private"/>
+    <aura:attribute name="communityForgotPasswordUrl" type="String" access="private"/>
+    <aura:attribute name="communitySelfRegisterUrl" type="String" access="private"/>
+    
+    <aura:attribute name="showASPDownTimeAlert" type="Boolean" default="false"/>
+    <aura:attribute name="aspDownTimeAlertMessage" type="String" default=""/>
+    
+    <aura:registerevent name="sitePropagatedStartUrl" type="c:setStartUrl"/>
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    <aura:dependency resource="c:setStartUrl" type="EVENT"/>
+    <!-- Please uncomment
+    <aura:dependency resource="siteforce:registerQueryEventMap" type="EVENT"/>
+    -->
+    <aura:handler event="c:setStartUrl" action="{!c.setStartUrl}"/>
+    
+    <div style="height:auto;">
+        <aura:renderIf isTrue="{!v.isUsernamePasswordEnabled}">
+            <span>
+                <aura:renderIf isTrue="{!v.showError}">
+                    <div id="error">
+                        <ui:outputRichText value="{!v.errorMessage}"/>
+                    </div>
+                </aura:renderIf>
+            </span>            
+            <div id="sfdc_username_container" class="sfdc">
+                <span id="sfdc_user">
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                </span>
+                <ui:inputText value="" aura:id="username" placeholder="{!v.usernameLabel}" keyup="{!c.onKeyUp}" class="input sfdc_usernameinput sfdc" label="{!v.usernameLabel}" labelClass="assistiveText"/>
+            </div>
+            
+            <div id="sfdc_password_container" class="sfdc">
+                <span id="sfdc_lock">
+                    <i class="fa fa-lock" aria-hidden="true"></i>
+                </span>
+                <ui:inputSecret value="" aura:id="password" placeholder="{!v.passwordLabel}" keyup="{!c.onKeyUp}" class="input sfdc_passwordinput sfdc" label="{!v.passwordLabel}" labelClass="assistiveText"/>
+            </div>
+            <div style="color: black;"> 
+                
+                <br></br>
+                
+                <ui:inputCheckbox aura:id="tcCheckbox" change="{!c.handlecheck}" class="tAndCCheckBox"></ui:inputCheckbox>
+                
+                &nbsp;I agree to the <a  target="_blank" href="{!$Label.c.Terms_Conditions_Link}" style="color:black !important;"><u> Terms and Conditions </u></a>
+                
+                
+                <div aura:id="tAndCMessage">
+                    <center> <ui:outputRichText value="{!v.tAndCMessage}" class="tAndCMessage"/> </center>
+                </div>
+                
+                <aura:renderif isTrue="{!v.showASPDownTimeAlert}">
+                    <br/>
+                    <p style="font-weight:bold;font-size:13px;color: #2574a9;">
+                        <aura:unescapedHtml value="{!v.aspDownTimeAlertMessage}"/> 
+                    </p>
+                </aura:renderif>
+            </div>
+            <div class="sfdc">
+                <ui:button aura:id="submitButton" label="{!v.loginButtonLabel}" press="{!c.handleLogin}" class="sfdc_button"/>
+            </div>
+            <div id="sfdc_forgot" class="sfdc">
+                <center><span><a href="{!if(v.communityForgotPasswordUrl == null, v.forgotPasswordUrl, v.communityForgotPasswordUrl)}" style="color:black !important;">{!v.forgotPasswordLabel}</a></span></center> 
+                
+            </div> 
+        </aura:renderIf>
+    </div>
+    
+</aura:component>

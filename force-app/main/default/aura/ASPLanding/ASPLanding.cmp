@@ -1,0 +1,37 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="LoggedInUserController" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="renderManageProfile" type="boolean" default="false"/>
+    <aura:attribute name="renderDVD" type="boolean" default="false"/>
+    <aura:attribute name="renderLevys" type="boolean" default="false"/>
+    <aura:attribute name="renderedRequestDetail" type="boolean" default="false"/>
+<div class="slds-text-color_inverse slds-text-title_caps slds-text-title_bold" style="padding:0.5rem;background:#FF0000">Coronavirus (COVID-19) SPECIAL REPORTING INSTRUCTIONS FOR INFORMATION <a href="https://www.pointtopoint.nsw.gov.au/coronavirus-covid-19-updates#Reporting%20COVID-19%20related%20Notifiable%20Occurences" class="slds-text-link_reset" target="_blank">CLICK HERE</a></div>
+    <div class="Container" >
+        <center>
+        <aura:renderIf isTrue="{!v.renderManageProfile}">
+            <c:NavigationCard title="Manage Account" 
+                              description="{!$Label.c.ASP_Home_Manage_Account_Description}"
+                              buttontext="Manage Account"
+                              buttonhref="/industryportal/s/manage-profile?src=accountMenu"
+                              image="{!$Resource.p2p300x200 + '/p2p300x200/CityTraffic-300x200.jpg'}"
+                              hovertext="Manage Account"/>
+        </aura:renderIf>
+        <aura:renderIf isTrue="{!v.renderDVD}">
+            <c:NavigationCard title="Driver Vehicle Dashboard" 
+                              description="{!$Label.c.ASP_Home_DVD_Description}"
+                              buttontext="Dashboard"
+                              buttonhref="/industryportal/s/dvddashboard?src=dvdMenu"
+                              image="{!$Resource.p2p300x200 + '/p2p300x200/PassingTaxi-300x200.jpg'}"
+                              hovertext="Driver Vehicle Dashboard"/>
+            
+        </aura:renderIf>      
+        <aura:renderIf isTrue="{!v.renderLevys}">   
+            <c:NavigationCard title="Passenger Services Levy" 
+                              description="{!$Label.c.ASP_Home_Passengers_Services_Levy_Description}"
+                              buttontext="Manage Levy"
+                              buttonhref="/industryportal/s/levy-management?src=levyMenu"
+                              image="{!$Resource.p2p300x200 + '/p2p300x200/TaxiRank-300x200.jpg'}"
+                              hovertext="Passenger Services Levy"/>
+        </aura:renderIf>
+       </center>
+    </div>
+</aura:component>

@@ -1,0 +1,653 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPFormSectionDataController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <aura:attribute name="uploadStatus" type="List" />
+    <aura:attribute name="caseId" type="String" default=""/>
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="entityType" type="String" default=""/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="withdrawnCase" type="Boolean" default="false"/>
+    <aura:attribute name="isInternalUser" type="Boolean" default="false"/>
+    
+    <aura:attribute name="aspCorporationPartners" type="Related_Contact__c[]" />
+    <aura:attribute name="aspApplicants" type="Related_Contact__c[]" />
+    
+    <aura:attribute name="baseUrl" type="String" default="$A.get('$Label.c.Community_Base_Url')" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <aura:attribute name="isComplexApplication" type="Boolean" default="false"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:if isTrue="{!and(and(not(v.readOnly), not(v.reviewEdit)), not(v.withdrawnCase))}">
+        <c:ASPFormSectionProgressIndicator currentSection="{!$Label.c.Corporate_Partnership_Header}" entityType="{!v.entityType}"/>
+        <br/>
+    </aura:if>
+    
+    <article class="slds-card" id="formPartC_CorporatePartnership">
+        
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#contact'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">       
+                        {!$Label.c.Corporate_Partnership_Header}
+                    </h2>
+                    <b>Note:</b> If granted, the authorisation will be in the name of partners.
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with&nbsp;<span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!and(v.readOnly == true, v.withdrawnCase == false)}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                    <div style="float:right">
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                            <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                        </ui:button>
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <form>
+            <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+                
+                
+                
+                <p class="slds-form- -stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+                    
+                    <p>
+                        Where more than one director or manager is being nominated with this application, the second and subsequent director or manager will be required to complete a separate <a href="http://www.pointtopoint.nsw.gov.au/how-become-authorised" target="_blank">Appointment of Director or Manager Notice</a>. This notice should be uploaded in section C of this application. Alternatively additional directors or managers can be nominated through your account on the industry portal once authorised.
+                    </p>
+                    <br/>
+                    <p>
+                        If you (the nominated director or manager) have not resided in Australia for at least the last 5 years, you will need to provide a Police Check from your former country of residence.
+                    </p>
+                </p>
+                
+                
+                <div class="slds-form--stacked">
+                    
+                    <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                        <span style="color: #ffffff;">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                        </span>
+                    </div>
+                    
+                    <table>
+                        <aura:iteration items="{!v.aspCorporationPartners}" var="relatedContact" indexVar="index"> 
+                            <aura:iteration items="{!v.aspApplicants}" var="relatedApplicant" indexVar="index1">
+                                <tr>
+                                    <td>
+                                        <aura:if isTrue="{!index == index1}">   
+                                            
+                                            <!-- Corporation Partnership Form Start -->
+                                            
+                                            <h2 style="width: 100%;margin: 15px 0px;padding: 0;text-align: center;font-size: 1.5em;">
+                                                <hr style="display: inline-block;margin: 0 20px 8px 0;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr> 
+                                                Corporate Partner {!index+1} Details
+                                                <hr style="display: inline-block;margin: 0 0 8px 20px;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr>
+                                            </h2>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col">
+                                                    <label class="slds-form-element__label">{!$Label.c.Corporation_Corporation_name}&nbsp;<span class="requiredField">*</span></label>
+                                                    <ui:inputText maxlength="255" disabled="true"   
+                                                                  aura:id="Corporation-Name-Input"
+                                                                  class="CamelCaseInput slds-input"  
+                                                                  value="{!relatedContact.Corporation_Name__c}"/>
+                                                </div>
+                                                <div class="slds-col">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col">
+                                                    <label class="slds-form-element__label">{!$Label.c.Corporation_ACN_ARBN_Type}&nbsp;<span class="requiredField">*</span></label>
+                                                    <ui:inputSelect class="slds-input" disabled="{!v.readOnly}" aura:id="Type-Input" value="{!relatedContact.Number_Type__c}">
+                                                        <ui:inputSelectOption text="" label="Please Select"/>
+                                                        <ui:inputSelectOption text="ACN"/>
+                                                        <ui:inputSelectOption text="ARBN"/>
+                                                    </ui:inputSelect>
+                                                </div>
+                                                
+                                                <div class="slds-col">
+                                                    <c:ACNComponent isReadOnly="{!v.readOnly}" 
+                                                                    aura:id="ACN-Input" 
+                                                                    uniqueIdentifier="{!'ACN-Input' + index}" 
+                                                                    fieldLabel="ACN Or ARBN"
+                                                                    corporateName="{!relatedContact.Corporation_Name__c}"
+                                                                    isRequired="true" acn="{!relatedContact.ACN__c}"/>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid">    
+                                                <div class="slds-col">
+                                                    <c:ABNComponent isReadOnly="{!v.readOnly}" aura:id="ABN-Input" 
+                                                                    uniqueIdentifier="{!'ABN-Input' + index}" 
+                                                                    fieldLabel="{!$Label.c.Corporation_ABN}" 
+                                                                    businessName="{!relatedContact.Registered_business_name__c}"
+                                                                    isRequired="false" 
+                                                                    abn="{!relatedContact.ABN__c}"/>
+                                                </div>
+                                                <div class="slds-col">
+                                                    <label class="slds-form-element__label">{!$Label.c.Corporation_Registered_Business_Name}</label>
+                                                    <ui:inputText maxlength="255" disabled="true" class="CamelCaseInput slds-input" 
+                                                                  aura:id="Business-Name-Input" 
+                                                                  value="{!relatedContact.Registered_business_name__c}"/>
+                                                </div>
+                                            </div>   
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col">
+                                                    <c:EmailAddressComponent isReadOnly="{!v.readOnly}" 
+                                                                             aura:id="Email-Input" 
+                                                                             uniqueIdentifier="{!'Email-Input' + index}"  
+                                                                             fieldLabel="{!$Label.c.Corporation_Email}" 
+                                                                             isRequired="false" 
+                                                                             email="{!relatedContact.Email__c}"/>
+                                                </div>
+                                                <div class="slds-col">    
+                                                    <legend class="slds-form-element__label">{!$Label.c.Corporation_Website}</legend>
+                                                    <ui:inputText maxlength="255" disabled="{!v.readOnly}" 
+                                                                  aura:id="Business-Website-Input" class="slds-input" 
+                                                                  value="{!relatedContact.Website__c}"/>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col" style="width: 50% !important;">
+                                                    <label class="slds-form-element__label"><aura:unescapedHtml value="{!$Label.c.Corporation_Has_had_authorization_refused}"/></label>
+                                                    <br/>
+                                                </div>
+                                                <div class="slds-col" style="width: 50% !important;">
+                                                    <input type="radio" checked="{!if(relatedContact.Authorisation_Cancelled__c == false, true, false)}" 
+                                                           disabled="{!v.readOnly}" aura:id="NoASPRefused" id="NoASPRefused" 
+                                                           name="{!'ASPRefusedGroup' + index}"
+                                                           onchange="{!c.aspRefusedChange}" data-Index="{!index}" /> &nbsp;No
+                                                    &nbsp;&nbsp;
+                                                    <input type="radio" checked="{!if(relatedContact.Authorisation_Cancelled__c == true, true, false)}"
+                                                           disabled="{!v.readOnly}" aura:id="YesASPRefused" id="YesASPRefused" 
+                                                           name="{!'ASPRefusedGroup' + index}"
+                                                           onchange="{!c.aspRefusedChange}" data-Index="{!index}" /> &nbsp;Yes, provide details
+                                                    <br/>
+                                                    <span id="{!'ASPRefusedError' + index}"  class="customErrorMsg"></span>
+                                                </div>    
+                                            </div>
+                                            <div class="slds-grid" style="padding-left: 2%;width:80%;display:block;">
+                                                <ui:inputTextarea disabled="{!v.readOnly}" aura:id="aspRefusedInputDetails" 
+                                                                  maxlength="1000" 
+                                                                  class="{!if(relatedContact.Authorisation_Cancelled__c == true, 'currentASPHandlerInputDetails', 'toggleDisplay currentASPHandlerInputDetails')}"
+                                                                  value="{!relatedContact.Auth_Cancellation_Details__c}" />
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col">
+                                                    <label class="slds-form-element__label">
+                                                        Do you have a <a href="{!$Label.c.Disqualifying_Offence_Url}" target="_blank">close associate:</a>&nbsp;<span class="requiredField">*</span>
+                                                    </label>
+                                                    <br/>
+                                                    <ul class="slds-list--dotted">
+                                                        <li class="slds-item">
+                                                            who has been convicted of or has current proceedings against them for a disqualifying offence; or
+                                                        </li>
+                                                        <li class="slds-item">
+                                                            who was a holder of an authorisation under the Point to Point Transport (Taxis and Hire Vehicles) Act 2016 that was cancelled or whose most recent application for any such authorisation was refused; or
+                                                        </li>
+                                                        <li class="slds-item">
+                                                            who was the holder of an accreditation, or an authorisation to operate a taxi-cab network, under the Passenger Transport Act 1990 that was cancelled, or whose most recent application for any such accreditation or authorisation was refused; or
+                                                        </li>
+                                                        <li class="slds-item">
+                                                            who was the holder of an accreditation to operate a public passenger service under the Passenger Transport Act 2014 that was cancelled, or whose most recent application for any such accreditation was refused.
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col" style="padding-top: 0%;">
+                                                    <input type="radio" checked="{!if(relatedContact.Close_Associate_Info_Provided__c == false, true, false)}" 
+                                                           disabled="{!v.readOnly}" aura:id="NoAssociate" id="NoAssociate" 
+                                                           name="{!'associateGroup' + index}"
+                                                           onchange="{!c.associateChange}" data-Index="{!index}" /> &nbsp;No
+                                                    &nbsp;&nbsp;
+                                                    <input type="radio" checked="{!if(relatedContact.Close_Associate_Info_Provided__c == true, true, false)}" 
+                                                           disabled="{!v.readOnly}" aura:id="YesAssociate" id="YesAssociate" 
+                                                           name="{!'associateGroup' + index}"
+                                                           onchange="{!c.associateChange}" data-Index="{!index}" /> &nbsp;Yes
+                                                    <br/>
+                                                    <span id="{!'NoAssociateError' + index}" class="customErrorMsg"></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <aura:if isTrue="{!v.readOnly == false}">
+                                                <aura:iteration var="fileStatus" items="{!v.uploadStatus}" indexVar="fileIndex">
+                                                    <aura:if isTrue="{!index == fileIndex}">
+                                                        <div class="slds-grid">
+                                                            <div class="slds-col">
+                                                                <c:P2POTAttachment category="CCC" uploadStatus="{!fileStatus.companyExtractUploadStatus}" uniqueIdentifier="{!'company-extract-' + index}" FileUploadChecked="{!relatedContact.Proof_Of_Company_Extract__c}" FileCheckLabel="Company Extract" UniqueClass="{!index}" aura:id="Company-Extract-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach Supporting Documents" AllowMultiple="true" section="CORP" index="1" />
+                                                            </div>
+                                                            <div class="slds-col">
+                                                            </div>
+                                                        </div>
+                                                    </aura:if>
+                                                </aura:iteration>
+                                            </aura:if>
+                                            
+                                            <!-- Corporation Partnership Form Start -->
+                                            
+                                            <!-- Applicant Details form Start -->
+                                            <h2 style="width: 100%;margin: 15px 0px;padding: 0;text-align: center;font-size: 1.5em;">
+                                                <hr style="display: inline-block;margin: 0 20px 8px 0;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr> 
+                                                Nominated Director Details 
+                                                <hr style="display: inline-block;margin: 0 0 8px 20px;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr>
+                                            </h2>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col">
+                                                    <legend class="slds-form-element__legend slds-form-element__label">{!$Label.c.Nominated_Director_Title}</legend>
+                                                    <ui:inputSelect disabled="{!v.readOnly}" class="single" aura:id="applicantInputSelectTitle" 
+                                                                    value="{!relatedApplicant.Title__c}">
+                                                        <ui:inputSelectOption text="" label="Please Select"/>
+                                                        <ui:inputSelectOption text="Mr." />
+                                                        <ui:inputSelectOption text="Mrs."/>
+                                                        <ui:inputSelectOption text="Ms." />
+                                                        <ui:inputSelectOption text="Miss."/>
+                                                        <ui:inputSelectOption text="Other"/>
+                                                    </ui:inputSelect>
+                                                </div>
+                                                
+                                                <div class="slds-col">
+                                                    <div class="slds-form-element__control">
+                                                        <c:DateOfBirthComponent isReadOnly="{!v.readOnly}" aura:id="applicantDOB" 
+                                                                                uniqueIdentifier="{!'applicantDOB' + index}"
+                                                                                fieldLabel="{!$Label.c.Nominated_Director_Birth_date}"
+                                                                                isRequired="true" DOB="{!relatedApplicant.Date_of_Birth__c}"/> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col">
+                                                    <div class="slds-form-element">
+                                                        <label class="slds-form-element__label" for="applicantFirstGivenName">{!$Label.c.Nominated_Director_First_given_name}&nbsp;<span class="requiredField">*</span></label>
+                                                        <ui:inputText disabled="{!v.readOnly}" value="{!relatedApplicant.First_Given_Name__c}" 
+                                                                      maxlength="40" class="slds-input" 
+                                                                      aura:id="applicantFirstGivenName" />
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="slds-col">
+                                                    <div class="slds-form-element">
+                                                        <label class="slds-form-element__label" for="applicantFamilyName">{!$Label.c.Nominated_Director_Family_name}&nbsp;<span class="requiredField">*</span></label>
+                                                        <ui:inputText disabled="{!v.readOnly}" value="{!relatedApplicant.Family_Name__c}" 
+                                                                      maxlength="80" class="slds-input upperCaseInput" 
+                                                                      aura:id="applicantFamilyName" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col">
+                                                    <div class="slds-form-element">
+                                                        <label class="slds-form-element__label" for="applicantOtherName">{!$Label.c.Nominated_Director_Other_given_name}</label>
+                                                        <ui:inputText disabled="{!v.readOnly}" value="{!relatedApplicant.Other_Given_Name__c}" 
+                                                                      maxlength="255" class="slds-input" 
+                                                                      aura:id="applicantOtherName" />
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="slds-col">
+                                                    <div class="slds-form-element nominatedDirectorHandler">
+                                                        <label class="slds-form-element__label" for="anotherGivenFamilyName">{!$Label.c.Nominated_Director_Ever_been_known_by_another_name}&nbsp;<span class="requiredField">*</span></label>
+                                                        <br/>
+                                                        <input type="radio" checked="{!if(relatedApplicant.Have_been_known_by_other_names__c == false, true, false)}" 
+                                                               disabled="{!v.readOnly}" aura:id="applicant_no_notminatedDirector" id="applicant_no_notminatedDirector" 
+                                                               name="{!'applicantotherNameGroup' + index}" class="nominatedDirectorHandler"
+                                                               onchange="{!c.applicantOtherNameChange}" data-Index="{!index}" /> &nbsp;No
+                                                        &nbsp;&nbsp;
+                                                        <input type="radio" checked="{!if(relatedApplicant.Have_been_known_by_other_names__c == true, true, false)}"
+                                                               disabled="{!v.readOnly}" aura:id="applicant_yes_notminatedDirector" id="applicant_yes_notminatedDirector" 
+                                                               name="{!'applicantotherNameGroup' + index}" class="nominatedDirectorHandler"
+                                                               onchange="{!c.applicantOtherNameChange}" data-Index="{!index}" /> &nbsp;Yes, provide details
+                                                        <br/>
+                                                        <span id="{!'ApplicantNominatedDirectorError' + index}"  class="customErrorMsg"></span>
+                                                        <br/>
+                                                        <ui:inputTextarea disabled="{!v.readOnly}" maxlength="1000" 
+                                                                          aura:id="applicantNominatedDirectorInputDetails" 
+                                                                          class="{!if(relatedApplicant.Have_been_known_by_other_names__c == true, '', 'toggleDisplay')}"
+                                                                          value="{!relatedApplicant.Known_by_Other_Names_Details__c}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col">    
+                                                    <div class="slds-form-element">
+                                                        <legend class="slds-form-element__legend slds-form-element__label">{!$Label.c.Nominated_Director_Residential_Address}&nbsp;<span class="requiredField">*</span></legend>
+                                                        <c:AddressInputComponent reviewReadOnly="{!v.readOnly}" 
+                                                                                 aura:id="Applicant-Residential-Address-Input" 
+                                                                                 unitType="{!relatedApplicant.residentialUnitType}" 
+                                                                                 street="{!relatedApplicant.residentialStreet}"
+                                                                                 city="{!relatedApplicant.Residential_Address_City__c}" 
+                                                                                 state="{!relatedApplicant.Residential_Address_State__c}"
+                                                                                 postalcode="{!relatedApplicant.Residential_Address_Postcode__c}" 
+                                                                                 country="{!relatedApplicant.Residential_Address_Country__c}"
+                                                                                 addressType="NominatedDirector_Residential_Address" 
+                                                                                 fullStreet="{!relatedApplicant.residentialStreet}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col">
+                                                    <div class="slds-form-element">
+                                                        <c:EmailAddressComponent isReadOnly="{!v.readOnly}" 
+                                                                                 aura:id="applicantEmailAddress" 
+                                                                                 uniqueIdentifier="{!'applicantEmailAddress' + index}"
+                                                                                 fieldLabel="{!$Label.c.Nominated_Director_Email}" 
+                                                                                 isRequired="true" 
+                                                                                 email="{!relatedApplicant.Email__c}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col">
+                                                    <div class="slds-form-element">
+                                                        <c:PhoneComponent isReadOnly="{!v.readOnly}" 
+                                                                          aura:id="applicantPhoneNumber" 
+                                                                          uniqueIdentifier="{!'applicantPhoneNumber' + index}"
+                                                                          fieldLabel="{!$Label.c.Nominated_Director_Daytime_phone_number}" 
+                                                                          isRequired="true" 
+                                                                          phoneNumber="{!relatedApplicant.Daytime_Phone__c}" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col">
+                                                    <div class="slds-form-element">
+                                                        <c:DriverLicenceComponent isReadOnly="{!v.readOnly}" 
+                                                                                  aura:id="Applicant-Driver-Licence-Number-Input" 
+                                                                                  uniqueIdentifier="{!'Applicant-Driver-Licence-Number-Input' + index}"
+                                                                                  fieldLabel="{!$Label.c.Nominated_Director_Australian_Driver_Licence_Number}"
+                                                                                  isRequired="false" licence="{!relatedApplicant.Australian_Driver_Licence__c}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col">
+                                                    <div class="slds-form-element">
+                                                        <label class="slds-form-element__label label" for="applicantState">{!$Label.c.Nominated_Director_Australian_Driver_Licence_State}</label>
+                                                        <ui:inputSelect disabled="{!v.readOnly}" label="" 
+                                                                        aura:id="applicantState" 
+                                                                        value="{!relatedApplicant.Australian_Driver_Licence_State__c}" 
+                                                                        class="slds-input" required="true">
+                                                            <ui:inputSelectOption text="" label="Please Select"/>
+                                                            <ui:inputSelectOption text="NSW" label="NSW"/>
+                                                            <ui:inputSelectOption text="ACT" label="ACT"/>
+                                                            <ui:inputSelectOption text="VIC" label="VIC"/>
+                                                            <ui:inputSelectOption text="QLD" label="QLD"/>
+                                                            <ui:inputSelectOption text="SA" label="SA"/>
+                                                            <ui:inputSelectOption text="NT" label="NT"/>
+                                                            <ui:inputSelectOption text="TAS" label="TAS"/>
+                                                            <ui:inputSelectOption text="WA" label="WA"/>
+                                                        </ui:inputSelect>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col">
+                                                    <div class="slds-form-element">
+                                                        <label class="slds-form-element__label label" for="applicantState"><aura:unescapedHtml value="{!$Label.c.Nominated_Director_Role}"/>&nbsp;<span class="requiredField">*</span></label>
+                                                        <ui:inputSelect disabled="{!v.readOnly}" label="" aura:id="applicantRole" value="{!relatedApplicant.Role__c}" class="slds-input" required="true" change="{!c.roleChange}">
+                                                            <ui:inputSelectOption text="" label="Please Select"/>
+                                                            <ui:inputSelectOption text="Company Secretary" label="Company Secretary"/>
+                                                            <ui:inputSelectOption text="Director" label="Director"/>
+                                                            <ui:inputSelectOption text="Manager" label="Manager"/>
+                                                        </ui:inputSelect>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="slds-col">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col" style="width: 50% !important;">
+                                                    <label class="slds-form-element__label">{!$Label.c.Additional_Information_Resided_In_Australia}</label>
+                                                    <br/>
+                                                </div>
+                                                <div class="slds-col" style="width: 50% !important;">
+                                                    <input type="radio" checked="{!if(relatedApplicant.Resided_In_Australia_For_Past_5_Years__c == false, true, false)}" 
+                                                           disabled="{!v.readOnly}" aura:id="ResidedInAustraliaNo" id="ResidedInAustraliaNo" 
+                                                           name="{!'residedInAustraliaGroup' + index}"
+                                                           onchange="{!c.residedInAustraliaChange}" data-Index="{!index}" /> &nbsp;No
+                                                    &nbsp;&nbsp;
+                                                    <input type="radio" checked="{!if(relatedApplicant.Resided_In_Australia_For_Past_5_Years__c == true, true, false)}" 
+                                                           disabled="{!v.readOnly}" aura:id="ResidedInAustraliaYes" id="ResidedInAustraliaYes" 
+                                                           name="{!'residedInAustraliaGroup' + index}"
+                                                           onchange="{!c.residedInAustraliaChange}" data-Index="{!index}" /> &nbsp;Yes            
+                                                    <br/>
+                                                    <span id="{!'ResidedInAustraliaError' + index}" class="customErrorMsg"></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div aura:id="notResidedInAustralia" 
+                                                 class="{!if(relatedApplicant.Resided_In_Australia_For_Past_5_Years__c == false, 'slds-grid', 'toggleDisplay slds-grid')}"
+                                                 style="padding-left: 2%;width:100%;">
+                                                <div style="width: 50% !important;">
+                                                    <label class="slds-form-element__label">{!$Label.c.Additional_Information_Resided_Other_Country}&nbsp;<span class="requiredField">*</span></label>
+                                                </div>
+                                                <div style="width: 50% !important;margin-left: 10px;">
+                                                    <ui:inputText disabled="{!v.readOnly}" aura:id="residedInOtherCountryDetails" maxlength="1000" value="{!relatedApplicant.Country_Stayed_During_Last_5_Years__c}"/>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col" style="width: 50% !important;">
+                                                    <label class="slds-form-element__label">{!$Label.c.Corporation_Has_convicted_or_disqualifying_offence}</label>
+                                                    <br/>
+                                                </div>
+                                                <div class="slds-col" style="width: 50% !important;">
+                                                    <input type="radio" checked="{!if(relatedApplicant.Corp_Convicted_Of_Disqualifying_Offence__c == false, true, false)}" 
+                                                           disabled="{!v.readOnly}" aura:id="CorporationOffenceNo" id="CorporationOffenceNo" 
+                                                           name="{!'corporationOffence' + index}"
+                                                           onchange="{!c.corporationOffenceChange}" data-Index="{!index}" /> &nbsp;No
+                                                    &nbsp;&nbsp;
+                                                    <input type="radio" checked="{!if(relatedApplicant.Corp_Convicted_Of_Disqualifying_Offence__c == true, true, false)}" 
+                                                           disabled="{!v.readOnly}" aura:id="CorporationOffenceYes" id="CorporationOffenceYes" 
+                                                           name="{!'corporationOffence' + index}"
+                                                           onchange="{!c.corporationOffenceChange}" data-Index="{!index}" /> &nbsp;Yes, provide details            
+                                                    <br/>
+                                                    <span id="{!'CorporationOffenceError' + index}" class="customErrorMsg"></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid" style="padding-left: 2%;width:80%;display:block;">
+                                                <ui:inputTextarea disabled="{!v.readOnly}" aura:id="CorporationOffenceDetails" maxlength="1000"
+                                                                  value="{!relatedApplicant.Corp_Disqualifying_Offence_Details__c}" 
+                                                                  class="{!if(relatedApplicant.Corp_Convicted_Of_Disqualifying_Offence__c == true, 'corporationOffence', 'toggleDisplay corporationOffences')}"/>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col" style="width: 50% !important;">
+                                                    <label class="slds-form-element__label">{!$Label.c.Corporation_Director_Convicted_Of_Disqualifying_Offence}</label>
+                                                    <br/>
+                                                </div>
+                                                <div class="slds-col" style="width: 50% !important;">
+                                                    <input type="radio" checked="{!if(relatedApplicant.Has_convicted_or_disqualifying_offence__c == false, true, false)}" 
+                                                           disabled="{!v.readOnly}" aura:id="OffenceNo" id="OffenceNo" 
+                                                           name="{!'offence' + index}"
+                                                           onchange="{!c.offenceChange}" data-Index="{!index}" /> &nbsp;No
+                                                    &nbsp;&nbsp;
+                                                    <input type="radio" checked="{!if(relatedApplicant.Has_convicted_or_disqualifying_offence__c == true, true, false)}" 
+                                                           disabled="{!v.readOnly}" aura:id="OffenceYes" id="OffenceYes" 
+                                                           name="{!'offence' + index}"
+                                                           onchange="{!c.offenceChange}" data-Index="{!index}" /> &nbsp;Yes, provide details
+                                                    <br/>
+                                                    <span id="{!'OffenceError' + index}" class="customErrorMsg"></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid" style="padding-left: 2%;width:80%;display:block;">
+                                                <ui:inputTextarea disabled="{!v.readOnly}" aura:id="OffenceDetails" maxlength="1000" 
+                                                                  value="{!relatedApplicant.Disqualifying_Offence_Details__c}" 
+                                                                  class="{!if(relatedApplicant.Has_convicted_or_disqualifying_offence__c == true, 'Offence', 'toggleDisplay Offence')}"/>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col" style="width: 50% !important;">
+                                                    <label class="slds-form-element__label"><aura:unescapedHtml value="{!$Label.c.Corporation_Authorisation_Cancelled}" /></label>
+                                                    <br/>
+                                                </div>
+                                                <div class="slds-col" style="width: 50% !important;">
+                                                    <input type="radio" checked="{!if(relatedApplicant.Authorisation_Cancelled__c == false, true, false)}" 
+                                                           disabled="{!v.readOnly}" aura:id="CancelNo" id="CancelNo" 
+                                                           name="{!'cancelled' + index}"
+                                                           onchange="{!c.cancellChange}" data-Index="{!index}" /> &nbsp;No
+                                                    &nbsp;&nbsp;
+                                                    <input type="radio" checked="{!if(relatedApplicant.Authorisation_Cancelled__c == true, true, false)}" 
+                                                           disabled="{!v.readOnly}" aura:id="CancelYes" id="CancelYes" 
+                                                           name="{!'cancelled' + index}"
+                                                           onchange="{!c.cancellChange}" data-Index="{!index}" /> &nbsp;Yes, provide details
+                                                    <br/>
+                                                    <span id="{!'CancellError' + index}" class="customErrorMsg"></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid" style="padding-left: 2%;width:80%;display:block;">
+                                                <ui:inputTextarea disabled="{!v.readOnly}" aura:id="CancelledDetails" maxlength="1000" 
+                                                                  value="{!relatedApplicant.Auth_Cancellation_Details__c}" 
+                                                                  class="{!if(relatedApplicant.Authorisation_Cancelled__c == true, 'cancellation', 'toggleDisplay cancellation')}"/>
+                                            </div>
+                                            
+                                            <div class="slds-grid">
+                                                <div class="slds-col" style="width: 50% !important;">
+                                                    <label class="slds-form-element__label"><aura:unescapedHtml value="{!$Label.c.Corporation_Authorisation_Refused}"/></label>
+                                                    <br/>
+                                                </div>
+                                                <div class="slds-col" style="width: 50% !important;">
+                                                    <input type="radio" checked="{!if(relatedApplicant.Has_had_authorisation_refused__c == false, true, false)}" 
+                                                           disabled="{!v.readOnly}" aura:id="RefusalNo" id="RefusalNo" 
+                                                           name="{!'refusal' + index}"
+                                                           onchange="{!c.refusalChange}" data-Index="{!index}" /> &nbsp;No
+                                                    &nbsp;&nbsp;
+                                                    <input type="radio" checked="{!if(relatedApplicant.Has_had_authorisation_refused__c == true, true, false)}" 
+                                                           disabled="{!v.readOnly}" aura:id="RefusalYes" id="RefusalYes" 
+                                                           name="{!'refusal' + index}"
+                                                           onchange="{!c.refusalChange}" data-Index="{!index}" /> &nbsp;Yes, provide details
+                                                    <br/>
+                                                    <span id="{!'RefusalError' + index}" class="customErrorMsg"></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-grid" style="padding-left: 2%;width:80%;display:block;">
+                                                <ui:inputTextarea disabled="{!v.readOnly}" aura:id="RefusedDetails" maxlength="1000" 
+                                                                  value="{!relatedApplicant.Auth_Refusal_Details__c}" 
+                                                                  class="{!if(relatedApplicant.Has_had_authorisation_refused__c == true, 'refusal', 'toggleDisplay refusal')}"/>
+                                            </div>
+                                            
+                                            <aura:if isTrue="{!v.readOnly == false}">
+                                                <aura:iteration var="fileStatus" items="{!v.uploadStatus}" indexVar="fileIndex">
+                                                    <aura:if isTrue="{!index == fileIndex}">
+                                                        <div class="slds-grid">
+                                                            <div class="slds-col-left">
+                                                                <c:P2POTAttachment category="POI" uploadStatus="{!fileStatus.poiUploadStatus}" uniqueIdentifier="{!'poi-doc-' + index}" FileUploadChecked="{!relatedApplicant.Proof_Of_Identity_Documents__c}" FileCheckLabel="Proof of identity" UniqueClass="{!index}" aura:id="Applicant-Identity-Document-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of your supporting documents" AllowMultiple="true" section="APPLICANT" index="2" />
+                                                            </div>
+                                                            <div class="slds-col-left">
+                                                                <c:P2POTAttachment category="NPC" uploadStatus="{!fileStatus.policeCheckUploadStatus}" uniqueIdentifier="{!'police-check-' + index}" FileUploadChecked="{!relatedApplicant.Proof_Of_National_Police_Check__c}" FileCheckLabel="National Police Check" UniqueClass="{!index}" aura:id="Applicant-Police-Check-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="" AllowMultiple="true" section="APPLICANT"/>
+                                                            </div>                                                    
+                                                        </div>
+                                                        <div class="slds-grid">
+                                                            <div class="slds-col-left">
+                                                                <aura:if isTrue="{!relatedApplicant.Role__c == 'Manager'}">
+                                                                    <c:P2POTAttachment category="ECL" uploadStatus="{!fileStatus.endorsementUploadStatus}" uniqueIdentifier="{!'endorsement-letter-' + index}" FileUploadChecked="{!relatedApplicant.Proof_Of_Endorsement_By_Director_Company__c}" FileCheckLabel="Copy of endorsement by Director or Company Secretary nominating the manager on Company letterhead" UniqueClass="{!index}" aura:id="Applicant-Endorsement-Check-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="" AllowMultiple="true" section="APPLICANT" index="2" />
+                                                                </aura:if>  
+                                                            </div>
+                                                            <div class="slds-col-left">
+                                                                <aura:if isTrue="{!and(relatedApplicant.Role__c != '', relatedApplicant.Resided_In_Australia_For_Past_5_Years__c == false)}">
+                                                                    <c:P2POTAttachment category="OCC" uploadStatus="{!fileStatus.overseasPoliceCertificateUploadStatus}" uniqueIdentifier="{!'criminal-history-' + index}" FileUploadChecked="{!relatedApplicant.Proof_Of_Criminal_History_Check__c}" FileCheckLabel="Overseas criminal history check (if applicable)" UniqueClass="{!index}" aura:id="Applicant-Criminal-Check-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="" AllowMultiple="true" section="APPLICANT" index="2" />
+                                                                </aura:if>  
+                                                            </div>                                                    
+                                                        </div>
+                                                    </aura:if>
+                                                </aura:iteration>
+                                            </aura:if>
+                                            
+                                            <!-- Applicant Details form End-->
+                                            
+                                            <!-- Add more / Remove buttons-->	
+                                            <div class="slds-card__footer" style="margin-top: 0px;">
+                                                <aura:if isTrue="{!and(not(v.readOnly), index != 0)}">
+                                                    <button type="button" onclick="{!c.removeRow}" id="{!index}" class="slds-button slds-button--neutral">
+                                                        <i style="color:#54698d !important;" class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Remove Corporate Partner
+                                                    </button>
+                                                </aura:if>
+                                                
+                                                <aura:if isTrue="{!and(not(v.readOnly), index == (v.aspCorporationPartners.length - 1))}">
+                                                    <ui:button class="slds-button slds-button--neutral" press="{!c.addRow}"> 
+                                                        <i style="color:#54698d !important;" class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add Corporate Partner
+                                                    </ui:button>
+                                                </aura:if>
+                                            </div>
+                                            
+                                        </aura:if>
+                                    </td>  
+                                </tr>
+                            </aura:iteration>
+                        </aura:iteration>
+                    </table>
+                    
+                </div>
+            </div>
+        </form>
+        
+        <div class="slds-card__footer">
+            
+            <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveFormState}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Finish Later
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+            <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                </ui:button>
+            </aura:if>
+            
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

@@ -1,0 +1,26 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+	<aura:attribute name="isRequired" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="isReadOnly" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="isValid" type="Boolean" default="true" access="public"/>
+    <aura:attribute name="arbn" type="String" default="" access="public" />
+    <aura:attribute name="fieldLabel" type="String" default="ARBN" access="public"/>
+    <aura:attribute name="uniqueIdentifier" type="String" default="arbn" access="public"/>
+    <aura:attribute name="isInitComplete" type="Boolean" default="false" access="private"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.validateArbn}"/>
+    <aura:method name="verifyArbn" action="{!c.validateArbnForSave}" />
+    
+    <div class="slds-grid slds-wrap">
+        <div class="{!v.uniqueIdentifier + 'Content slds-size--1-of-1 uiInput--default'}">
+            <label class="slds-form-element__label" >{!v.fieldLabel}</label>
+            <aura:if isTrue="{!v.isReadOnly == false}">
+                <ui:inputText updateOn="keyup" value="{!v.arbn}" keyup="{!c.validateArbn}" paste="{!c.validateArbn}" maxlength="11" class="slds-input"/>   	
+                <span class="{!v.uniqueIdentifier + 'Error slds-form-element__help' }"></span>
+                <aura:set attribute="else">
+                    <ui:outputText value="{!v.arbn}"  class="slds-input slds-output"/>
+                </aura:set>
+            </aura:if>
+        </div>
+    </div>
+    
+</aura:component>

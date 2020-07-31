@@ -1,0 +1,11 @@
+<aura:event type="APPLICATION" description="Used to handle events fired by TaxiAccordiaonNavigation Component" access="global" >
+    <aura:attribute name="renderCases" type="boolean" default="false" access="global"/>
+    <aura:attribute name="renderAccount" type="boolean" default="false" access="global"/>
+    <aura:attribute name="renderContacts" type="boolean" default="false" access="global"/>
+    <aura:attribute name="renderLicences" type="boolean" default="false" access="global"/>
+    <aura:attribute name="renderPartners" type="boolean" default="false" access="global"/>
+    <aura:attribute name="renderPayments" type="boolean" default="false" access="global"/>
+    <aura:attribute name="renderLeases" type="boolean" default="false" access="global"/>
+    <aura:attribute name="whichButton" type="string" default="" access="global"/>
+    <aura:attribute name="spinner" type="boolean" default="false" access="global"/>
+</aura:event>

@@ -1,0 +1,6 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+	<p class="headertext">Something went wrong, please login again.</p>
+            <span class="cancelLink">
+            <center><a href="/industryportal/s/login/" style="color:black !important;  text-decoration: underline;">Back to login</a></center>
+        </span>
+</aura:component>

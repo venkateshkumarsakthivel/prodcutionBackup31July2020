@@ -1,0 +1,22 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+ 
+    <aura:registerEvent name="filterEvent" type="c:TaxiAgentNavigationEvent"/> 
+	<aura:attribute name="renderPartners" type="Boolean" default="false"/>
+    
+    <div class="slds-grid slds-grid--vertical slds-navigation-list--vertical" style="color: #000000;">
+        <ul class="navigations">
+            <li style="padding: 0 0 0.5rem 0rem;" class="ActivitiesListItem ListItem" aura:id="ActivitiesListItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Activities" id="Activities" onclick="{!c.renderfilter}">Agent Activities</a>
+            </li>
+            <li style="padding: 0.5rem 0 0.5rem 0rem;" class="AgentAccountListItem ListItem" aura:id="AgentAccountListItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Agent Account" id="Agent Account" onclick="{!c.renderfilter}">Agent Account</a>
+            </li>
+            <li style="padding: 0.5rem 0 0.5rem 0rem;" class="AgentContactsListItem ListItem" aura:id="AgentContactsListItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Agent Contacts" id="Agent Contacts" onclick="{!c.renderfilter}">Agent Contacts</a>
+            </li>
+            <li style="padding: 0.5rem 0 0.5rem 0rem;" class="ClientAccountsListItem ListItem slds-is-active" aura:id="ClientAccountsListItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Client Accounts" id="Client Accounts" onclick="{!c.renderfilter}">Managed Accounts</a>
+            </li>
+        </ul>
+    </div>
+</aura:component>

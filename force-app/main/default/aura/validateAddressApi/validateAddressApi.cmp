@@ -1,0 +1,7 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    <aura:attribute name="frameSrc" type="String"/>
+    <div class="slds-size--1-of-2 slds-m-around--small framediv">
+        <iframe id="myFrame" style="height: 100%;width: 100%" src="{!v.frameSrc}"/>
+    </div>
+</aura:component>

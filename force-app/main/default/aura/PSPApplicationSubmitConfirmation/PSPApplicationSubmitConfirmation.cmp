@@ -1,0 +1,17 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    <h2>Application for Service Provider Authorisation<br/><br/>
+    Thank you XYZ<br/><br/>
+    Your application has been saved.</h2><br/>
+    <h3>Ref: XYZ 002276378923</h3><br/><br/>
+    An email has been sent to youwith a link to your application.<br/>
+    To retrieve your application please use<br/>
+    1. the link provided in your email or<br/>
+    2. copy the following information and add the url directly in your browser.
+    <a href="">industryportal/XYZ002276378923</a><br/><br/>
+    You will have 30 days to complete your application after such time the application will be discarded and a new
+    application will be required to be completed.<br/><br/>
+    <a href="">Privacy Statement</a>
+    <div style="float:right;">
+        <ui:button class="slds-button slds-button-neutral">Continue Now</ui:button>
+    </div>
+</aura:component>

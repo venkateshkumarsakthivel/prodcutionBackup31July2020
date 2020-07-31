@@ -1,0 +1,4 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <img src="{!$Resource.P2P_PortalLogo}" style="max-width:230px;"/>
+</aura:component>

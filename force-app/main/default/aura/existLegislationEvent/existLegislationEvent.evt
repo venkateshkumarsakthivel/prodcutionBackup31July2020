@@ -1,0 +1,4 @@
+<!-- c:existLegislationEvent -->
+<aura:event type="APPLICATION" description="Broadcaset existing Legislation to Case or Notice Record" >
+    <aura:attribute name="existLegislations" type="Object"/>
+</aura:event>

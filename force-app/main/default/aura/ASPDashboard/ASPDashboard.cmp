@@ -1,0 +1,822 @@
+<aura:component controller="ASPDashboardController" implements="forceCommunity:availableForAllPageTypes" access="global">
+    
+    <ltng:require scripts="{!$Resource.Defiantjs}"/> 
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/> 
+    <ltng:require scripts="{!$Resource.momentJS}"/>
+    
+    <aura:registerEvent name="navigationEvent" type="c:ASPDashboardTabNavigationEvent"/>
+    
+    <aura:attribute name="dvdDriverMasterList" type="DVD_Entity__c[]"/>
+    <aura:attribute name="dvdVehicleMasterList" type="DVD_Entity__c[]"/>
+    
+    <aura:attribute name="dvdDriversList" type="DVD_Entity__c[]"/>
+    <aura:attribute name="dvdVehiclesList" type="DVD_Entity__c[]"/>
+    
+    <aura:attribute name="dvdDriversMap" type="Map"/>
+    <aura:attribute name="dvdVehiclesMap" type="Map"/>
+    
+    <aura:attribute name="sdoDriversMap" type="Map"/>
+
+    <aura:attribute name="dvdListBeforeSearch" type="DVD_Entity__c[]"/>
+    
+    <aura:attribute name="selectedDVDRecords" type="String[]"/>
+    
+    <aura:attribute name="body" type="String"/> 
+    
+    <aura:attribute name="currentGrid" type="string"/>
+    
+    <aura:attribute name="ShowCriminalCharge" type="boolean" default="false"/>
+    <aura:attribute name="ShowLicenceEligibility" type="boolean" default="false"/>
+    <aura:attribute name="ShowP2pEligibility" type="boolean" default="false"/>
+    <aura:attribute name="ShowSeriousDrivingOffences" type="boolean" default="false"/>
+    <aura:attribute name="ShowVehicleCheck" type="boolean" default="false"/>
+	<aura:attribute name="hideInspectionDateCheck" type="boolean" default="false"/>
+	<aura:attribute name="hideTenureCheck" type="boolean" default="false"/>
+    
+    <aura:attribute name="driverCount" type="Integer" default="0"/> 
+    <aura:attribute name="vehicleCount" type="Integer" default="0"/> 
+    
+    
+    <aura:attribute name="maxLimitCheck" type="Integer" default="49999" />
+    
+    <aura:attribute name="driverRedCount" type="Integer" default="0"/>
+    <aura:attribute name="driverGreenCount" type="Integer" default="0"/>
+    <aura:attribute name="driverNoneCount" type="Integer" default="0"/>
+    <aura:attribute name="driverErrorCount" type="Integer" default="0"/>
+    
+    <aura:attribute name="sdoRedCount" type="Integer" default="0"/> 
+    <aura:attribute name="sdoGreenCount" type="Integer" default="0"/>
+    <aura:attribute name="sdoNoneCount" type="Integer" default="0"/>
+    <aura:attribute name="sdoErrorCount" type="Integer" default="0"/>
+	
+	<aura:attribute name="tenureRedCount" type="Integer" default="0"/> 
+    <aura:attribute name="tenureGreenCount" type="Integer" default="0"/>
+    <aura:attribute name="tenureNoneCount" type="Integer" default="0"/>
+    <aura:attribute name="tenureErrorCount" type="Integer" default="0"/>
+    
+    <aura:attribute name="p2pEligibilityRedCount" type="Integer" default="0"/>
+    <aura:attribute name="p2pEligibilityGreenCount" type="Integer" default="0"/>
+    <aura:attribute name="p2pEligibilityNoneCount" type="Integer" default="0"/>
+    
+    <aura:attribute name="ccRedCount" type="Integer" default="0"/> 
+    <aura:attribute name="ccGreenCount" type="Integer" default="0"/>
+    <aura:attribute name="ccNoneCount" type="Integer" default="0"/>
+    <aura:attribute name="ccErrorCount" type="Integer" default="0"/>
+    
+
+    <aura:attribute name="vehicleRedCount" type="Integer" />
+    <aura:attribute name="vehicleGreenCount" type="Integer" />
+    <aura:attribute name="vehicleNoneCount" type="Integer" />
+    <aura:attribute name="vehicleErrorCount" type="Integer" />
+	
+    <aura:attribute name="inspectionDateRedCount" type="Integer" default="0"/>
+    <aura:attribute name="inspectionDateGreenCount" type="Integer" default="0"/>
+    <aura:attribute name="inspectionDateNoneCount" type="Integer" default="0"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="c:ASPDashboardNavigationEvent" action="{!c.renderfiltersHandler}"/>
+    <aura:handler event="c:SetAccordianMenuItemEvent" action="{!setAccordianMenuItem}" />
+    
+    <aura:handler name="confirmRecordDelete" event="c:ConfirmRecordDeleteEvent" action="{!c.handleDVDRecordDelete}"/>
+    <aura:handler name="createFleetEntity" event="c:CreateFleetEntityEvent" action="{!c.handleFleetEntityCreate}"/>
+    
+    <aura:handler name="confirmChecks" event="c:ConfirmRunChecks" action="{!c.handleDVDCheck}" />
+    <aura:handler name="confirmChecksAll" event="c:ConfirmRunChecksAll" action="{!c.handleDVDCheckAll}" />
+    
+    <aura:attribute type="String" name="sortDriverField"/>
+    <aura:attribute type="Boolean" name="sortDriverAsc"/>
+    <aura:attribute type="String" name="sortVehicleField"/>
+    <aura:attribute type="Boolean" name="sortVehicleAsc"/>
+    
+    <aura:attribute type="String" name="driverScrollCheckIntervalId"/>
+    <aura:attribute type="String" name="vehicleScrollCheckIntervalId"/>
+    
+    <aura:attribute type="Integer" name="recordCountToLoadOnScroll"/>
+    <aura:attribute type="DVD_Entity__c[]" name="dvdFullScrollList"/>
+    
+    <aura:attribute type="Integer" name="deletedRecordsCount" default="0"/>
+    
+
+    <aura:attribute name="taxiLicenceRedCount" type="Integer" default="0" />
+    <aura:attribute name="taxiLicenceGreenCount" type="Integer" default="0" />
+    <aura:attribute name="taxiLicenceWhiteCount" type="Integer" default="0" />
+
+    <aura:attribute name="taxiLicenceCheck" type="Boolean" default="false" />
+    <aura:attribute name="vehTableColWidth" type="Object" />
+
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" />
+    
+    <aura:method name="editDriver" action="{!c.editDriverDVDRecord}"/>
+    <aura:method name="updateDriver" action="{!c.updateDriverDVDRecord}"/>
+    <aura:method name="deleteDriver" action="{!c.confirmDVDRecordDelete}"/>
+    <aura:method name="cancelDriver" action="{!c.cancelDriverDVDRecordEdit}"/>
+    <aura:method name="selectDriver" action="{!c.handleSingleSelect}"/>
+    
+    <aura:method name="editVehicle" action="{!c.editVehicleDVDRecord}"/>
+    <aura:method name="updateVehicle" action="{!c.updateVehicleDVDRecord}"/>
+    <aura:method name="deleteVehicle" action="{!c.confirmDVDRecordDelete}"/>
+    <aura:method name="cancelVehicle" action="{!c.cancelVehicleDVDRecordEdit}"/>
+    <aura:method name="selectVehicle" action="{!c.handleSingleSelect}"/>
+    
+    <aura:attribute name="driverScrollIndex" type="Integer" default="1"/>
+    <aura:attribute name="vehicleScrollIndex" type="Integer" default="1"/>
+    <!-- <div class="loader slds-show" aura:id="spinner"></div> -->
+    
+    <div class="slds-col slds-p-around_small container">
+        <div class="slds-page-header">
+            <div class="slds-grid">
+                <div class="slds-col slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <aura:renderIf isTrue="{!v.currentGrid == 'Drivers'}">
+                                <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                           svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#user" category="standard" size="small" name="fleet">
+                                </c:svgIcon>
+                            </aura:renderIf>
+                            <aura:renderIf isTrue="{!v.currentGrid == 'Vehicles'}">
+                                <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                           svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#work_order" category="standard" size="small" name="fleet">
+                                </c:svgIcon>
+                            </aura:renderIf>
+                            
+                            <aura:renderIf isTrue="{!v.currentGrid == 'DVDLogs'}">
+                                <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                           svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="fleet">
+                                </c:svgIcon>
+                            </aura:renderIf>
+                        </div>
+                        <div class="slds-media__body" style="text-align:left;">                         
+                            <aura:renderIf isTrue="{!v.currentGrid == 'Drivers'}">
+                                <p class="slds-text-title--caps slds-line-height--reset">DRIVER DASHBOARD</p>
+                                <h1 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Drivers">Drivers</h1>
+                            </aura:renderIf>
+                            <aura:renderIf isTrue="{!v.currentGrid == 'Vehicles'}">
+                                <p class="slds-text-title--caps slds-line-height--reset">VEHICLE DASHBOARD</p>
+                                <h1 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Vehicles">Vehicles</h1>
+                            </aura:renderIf>
+                            <aura:renderIf isTrue="{!v.currentGrid == 'DVDLogs'}">
+                                <p class="slds-text-title--caps slds-line-height--reset">DRIVERS / VEHICLES LOGS</p>
+                                <h1 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Query Logs">Query Logs</h1>
+                            </aura:renderIf>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <!-- Header Cards -->    
+                    <ul class="slds-has-dividers--around-space result-cards">
+                        <aura:renderIf isTrue="{!v.currentGrid == 'Drivers'}">
+                            <li class="slds-item slds-item-driver">
+                                <div class="slds-tile slds-tile--board">
+                                    <div class="slds-tile__detail slds-text-body--small">
+                                        <table border="0">
+                                            
+                                            <tr>
+                                                <td style="text-align:right;">
+                                                    #Drivers:
+                                                </td>
+                                                <td>
+                                                    <span style="padding-left:20px">{!v.driverCount}</span>
+                                                </td>
+                                            </tr>
+                                            <aura:if isTrue="{!v.ShowLicenceEligibility == false}">
+                                                <tr>
+                                                    <td style="text-align:right;">
+                                                        NSW Licence:
+                                                    </td>
+                                                    <td>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.Red}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.driverRedCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.Green}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.driverGreenCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.White}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.driverNoneCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.Unknown}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.driverErrorCount}</span>
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </aura:if>
+                                            
+											<aura:if isTrue="{!v.hideTenureCheck == false}">
+                                                <tr>
+                                                    <td style="text-align:right;">
+                                                        NSW Licence Tenure:
+                                                    </td>
+                                                    <td>
+                                                        <p class="slds-truncate" style="float: left;width:90px">                                            
+                                                            <img src="{!$Resource.Red}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.tenureRedCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.Green}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.tenureGreenCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.White}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.tenureNoneCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.Unknown}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.tenureErrorCount}</span>
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </aura:if>
+											
+                                            <aura:if isTrue="{!v.ShowSeriousDrivingOffences == false}">
+                                                <tr>
+                                                    <td style="text-align:right;">
+                                                        Serious Driving Offences:
+                                                    </td>
+                                                    <td>
+                                                        <p class="slds-truncate" style="float: left;width:90px">                                            
+                                                            <img src="{!$Resource.Red}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.sdoRedCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.Green}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.sdoGreenCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.White}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.sdoNoneCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.Unknown}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.sdoErrorCount}</span>
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </aura:if>
+                                            
+                                            <aura:if isTrue="{!v.ShowP2pEligibility == false}">
+                                                <tr>
+                                                    <td style="text-align:right;">
+                                                        P2P:
+                                                    </td>
+                                                    <td>
+                                                        <p class="slds-truncate" style="float: left;width:90px">                                            
+                                                            <img src="{!$Resource.Red}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.p2pEligibilityRedCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.Green}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.p2pEligibilityGreenCount}</span></p>
+                                                        <!--
+                                                    <p class="slds-truncate" style="float: left;width:90px">
+              <img src="{!$Resource.White}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+              <span>{!v.p2pEligibilityNoneCount}</span></p>
+             -->
+                                                    </td>
+                                                </tr>
+                                            </aura:if>
+                                            
+                                            <aura:if isTrue="{!v.ShowCriminalCharge == false}">
+                                                <tr>
+                                                    <td style="text-align:right;">
+                                                        Criminal Charges:
+                                                    </td>
+                                                    <td>
+                                                        <p class="slds-truncate" style="float: left;width:90px">                                            
+                                                            <img src="{!$Resource.Red}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.ccRedCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.Green}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.ccGreenCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.White}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.ccNoneCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <img src="{!$Resource.Unknown}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/>
+                                                            <span>{!v.ccErrorCount}</span>
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </aura:if>
+											
+                                        </table>
+                                          
+                                    </div>
+                                </div>
+                            </li>
+                        </aura:renderIf>
+                        <aura:renderIf isTrue="{!v.currentGrid == 'Vehicles'}">
+                            <li class="slds-item slds-item-vehicle">
+                                <div class="slds-tile slds-tile--board">
+                                    <div class="slds-tile__detail slds-text-body--small">
+                                        <table border="0">
+                                            <tr>
+                                                <td style="text-align:right;">
+                                                    Total:
+                                                </td>
+                                                <td>
+                                                    <span style="padding-left:20px">{!v.vehicleCount}</span>
+                                                </td>
+                                            </tr>
+                                            <aura:if isTrue="{!v.ShowVehicleCheck == false}">
+                                                <tr>
+                                                    <td style="text-align:right;">
+                                                        Registration Check:
+                                                    </td>
+                                                    <td>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <label><img src="{!$Resource.Red}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/></label>
+                                                            <span>{!v.vehicleRedCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <label><img src="{!$Resource.Green}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/></label>
+                                                            <span>{!v.vehicleGreenCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <label><img src="{!$Resource.White}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/></label>
+                                                            <span>{!v.vehicleNoneCount}</span>
+                                                        </p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <label><img src="{!$Resource.Unknown}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/></label>
+                                                            <span>{!v.vehicleErrorCount}</span>
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </aura:if>
+											<aura:if isTrue="{!v.hideInspectionDateCheck == false}">
+                                                <tr>
+                                                    <td style="text-align:right;">
+                                                        Safety Check:
+                                                    </td>
+                                                    <td>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <label><img src="{!$Resource.Red}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/></label>
+                                                            <span>{!v.inspectionDateRedCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <label><img src="{!$Resource.Green}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/></label>
+                                                            <span>{!v.inspectionDateGreenCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <label><img src="{!$Resource.White}" style="height: 15px;padding-left: 20px;padding-right: 5px;"/></label>
+                                                            <span>{!v.inspectionDateNoneCount}</span>
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </aura:if>
+											
+                                            <aura:if isTrue="{!v.taxiLicenceCheck}">
+                                                <tr>
+                                                    <td style="text-align:right;">
+                                                        Taxi Licence Status:
+                                                    </td>
+                                                    <td>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <label><img src="{!$Resource.Red}" style="height: 15px;padding-left: 20px;padding-right: 5px;" /></label>
+                                                            <span>{!v.taxiLicenceRedCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <label><img src="{!$Resource.Green}" style="height: 15px;padding-left: 20px;padding-right: 5px;" /></label>
+                                                            <span>{!v.taxiLicenceGreenCount}</span></p>
+                                                        <p class="slds-truncate" style="float: left;width:90px">
+                                                            <label><img src="{!$Resource.White}" style="height: 15px;padding-left: 20px;padding-right: 5px;" /></label>
+                                                            <span>{!v.taxiLicenceWhiteCount}</span>
+                                                        </p>
+                                                        <!--<p class="slds-truncate" style="float: left;width:90px">
+                                                            <label><img src="{!$Resource.Unknown}" style="height: 15px;padding-left: 20px;padding-right: 5px;" /></label>
+                                                            <span>{!v.taxiLicenceErrorCount}</span>
+                                                        </p>-->
+                                                    </td>
+                                                </tr>
+                                            </aura:if>
+                                        </table>
+                                    </div>
+                                </div>
+                            </li>
+                        </aura:renderIf>
+                    </ul>
+                </div>
+            </div>
+            
+           
+            
+        </div>
+     
+ 	
+        
+        
+        <aura:renderIf isTrue="{!v.currentGrid == 'Drivers'}">
+            <div class="slds-grid" style="padding-top:10px;">
+                <aura:if isTrue="{!v.driverCount > 49999}">  
+     <div class="slds-text-align_left">
+     <div class="slds-text-color_error">
+         > Please click the RunALL button to run a check for ALL drivers <br> </br>
+         > If you require an export of ALL drivers please contact us</div>
+     </div>
+ </aura:if> 
+                
+                <div class="slds-col" style="float:left;padding-right: 10px; ">
+                    <span style="padding-left:4px;" title="Specify search term and press enter to filter out matching records">
+                        <ui:inputText aura:id="driverSearch" class="slds-input searchBox" placeholder="Search Driver Licence, Last Name" keyup="{!c.searchDriver}"></ui:inputText>
+                        <span id="driverSearchIcon" class="searchIcon" style="margin-left:-23px; !important; cursor:pointer;" onclick="{!c.searchDriver}">
+                            <i style="color:#54698d !important;" class="fa fa-search" aria-hidden="true"></i>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            
+  
+            
+            
+            
+            <div class="slds-tabs--scoped" style="padding-top:10px;">
+                <ul class="slds-tabs--scoped__nav" role="tablist" style="float:left;" aura:id="driverSubmenu">
+                    <li class="slds-tabs--scoped__item slds-active driversTab" title="Drivers" role="presentation" aura:id="allDrivers__itemtab" id="allDrivers__itemtab">
+                        <a class="slds-tabs--scoped__link slds-active" href="javascript:void(0);" role="tab" onclick="{!c.filterShowAllDrivers}" tabindex="0" aria-selected="true" aria-controls="tab-scoped-1" aura:id="allDrivers__item" id="allDrivers__item">All</a></li>
+                    <li class="slds-tabs--scoped__item driversTab" title="Red" role="presentation" aura:id="redDrivers__itemtab" id="redDrivers__itemtab">
+                        <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" onclick="{!c.filterRedDrivers}" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-2" aura:id="redDrivers__item" id="redDrivers__item"> Red</a></li>
+                    <li class="slds-tabs--scoped__item driversTab" title="White" role="presentation" aura:id="whiteDrivers__itemtab" id="whiteDrivers__itemtab">
+                        <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" onclick="{!c.filterWhiteDrivers}" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-3" aura:id="whiteDrivers__item" id="whiteDrivers__item">White</a></li>
+                    <li class="slds-tabs--scoped__item driversTab" title="Green" role="presentation" aura:id="greenDrivers__itemtab" id="greenDrivers__itemtab">
+                        <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" onclick="{!c.filterGreenDrivers}" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-4" aura:id="greenDrivers__item" id="greenDrivers__item">Green</a>
+                    </li>
+                    
+                </ul>
+                <div class="slds-grid" style="float:right;width:462px;">
+                    <div class="slds-col">
+                      
+                        <div class="renderButtons">
+      
+                            <ui:button class="slds-button slds-button--neutral addDriver"  press="{!c.newDriver}">
+                                <i style="color:#54698d !important;" class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add</ui:button>
+                            
+                            <ui:button class="slds-button slds-button--neutral" press="{!c.runDriversDVD}">
+                                <i style="color:#54698d !important;" class="fa fa-play" aria-hidden="true"></i>&nbsp;&nbsp;Run</ui:button>
+
+                              <aura:if isTrue="{!v.driverCount > 49999}">  
+								    <ui:button class="slds-button slds-button_neutral" press="{!c.runDriversDVDAll}">
+                                	<i style="color:#54698d !important;" class="fa fa-play" aria-hidden="true"></i>&nbsp;&nbsp;RunALL</ui:button>
+									
+                                 
+								</aura:if> 
+
+                            <ui:button class="slds-button slds-button--neutral" press="{!c.confirmDVDRecordDelete}">
+                                <i style="color:#54698d !important;" class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Delete</ui:button>
+                            
+                            <ui:button class="slds-button slds-button--neutral" press="{!c.uploadDrivers}" > 
+                                <i style="color:#54698d !important;" class="fa fa-upload" aria-hidden="true"></i>&nbsp;&nbsp;Upload Drivers</ui:button>
+    
+                             <ui:button class="slds-button slds-button--neutral" press="{!c.deleteDrivers}" > 
+                                <i style="color:#54698d !important;" class="fa fa-upload" aria-hidden="true"></i>&nbsp;&nbsp;Delete Drivers</ui:button>
+
+                            <ui:button class="slds-button slds-button--neutral"  press="{!c.export}" aura:id="Drivers Export">
+                                <i style="color:#54698d !important;" class="fa fa-download" aria-hidden="true"></i>&nbsp;&nbsp;Export Results</ui:button>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div style="clear:both;"></div>
+                    <aura:if isTrue="{!v.driverCount > 49999}"> 
+                
+                <div class="slds-text-align_left slds-text-color_error">
+                  
+                         Only 49,999 are displayed out of {!v.driverCount}	</div>
+                 
+                        
+                </aura:if> 
+                <div aura:id="drivers-tab-scoped-1" id="drivers-tab-scoped-1" class="slds-tabs--scoped__content slds-show driversTabScope" role="tabpanel" aria-labelledby="tab-scoped-1__item">
+                    <div class="slds-grid slds-grid--vertical">
+                        <div class="slds-grow">
+                            
+                            <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered slds-no-row-hover" style="background-color: #003577;">
+                                <thead style="{!v.dvdDriversList.length >= 12 ? 'display:block; width: calc(100% + 0px);background: #003577;' : 'background: #003577;'}">
+                                    <tr class="slds-line-height--reset">
+                                                  <th scope="col" style="width:4%;" title="Select All">
+                                            <span class="slds-align--absolute-center">
+                                                <ui:inputCheckbox aura:id="selectAllDrivers" class="allDrivers" value="false" change="{!c.handleSelectAll}"/>
+                                            </span>  
+                                        </th>
+                                        <th scope="col" style="width:10%;" class="tabColSort" onclick="{!c.sortDriverColumn}" id="Last_Name__c">
+                                            <div class="slds-text-title--caps" title="Last Name">
+                                                <span class="slds-text-align--left tableheader" id="Last_Name__c">
+                                                    Last Name
+                                                    <aura:if isTrue="{!v.sortDriverField=='Last_Name__c'}">
+                                                        <span>
+                                                            <aura:if isTrue="{!v.sortDriverAsc}">
+                                                                &#8593;
+                                                                <aura:set attribute="else">
+                                                                    &#8595;
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </span>
+                                                    </aura:if>
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th scope="col" style="width:10%;" class="tabColSort" onclick="{!c.sortDriverColumn}" id="Drivers_Licence_Number__c">
+                                            <div class="slds-text-title--caps" title="NSW Driver Licence">
+                                                <span class="slds-text-align--left tableheader" title="NSW Driver Licence" id="Drivers_Licence_Number__c">
+                                                    NSW Driver Licence
+                                                    <aura:if isTrue="{!v.sortDriverField=='Drivers_Licence_Number__c'}">
+                                                        <span>
+                                                            <aura:if isTrue="{!v.sortDriverAsc}">
+                                                                &#8593;
+                                                                <aura:set attribute="else">
+                                                                    &#8595;
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </span>
+                                                    </aura:if>
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th scope="col" style="width:14%;" id="Date_of_Birth__c">
+                                            <div class="slds-text-title--caps" title="DOB">
+                                                <span class="slds-align--absolute-center tableheader" title="DOB" id="Date_of_Birth__c">
+                                                    DOB
+                                                    <aura:if isTrue="{!v.sortDriverField=='Date_of_Birth__c'}">
+                                                        <span>
+                                                            <aura:if isTrue="{!v.sortDriverAsc}">
+                                                                &#8593;
+                                                                <aura:set attribute="else">
+                                                                    &#8595;
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </span>
+                                                    </aura:if>
+                                                </span>
+                                            </div>
+                                        </th>
+                                        
+                                        <th scope="col" style="width:11%;" class="tabCol">
+                                            <div class="slds-text-title--caps" title="Licence Eligibility">
+                                                <span class="slds-align--absolute-center tableheader" title="NSW Licence">NSW Licence</span>
+                                            </div>
+                                        </th>
+                                       
+										<th scope="col" style="width:10%;" class="tabCol">
+                                            <div class="slds-text-title--caps" title="NSW Licence Tenure">
+                                                <span class="slds-align--absolute-center tableheader" title="NSW Licence Tenure">NSW Licence Tenure</span>
+                                            </div>
+                                        </th>
+                                        
+                                        <th scope="col" style="width:10%;" class="tabCol">
+                                            <div class="slds-text-title--caps" title="Driving History">
+                                                <span class="slds-align--absolute-center tableheader" title="Serious Driving Offences">Serious Driving Offences</span>
+                                            </div>
+                                        </th>
+                                        
+                                        <th scope="col" style="width:10%;" class="tabCol">
+                                            <div class="slds-text-title--caps" title="P2P Eligibility">
+                                                <span class="slds-align--absolute-center tableheader" title="P2P Eligibility">P2P Eligibility</span>
+                                            </div>
+                                        </th>
+                                        
+                                        
+                                        <th scope="col" style="width:10%;" class="tabCol">
+                                            <div class="slds-text-title--caps" title="Criminal Charge">
+                                                <span class="slds-align--absolute-center tableheader" title="Criminal Charge">Criminal Charge</span>
+                                            </div>
+                                        </th>
+										 <th scope="col" style="width:25%;" class="tabCol" id="PTCode_Active_Start_Date__c">
+                                            <div class="slds-text-title--caps" title="PT Start Date">
+                                                <span class="slds-align--absolute-center tableheader" title="PT Start Date" id="PTCode_Active_Start_Date__c">
+                                                    PT CODE APPLIED
+                                            </span>
+                                            </div>
+                                        </th>
+                                        <th scope="col" style="width:12%;cursor:pointer;" class="tabCol" onclick="{!c.sortDriverColumn}" id="Last_DVD_Check_date__c">
+                                            <div class="slds-text-title--caps" title="Checked Date">
+                                                <span class="slds-align--absolute-center tableheader" title="Checked Date" id="Last_DVD_Check_date__c">
+                                                    LAST CHECKED
+                                                    <aura:if isTrue="{!v.sortDriverField=='Last_DVD_Check_date__c'}">
+                                                        <span>
+                                                            <aura:if isTrue="{!v.sortDriverAsc}">
+                                                                &#8593;
+                                                                <aura:set attribute="else">
+                                                                    &#8595;
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </span>
+                                                    </aura:if>
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th scope="col">
+                                            
+                                        </th>
+                                        <th scope="col">
+                                            
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                            <div id="driverTableScrollContainer" style="height:400px;overflow:auto;display:block;">
+                                <table id="driverTable" class="slds-table slds-table--fixed-layout slds-table--bordered slds-no-row-hover">
+                                    <tbody id="driverTableBody">
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+        </aura:renderIf>
+        
+        <aura:renderIf isTrue="{!v.currentGrid == 'Vehicles'}">
+            <div class="slds-grid" style="padding-top:10px;">
+                <div class="slds-col" style="float:left; padding-right:10px; ">
+                  
+                    <aura:if isTrue="{!v.vehicleCount > 49999}">  
+                         <div class="slds-text-align_left">
+                             <div class="slds-text-color_error">
+                                 > Please click the RunALL button to run a check for ALL Vehicles <br> </br>
+                                 > If you require an export of ALL Vehicles please contact us</div>
+                             </div>
+                     </aura:if> 
+                    
+                    
+                    <span style="padding-left:4px;" title="Specify search term and press enter to filter out matching records">
+                        <ui:inputText aura:id="vehicleSearch" class="slds-input searchBox" placeholder="Search Vehicles" keyup="{!c.searchVehicle}"></ui:inputText>  
+                        <span id="vehicleSearchIcon" class="searchIcon" style="margin-left:-23px; !important; cursor: pointer;" onclick="{!c.searchVehicle}">
+                            <c:svgIcon class="dashboard_icon" svgPath="/industryportal/resource/slds221/assets/icons/utility-sprite/svg/symbols.svg#search"
+                                       category="utility" size="x-small" name="searchIcon">
+                            </c:svgIcon>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="slds-tabs--scoped" style="padding-top:10px;">
+                <ul class="slds-tabs--scoped__nav" role="tablist" style="float:left;" aura:id="vehicleSubmenu">
+                    <li class="slds-tabs--scoped__item slds-active vehiclesTab" title="Vehicles" role="presentation" aura:id="allVehicles__itemtab" id="allVehicles__itemtab">
+                        <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" onclick="{!c.filterShowAllVehicles}" tabindex="0" aria-selected="true" aria-controls="tab-scoped-1" aura:id="allVehicles__item" id="allVehicles__item">All</a></li>
+                    <li class="slds-tabs--scoped__item vehiclesTab" title="Red" role="presentation" aura:id="redVehicles__itemtab" id="redVehicles__itemtab">
+                        <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" onclick="{!c.filterRedVehicles}" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-2" aura:id="redVehicles__item" id="redVehicles__item"> Red</a></li>
+                    <li class="slds-tabs--scoped__item vehiclesTab" title="White" role="presentation" aura:id="whiteVehicles__itemtab" id="whiteVehicles__itemtab">
+                        <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" onclick="{!c.filterWhiteVehicles}" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-3" aura:id="whiteVehicles__item" id="whiteVehicles__item">White</a></li>
+                    <li class="slds-tabs--scoped__item vehiclesTab" title="Green" role="presentation" aura:id="greenVehicles__itemtab" id="whiteVehicles__itemtab">
+                        <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" onclick="{!c.filterGreenVehicles}" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-4" aura:id="greenVehicles__item" id="greenVehicles__item">Green</a></li>
+                </ul>
+                
+                <div class="slds-grid" style="float:right;width:662px;">
+                    <div class="slds-col">
+                        <div class="renderButtons">
+                            
+                            
+                            <ui:button class="slds-button slds-button--neutral addDriver"  press="{!c.newVehicle}">
+                                <i style="color:#54698d !important;" class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add</ui:button>
+                            
+                            <ui:button class="slds-button slds-button--neutral" press="{!c.runVehiclesDVD}">
+                                <i style="color:#54698d !important;" class="fa fa-play" aria-hidden="true"></i>&nbsp;&nbsp;Run</ui:button>
+                            
+                             <aura:if isTrue="{!v.vehicleCount > 49999}">  
+						 <ui:button class="slds-button slds-button_neutral" press="{!c.runVehicleDVDAll}">
+                                	<i style="color:#54698d !important;" class="fa fa-play" aria-hidden="true"></i>&nbsp;&nbsp;RunALL</ui:button>
+                            </aura:if> 
+                            
+                            <ui:button class="slds-button slds-button--neutral" press="{!c.confirmDVDRecordDelete}">
+                                <i style="color:#54698d !important;" class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Delete</ui:button>
+                            
+                            <ui:button class="slds-button slds-button--neutral" press="{!c.uploadVehicle}" > 
+                                <i style="color:#54698d !important;" class="fa fa-upload" aria-hidden="true"></i>&nbsp;&nbsp;Upload Vehicles</ui:button>
+                            
+                            <ui:button class="slds-button slds-button--neutral"  press="{!c.export}" aura:id="Vehicles Export">
+                                <i style="color:#54698d !important;" class="fa fa-download" aria-hidden="true"></i>&nbsp;&nbsp;Export Results</ui:button>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="clear:both;"></div>
+                 <aura:if isTrue="{!v.vehicleCount > 49999}"> 
+                
+                <div class="slds-text-align_left slds-text-color_error">
+                         Only 49,999 are displayed out of {!v.vehicleCount}	</div>
+                </aura:if> 
+                
+                <div aura:id="vehicles-tab-scoped-1" id="vehicles-tab-scoped-1" class="slds-tabs--scoped__content slds-show vehiclesTabScope" role="tabpanel" aria-labelledby="tab-scoped-1__item">
+                    
+                    <div class="slds-grid slds-grid--vertical">
+                        <div class="slds-grow">
+                            
+                            <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered slds-no-row-hover" style="background-color: #003577;">
+                                <thead style="{!v.dvdVehiclesList.length >= 12 ? 'display:block; width: calc(100% - 17px);background: #003577;' : 'background: #003577;'}">
+                                    <tr class="slds-line-height--reset">
+                                        <th scope="col" style="{!'width:' + v.vehTableColWidth.vehSelect}" title="Select All">
+                                            <span class="slds-align--absolute-center">
+                                                <ui:inputCheckbox aura:id="selectAllVehicles" class="allVehicles" click="{!c.handleSelectAll}"/>
+                                            </span>
+                                        </th>
+                                        <th scope="col" style="{!'width:' + v.vehTableColWidth.plateNumber + 'cursor:pointer;'}" onclick="{!c.sortVehicleColumn}" id="Plate_Number__c">
+                                            <div class="slds-text-title--caps" title="Plate Number">
+                                                <span class="slds-text-align--left tableheader" id="Plate_Number__c">
+                                                    Plate Number
+                                                    <aura:if isTrue="{!v.sortVehicleField=='Plate_Number__c'}">
+                                                        <span>
+                                                            <aura:if isTrue="{!v.sortVehicleAsc}">
+                                                                &#8593;
+                                                                <aura:set attribute="else">
+                                                                    &#8595;
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </span>
+                                                    </aura:if>
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th scope="col" style="{!'width:' + v.vehTableColWidth.plateType + 'cursor:pointer;'}" onclick="{!c.sortVehicleColumn}" id="Plate_Type__c">
+                                            <div class="slds-text-title--caps" title="Plate Type">
+                                                <span class="slds-align--absolute-center tableheader" id="Plate_Type__c">
+                                                    Plate Type
+                                                    <aura:if isTrue="{!v.sortVehicleField=='Plate_Type__c'}">
+                                                        <span>
+                                                            <aura:if isTrue="{!v.sortVehicleAsc}">
+                                                                &#8593;
+                                                                <aura:set attribute="else">
+                                                                    &#8595;
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </span>
+                                                    </aura:if>
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th scope="col" style="{!'width:' + v.vehTableColWidth.vinChasis + 'cursor:pointer;'}" onclick="{!c.sortVehicleColumn}" id="VIN_Number_or_Chassis_Number__c">
+                                            <div class="slds-text-title--caps" title="Last 4 Digits of VIN or Chassis #">
+                                                <span class="slds-align--absolute-center tableheader" id="VIN_Number_or_Chassis_Number__c">
+                                                    Last 4 Digits of VIN or Chassis #
+                                                    <aura:if isTrue="{!v.sortVehicleField=='VIN_Number_or_Chassis_Number__c'}">
+                                                        <span>
+                                                            <aura:if isTrue="{!v.sortVehicleAsc}">
+                                                                &#8593;
+                                                                <aura:set attribute="else">
+                                                                    &#8595;
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </span>
+                                                    </aura:if>
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th scope="col" style="{!'width:' + v.vehTableColWidth.vehicleCheck}">
+                                            <div class="slds-text-title--caps" title="Vehicle Check">
+                                                <span class="slds-align--absolute-center tableheader" id="Vehicle_Check__c">
+                                                    Registration Check
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <aura:if isTrue="{!v.taxiLicenceCheck}">
+                                            <th scope="col" style="{!'width:' + v.vehTableColWidth.taxilicCheck}">
+                                                <div class="slds-text-title--caps" title="Taxi Licence Status">
+                                                    <span class="slds-align--absolute-center tableheader" id="Taxi_Licence_Status__c">
+                                                        Taxi Licence Status
+                                                    </span>
+                                                </div>
+                                            </th>
+                                        </aura:if>
+										<th scope="col" style="{!'width:' + v.vehTableColWidth.safetyCheck}">
+											<div class="slds-text-title--caps" title="Safety Check">
+												<span class="slds-align--absolute-center tableheader" id="Last_AIS_Inspection_Date__c">
+													Safety Check
+												</span>
+											</div>
+										</th>
+                                        
+                                        <th scope="col" style="{!'width:' + v.vehTableColWidth.dvdStatus + 'cursor:pointer;'}" onclick="{!c.sortVehicleColumn}" id="Last_DVD_Check_date__c">
+                                            <div class="slds-text-title--caps" title="Checked Date">
+                                                <span class="slds-align--absolute-center tableheader" id="Last_DVD_Check_date__c">
+                                                    Checked Date
+                                                    <aura:if isTrue="{!v.sortVehicleField=='Last_DVD_Check_date__c'}">
+                                                        <span>
+                                                            <aura:if isTrue="{!v.sortVehicleAsc}">
+                                                                &#8593;
+                                                                <aura:set attribute="else">
+                                                                    &#8595;
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </span>
+                                                    </aura:if>
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th scope="col">
+                                            
+                                        </th>
+                                        <th scope="col">
+                                            
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                            <div id="vehicleTableScrollContainer" style="height:400px;overflow-y:auto;overflow-x: hidden;display:block;">
+                                <table id="vehicleTable" class="slds-table slds-table--fixed-layout slds-table--bordered slds-no-row-hover"> 
+                                    <tbody id="vehicleTableBody">
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aura:renderIf>
+        
+        <aura:if isTrue="{!v.currentGrid == 'DVDLogs'}">
+            <c:DVDQueryLogs ShowCriminalCharge ='{!v.ShowCriminalCharge}' ShowLicenceEligibility='{!v.ShowLicenceEligibility}' ShowP2pEligibility='{!v.ShowP2pEligibility}' ShowSeriousDrivingOffences='{!v.ShowSeriousDrivingOffences}' ShowVehicleCheck='{!v.ShowVehicleCheck}' taxiLicenceCheck='{!v.taxiLicenceCheck}'/>
+        </aura:if>
+    </div>
+    
+    <p>{!v.body}</p>
+    
+    <div class="slds-backdrop slds-backdrop--hide" aura:id="backdrop"></div> 
+</aura:component>

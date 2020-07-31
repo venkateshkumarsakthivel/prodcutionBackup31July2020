@@ -1,0 +1,125 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="LevyAssessmentTabController">
+    
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="assessmentRecord" type="Assessment__c" />
+    <aura:attribute name="hadTSP" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="hadBSP" type="Boolean" default="false" access="public"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-show"/>
+    
+    <div class="slds-card__body">
+        <label class="slds-form-element__label">Levy Period</label>
+        <hr style="margin:0px;margin-bottom:5px;"/>
+        
+        <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col" >
+                Period Start
+            </div>
+            <div class="slds-col" >
+                <ui:outputDate class="slds-float_right" value="{!v.assessmentRecord.Period_Start_Date__c}" format="dd-MMM-YYYY"/>
+            </div>
+        </div>
+        
+        <div class="slds-grid" style="padding-left:5%;">
+            <div class="slds-col" >
+                Period End
+            </div>
+            <div class="slds-col" >
+                <ui:outputDate class="slds-float_right" value="{!v.assessmentRecord.Period_End_Date__c}" format="dd-MMM-YYYY"/>
+            </div>
+        </div>
+        
+        <aura:if isTrue="{!or(v.hadTSP, v.hadBSP)}">
+            <br/>
+            <label class="slds-form-element__label">Return Details</label>
+            <hr style="margin:0px;margin-bottom:5px;"/>
+            
+            <aura:if isTrue="{!v.hadBSP}">
+                <div class="slds-grid" style="padding-left:5%;">
+                    <div class="slds-col" >
+                        Booked Services
+                    </div>
+                    <div class="slds-col" >
+                        <ui:outputNumber class="slds-float_right" value="{!v.assessmentRecord.BSP_Transaction_Count__c}"/>
+                    </div>
+                </div>
+            </aura:if>
+            
+            <aura:if isTrue="{!v.hadTSP}">
+                <div class="slds-grid" style="padding-left:5%;">
+                    <div class="slds-col" >
+                        Taxi Services
+                    </div>
+                    <div class="slds-col" >
+                        <ui:outputNumber class="slds-float_right" value="{!v.assessmentRecord.TSP_Transaction_Count__c }"/>
+                    </div>
+                </div>
+            </aura:if>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.assessmentRecord.Total_Levy_Amount__c != undefined}">
+            <br/>
+            <div class="slds-grid">
+                <div class="slds-col" >
+                    <label class="slds-form-element__label">
+                        Assessed Liability
+                    </label>
+                </div>
+                <div class="slds-col" >
+                    <label class="slds-form-element__label slds-float_right" style="margin-right:0px;">
+                        <ui:outputCurrency currencySymbol="$" value="{!v.assessmentRecord.Total_Levy_Amount__c}"/>
+                    </label>
+                </div>
+            </div>
+        </aura:if>
+        
+        <br/>
+        <aura:if isTrue="{!v.assessmentRecord.Assessment_Type__c == 'Assessment'}">
+            <div class="slds-grid">  
+                <div class="slds-col">
+                    <label class="slds-form-element__label">
+                        Assessment Issued
+                    </label>
+                </div>
+                <div class="slds-col">
+                    <label class="slds-form-element__label slds-float_right" style="margin-right:0px;">
+                        <ui:outputDate value="{!v.assessmentRecord.Issue_Date__c}" format="dd-MMM-YYYY"/>
+                    </label>
+                </div>
+            </div>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.assessmentRecord.Assessment_Type__c != 'Assessment'}">
+            <div class="slds-grid">  
+                <div class="slds-col" >
+                    <label class="slds-form-element__label">
+                        Reassessment Issued
+                    </label>
+                </div>
+                <div class="slds-col" >
+                    <label class="slds-form-element__label slds-float_right" style="margin-right:0px;">
+                        <ui:outputDate value="{!v.assessmentRecord.Issue_Date__c}" format="dd-MMM-YYYY"/>
+                    </label>
+                </div>
+            </div>
+        </aura:if>
+        
+        <br/>
+        <div class="slds-grid">
+            <div class="slds-col" >
+                <label class="slds-form-element__label">
+                    Payment Date
+                </label>
+            </div>
+            <div class="slds-col" >
+                <label class="slds-form-element__label slds-float_right" style="margin-right:0px;">
+                    <ui:outputDate value="{!v.assessmentRecord.Payment_Due_Date__c}" format="dd-MMM-YYYY"/>
+                </label>
+            </div>
+        </div>
+        
+    </div>
+</aura:component>

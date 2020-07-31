@@ -1,0 +1,5 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" controller="ASPNotifiableReopenCase" >
+    <aura:handler name="init" action="{!c.init}" value="{!this}" /> 
+    <aura:attribute name="recordId" type="String" /> 
+    <lightning:spinner variant="brand" aura:id="spinner" size="large"></lightning:spinner>
+</aura:component>

@@ -1,0 +1,111 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" access="global" controller="CriminalOffenceInvestigationController">
+    
+    <ltng:require styles="{!$Resource.TaxiLicenceActionStyle}"/>
+    
+    <aura:attribute name="dateValidationError" type="boolean" />
+    <aura:attribute name="accountRecord" type="Object"/>
+    <aura:attribute name="accountError" type="String"/>
+    
+    <aura:attribute name="newCase" type="Object"/>
+    <aura:attribute name="simpleNewCase" type="Object"/>
+    <aura:attribute name="caseError" type="String"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <force:recordData aura:id="recordLoader"
+                      layoutType="COMPACT"
+                      recordId="{!v.recordId}"	
+                      targetFields="{!v.accountRecord}"
+                      targetError="{!v.recordError}"
+                      recordUpdated="{!c.handleRecordUpdated}"/>
+
+    <force:recordData aura:id="caseRecordCreator" 
+                      layoutType="COMPACT"
+                      targetRecord="{!v.newCase}"
+                      targetFields="{!v.simpleNewCase}"
+                      targetError="{!v.caseError}" />
+    
+    
+    <article class="slds-card" id="CriminalOffenceInvestigationInformation">
+        
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#account'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">   
+                        Criminal Charge Investigation Information
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked"> 
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>   
+                
+                <div class="slds-grid">
+                    <div class="slds-col">
+                       <label class="slds-form-element__label">Account Name :  </label>
+                       <lightning:formattedText title="Billing City" value="{!v.accountRecord.Name}" />
+                    </div>
+                    <div class="slds-col"></div>
+                </div> 
+
+               <div class="slds-grid">
+                    <div class="slds-col">
+                       <lightning:input aura:id="caseField" label="Subject" value="{!v.simpleNewCase.Subject}" required="true"/>
+                    </div>
+                    <div class="slds-col">
+                    	<lightning:input aura:id="caseField" label="Charge Code Identifier" value="{!v.simpleNewCase.Charge_Code_Identifier__c}" maxlength="10" required="true" pattern="[A-Za-z0-9\s]*"/>
+					</div>
+                </div>
+                
+                <div class="slds-grid">
+                    <div class="slds-col">
+                       <lightning:textarea aura:id="caseField" value="{!v.simpleNewCase.Description}" class="topText" label="Description" maxlength="300" required="true"/>
+                    </div>
+                    <div class="slds-col">
+                        <lightning:input class="{! v.dateValidationError ? 'slds-has-error' : ''}"
+                                         type="date"
+                                         aura:id="caseField"
+                                         value="{!v.simpleNewCase.Consent_Date__c}"
+                                         name="date"
+                                         onchange="{!c.dateUpdate}"
+                                         label="Consent Date"
+                                         required="true"
+                                         />
+                        <aura:if isTrue="{!v.dateValidationError}">
+                            <div class="slds-text-color_error slds-p-left_x-small">
+                                Date must be  present or past date
+                            </div>
+                        </aura:if> 
+					</div>
+                </div>
+                
+                <div class="slds-grid">
+                    <div class="slds-col"></div>
+                    <div class="slds-col" align = "right">
+                    	<lightning:button aura:id="Submit" iconName="utility:save" class="slds-button slds-button_neutral" type="Submit" name="Submit" label="Submit" onclick="{!c.handleSaveCase}"/>
+                    </div>
+                </div>
+             </div>
+        </div>
+        
+    </article>
+    
+    
+</aura:component>

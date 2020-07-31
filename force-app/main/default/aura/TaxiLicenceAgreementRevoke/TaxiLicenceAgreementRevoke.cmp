@@ -1,0 +1,161 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TaxiLicenceAgreementRevokeController">
+    
+    <!--<ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />-->
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="revokeErrorList" type="String" access="public"/>
+    <aura:attribute name="isSelectAll" type="boolean" default="false"/>
+    <aura:attribute name="options" type="String[]" access="public"/>
+    <aura:attribute name="serviceProvider" type="String" access="public"/>
+    <aura:attribute name="caseNumber" type="String" access="public"/>
+    <aura:attribute name="caseId" type="String" access="public"/>
+    <aura:attribute name="newCaseId" type="String" access="public"/>
+    <aura:attribute name="relatedContactList" type="Related_Contact__c[]" access="public"/>
+    <aura:attribute name="authorisationAgentList" type="Authorisation_Agent__c[]" access="public"/>
+    <aura:attribute name="accountId" type="String" default="" access="public"/>
+    <aura:attribute name="uliUploadStatus" type="Boolean" access="public" default="false"/>
+    <aura:attribute name="identityCheck" type="boolean" access="public" default="false"/>
+    
+    <aura:registerEvent name="loadSection" type="c:TaxiLicenceAgreementRevokeEvent" access="public"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <c:TaxiLicenceAgreementRevokeProgressIndicator currentSection="{!$Label.c.Revoke_Agreements}"/>
+    
+    <article class="slds-card" id="taxiLicenceAgreementRevoke">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/custom-sprite/svg/symbols.svg#custom18'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">   
+                        {!$Label.c.Revoke_Agreements}
+                    </h2>
+                </div>
+            </header>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;" >
+            <div class="slds-form--stacked">
+                
+                <!--<div class="slds-media__body">
+                    <h2 style="font-size: 1.3em;">   
+                        {!$Label.c.Revoke_Agreements_Text }
+                    </h2>
+                </div>-->
+                
+                <div class="slds-grid" style="padding-top:10px;">
+                    <div class="slds-col" style="float:left;padding-right: 10px; ">
+                        <label class="slds-form-element__label">
+                            {!$Label.c.Revoke_Agreements_Text}&nbsp;
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="slds-grid" style="padding-top:10px;">
+                    <div class="slds-col" style="float:left;padding-right: 10px; ">
+                        <ui:inputSelect aura:id="Service-Provider-Input" change="{!c.fetchfilterAuthorisationAgents}">
+                            <aura:iteration items="{!v.options}" var="option">
+                            </aura:iteration>
+                        </ui:inputSelect>
+                        
+                    </div>
+                    <div class="slds-col" style="float:left;padding-right: 10px; ">
+                    </div>
+                    <div class="slds-col" style="float:left;padding-right: 10px; ">
+                    </div>
+                    <div class="slds-col" style="float:left;padding-right: 10px; ">
+                    </div>
+                </div>
+                
+                <div class="slds-grid" style="padding-top:10px;">
+                    <div class="slds-col" style="float:left;padding-right: 10px; ">
+                        <ui:inputText aura:id="CaseNumber" class="slds-input" value="{!v.caseNumber}" placeholder="Enter ICC Case Number"/> 
+                    </div>
+                    <div class="slds-col" style="float:left;padding-right: 10px; padding-top: 7px;">
+                        <label class="slds-form-element__label">
+                            {!$Label.c.Revoke_Agreements_Text_2}&nbsp;
+                        </label>
+                    </div>
+                    <div class="slds-col" style="float:left;padding-right: 10px; ">
+                    </div>
+                    <div class="slds-col" style="float:left;padding-right: 10px; ">
+                    </div>
+                    <div class="slds-col" style="float:left;padding-right: 10px; ">
+                    </div>
+                </div>
+                
+                <div class="slds-grid" style="padding-top:10px;">
+                    <div class="slds-col" style="float:left;padding-right: 10px; ">
+                    </div>
+                </div>
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;padding-top:10px;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!v.revokeErrorList}
+                    </span>
+                </div>
+                
+                <div class="slds-grid" style="padding-top:10px;">
+                    <div class="slds-col" style="float:left;padding-right: 10px; ">
+                    </div>
+                </div>
+                
+                <!--Table Part--> 
+                <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered slds-table--striped slds-no-row-hover" style="background-color: #eef1f6;">
+                    <thead style="background: #003577;">
+                        <tr class="slds-line-height--reset">
+                            <th aria-label="Select ChechkBox" class="tabCol" scope="col" style="width:10%">
+                                <ui:inputCheckbox aura:id="SelectAll" class="slds-form-element__label tableheader" value="{!v.isSelectAll}" change="{!c.handleSelectAll}"/>
+                            </th>
+                            <th aria-label="Taxi Licence" class="tabCol" scope="col" style="width:10%">
+                                <label class="slds-form-element__label tableheader">{!$Label.c.Taxi_Licence}</label>
+                            </th>
+                            <th aria-label="Plate Number" class="tabCol" scope="col" style="width:10%">
+                                <label class="slds-form-element__label tableheader">{!$Label.c.Plate_Number}</label>
+                            </th>
+                            <th aria-label="Agreement Type" class="tabCol" scope="col" style="width:10%">
+                                <label class="slds-form-element__label tableheader">{!$Label.c.Agreement_Type}</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.authorisationAgentList}" var="authorisationAgentRecord" indexVar="index">
+                            <tr class="slds-line-height--reset">
+                                <td role="gridcell" class="tabCol">
+                                  <ui:inputCheckBox aura:id="IsSelected" class="slds-output" value="{!authorisationAgentRecord.isSelectedForRevokeAgreement__c}"/>
+                               </td>
+                                <td role="gridcell" class="tabCol">
+                                    <ui:outputText aura:id="AuthorisationName" class="slds-output" value="{!authorisationAgentRecord.Authorisation__r.Name}"/>
+                                </td>
+                                <td role="gridcell" class="tabCol">
+                                    <ui:outputText aura:id="PlateNumber" class="slds-output" value="{!authorisationAgentRecord.Authorisation__r.Plate_Number__c}"/>
+                                </td>
+                                <td role="gridcell" class="tabCol">
+                                    <ui:outputText aura:id="AgreementType" class="slds-output" value="{!authorisationAgentRecord.Agreement_Type__c}"/>
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+        <div class="slds-card__footer">
+            
+            <ui:button class="slds-button slds-button--neutral" press="{!c.continueFuntion}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+            </ui:button>
+            
+        </div>
+        
+    </article>
+</aura:component>

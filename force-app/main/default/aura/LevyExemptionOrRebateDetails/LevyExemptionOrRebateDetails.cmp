@@ -1,0 +1,248 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <aura:attribute name="registrationId" type="String" default="" access="public"/>
+    <aura:attribute name="accountId" type="String" default="" access="public"/>
+    
+    <aura:attribute name="registrationRecord" type="Tax_Payer_Registration__c" default="" access="public"/>
+    
+    <aura:attribute name="readOnly" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="supportingDocumentsUploadStatus" type="Boolean" default="false" access="public"/>
+    
+    <aura:registerEvent name="loadSection" type="c:LevyFormSectionEvent"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:if isTrue="{!not(v.readOnly)}">
+        <c:LevyFormSectionProgressIndicator currentSection="{!$Label.c.Levy_Exemption_or_Rebate}"/>
+        <br/>
+    </aura:if>
+    
+    <article class="slds-card" id="levyExemptionRebateDetails">
+        
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/custom-sprite/svg/symbols.svg#custom17'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">   
+                        {!$Label.c.Levy_Exemption_or_Rebate}
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!v.readOnly}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <aura:if isTrue="{!v.registrationRecord.Annual_Trip_Estimate__c == $Label.c.Levy_Trip_Estimate_Less_Than_150_Value}">
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">  
+                            
+                            <h2 style="font-size: 18px;font-weight:bold;">   
+                                {!$Label.c.Levy_Exemption_Section_Title}
+                            </h2>
+                            
+                            <p>
+                                <aura:unescapedHtml value="{!$Label.c.Levy_Exemption_Section_Description}"/>
+                            </p>
+                            
+                        </div>    
+                    </div>
+                    
+                    <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                        <span style="color: #ffffff;">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                        </span>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        
+                        <div class="slds-col">
+                            <div style="display:inline">
+                                <legend class="slds-form-element__label">{!$Label.c.Levy_Seeking_To_Apply_For_Exemption}&nbsp;<span class="requiredField">*</span></legend>
+                                <div class="radiobuttonClass">
+                                    <ui:inputRadio disabled="{!v.readOnly}" aura:id="exemptionR0" change="{!c.toggleExemptionNotes}" name="applyForExemption" label="" value="{!v.registrationRecord.Applied_For_Exemption__c == 'Yes' ? true : false}"/> Yes &nbsp;&nbsp;&nbsp;
+                                    <ui:inputRadio disabled="{!v.readOnly}" aura:id="exemptionR1" change="{!c.toggleExemptionNotes}" name="applyForExemption" label="" value="{!v.registrationRecord.Applied_For_Exemption__c == 'No' ? true : false}"/> No
+                                    <br/>
+                                    <span id="applyForExemptionError" class="customErrorMsg"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-col">
+                        </div>
+                    </div>
+                    
+                    <aura:if isTrue="{!v.registrationRecord.Applied_For_Exemption__c == 'Yes'}">
+                        <div class="slds-grid" style="padding-left: 2%;width:100%;">
+                            <div style="width: 80% !important;">
+                                <legend class="slds-form-element__label">{!$Label.c.Levy_Exemption_Notes}&nbsp;<span class="requiredField">*</span></legend>
+                                <ui:inputTextarea disabled="{!v.readOnly}" aura:id="exemptionNotes" maxlength="1000" 
+                                                  value="{!v.registrationRecord.Exemption_Comment__c}"/>
+                            </div>
+                            <div style="width: 20% !important;margin-left: 10px;">
+                            </div>
+                        </div>
+                        
+                        <aura:if isTrue="{!v.readOnly == false}">
+                            <div class="slds-grid">
+                                <div class="slds-col" style="padding-bottom: 0%">
+                                    <c:P2POTAttachment category="TPR" uploadStatus="{!v.supportingDocumentsUploadStatus}" uniqueIdentifier="supporting-documents-exemption" FileUploadChecked="{!v.registrationRecord.Exemption_Supporting_Documents_Uploaded__c}" FileCheckLabel="Supporting Documents" aura:id="Supporting-Documents-Upload-Exemption" ParentRecordId="{!v.registrationRecord.Service_Provider_Name__c}" acceptedFileTypes=".pdf"  AllowMultiple="true" section="Exemption" index="1" />
+                                </div></div>
+                        </aura:if>
+                        
+                        <div class="slds-grid">
+                            
+                            <div class="slds-col" style="padding-top: 0%">
+                                <p>
+                                    <legend class="slds-form-element__label">Declaration</legend> 
+                                </p>
+                                <br/>
+                                <p>
+                                    <b><aura:unescapedHtml value="{!$Label.c.Levy_Privacy_Declaration_Paragraph_4}"></aura:unescapedHtml></b>
+                                </p>
+                                <br/>
+                                <div class="slds-form-element">
+                                    <div class="slds-form-element__control">
+                                        
+                                        <ui:inputCheckbox disabled="{!v.readOnly}" aura:id="exemptionDeclarationAcceptanceCheckbox" label="" value="{!v.registrationRecord.Exemption_Rebate_Declaration__c}" class="declarationCheckBox"/><aura:unescapedHtml value="{!$Label.c.Levy_Exemption_Request_Declaration}"></aura:unescapedHtml>
+                                        <span id="declarationAcceptanceError" class="customErrorMsg"></span>
+                                    </div>
+                                </div></div></div>
+                    </aura:if>
+                </aura:if>
+                
+                <aura:if isTrue="{!or(v.registrationRecord.Annual_Trip_Estimate__c == '151 to 400', v.registrationRecord.Annual_Trip_Estimate__c == '401 to 600')}">
+                    
+                    <div class="slds-grid">
+                        
+                        <div class="slds-col">  
+                            
+                            <h2 style="font-size: 18px;font-weight:bold;">   
+                                {!$Label.c.Levy_Rebate_Section_Title}
+                            </h2>
+                            
+                            <p>
+                                <aura:unescapedHtml value="{!$Label.c.Levy_Rebate_Section_Description}"/>
+                            </p>
+                            
+                        </div>
+                        
+                    </div>
+                    
+                    <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                        <span style="color: #ffffff;">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                        </span>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        
+                        <div class="slds-col">
+                            <div style="display:inline">
+                                <legend class="slds-form-element__label">{!$Label.c.Levy_Seeking_To_Apply_For_Rebate}&nbsp;<span class="requiredField">*</span></legend>
+                                <div class="radiobuttonClass">
+                                    <ui:inputRadio disabled="{!v.readOnly}" aura:id="rebateR0" change="{!c.toggleRebateNotes}" name="applyForRebate" label="" value="{!v.registrationRecord.Applied_For_Rebate__c == 'Yes' ? true : false}"/> Yes &nbsp;&nbsp;&nbsp;
+                                    <ui:inputRadio disabled="{!v.readOnly}" aura:id="rebateR1" change="{!c.toggleRebateNotes}" name="applyForRebate" label="" value="{!v.registrationRecord.Applied_For_Rebate__c == 'No' ? true : false}"/> No
+                                    <br/>
+                                    <span id="applyForRebateError" class="customErrorMsg"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-col">
+                        </div>
+                    </div>
+                    
+                    <aura:if isTrue="{!v.registrationRecord.Applied_For_Rebate__c == 'Yes'}">
+                        <div class="slds-grid" style="padding-left: 2%;width:100%;">
+                            <div style="width: 80% !important;">
+                                <legend class="slds-form-element__label">{!$Label.c.Levy_Rebate_Notes}&nbsp;<span class="requiredField">*</span></legend>
+                                <ui:inputTextarea disabled="{!v.readOnly}" aura:id="rebateNotes" maxlength="1000" 
+                                                  value="{!v.registrationRecord.Rebate_Comment__c}"/>
+                            </div>
+                            <div style="width: 20% !important;margin-left: 10px;">
+                            </div>
+                        </div>
+                        
+                        <aura:if isTrue="{!v.readOnly == false}">
+                            <div class="slds-grid">
+                                <div class="slds-col" style="padding-bottom: 0%">
+                                    <c:P2POTAttachment category="TPR" uploadStatus="{!v.supportingDocumentsUploadStatus}" uniqueIdentifier="supporting-documents-rebate" FileUploadChecked="{!v.registrationRecord.Rebate_Supporting_Documents_Uploaded__c}" FileCheckLabel="Supporting Documents" aura:id="Supporting-Documents-Upload-Rebate" ParentRecordId="{!v.registrationRecord.Service_Provider_Name__c}" acceptedFileTypes=".pdf"  AllowMultiple="true" section="Rebate" index="1" />
+                                </div>
+                            </div>
+                        </aura:if>
+                        
+                        <div class="slds-grid">
+                            
+                            <div class="slds-col" style="padding-top: 0%">
+                                <p>
+                                    <legend class="slds-form-element__label">Declaration</legend>
+                                </p>
+                                <br/>
+                                <p>
+                                    <b><aura:unescapedHtml value="{!$Label.c.Levy_Privacy_Declaration_Paragraph_4}"></aura:unescapedHtml></b>
+                                </p>
+                                <br/>
+                                <div class="slds-form-element">
+                                    <div class="slds-form-element__control">
+                                        
+                                        <ui:inputCheckbox disabled="{!v.readOnly}" aura:id="rebateDeclarationAcceptanceCheckbox" label="" value="{!v.registrationRecord.Exemption_Rebate_Declaration__c}" class="declarationCheckBox"/><aura:unescapedHtml value="{!$Label.c.Levy_Rebate_Declaration_Request}"></aura:unescapedHtml>
+                                        <span id="declarationAcceptanceError" class="customErrorMsg"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aura:if>
+                </aura:if>
+                
+                <aura:if isTrue="{!v.registrationRecord.Annual_Trip_Estimate__c == 'Over 600'}">
+                    
+                    <p>
+                        <aura:unescapedHtml value="{!$Label.c.Levy_No_Rebate_Exemption}"></aura:unescapedHtml>
+                    </p>
+                </aura:if>
+                
+            </div>
+        </div>
+        
+        <div class="slds-card__footer">
+            
+            <aura:if isTrue="{!not(v.readOnly)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+        </div>
+        
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

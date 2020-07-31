@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION" description="Get the COmpany Name for ACN" access="global">
+     <aura:attribute name="companyName" type="string" default="" access="global"/>
+     <aura:attribute name="abn" type="string" default="" access="global"/>
+    <aura:attribute name="uniqueIdentifier" type="string" default="" access="global"/>
+</aura:event>

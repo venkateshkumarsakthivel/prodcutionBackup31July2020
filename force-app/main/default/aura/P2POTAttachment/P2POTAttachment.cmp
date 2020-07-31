@@ -1,0 +1,99 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes"
+	access="global" controller="P2POTAttachmentController">
+	<lightning:spinner aura:id="spinner" variant="brand" size="large"
+		class="slds-hide" />
+	<ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+
+    <aura:attribute name="bypassUserTypeCheck" type="Boolean" default="false" />
+    <aura:attribute name="isInternalUser" type="Boolean" default="false" />
+	<aura:handler name="init" value="{!this}" action="{!c.initialize}" />
+	<aura:attribute name="index" type="Integer" />
+    <aura:attribute name="attachId" type="String" access="public"/>
+    <aura:attribute name="uniqueIdentifier" type="String" access="public" default="attachment"/>
+	<aura:attribute name="upload" type="Boolean" />
+	<aura:attribute name="severity" type="String" default="info" />
+    <aura:attribute name="uploadStatus" type="Boolean" default="false" access="public"/>
+
+	<aura:attribute name="section" type="String" default="" />
+	<aura:attribute name="category" type="String" default="POI" />
+	<aura:attribute name="type" type="String" default="PT" />
+	<aura:attribute name="typeOptionsCategorywise" type="Map" />
+
+	<aura:attribute name="acceptedFileTypes" type="String" default="" />
+	<aura:attribute name="ParentRecordId" type="String" default="" />
+	<aura:attribute name="displayAttachmentHeader" type="Boolean"
+		default="true" />
+	<aura:attribute name="FileInputLabel" type="String"
+		default="Attach copies of supporting documents" access="global" />
+	<aura:attribute name="FileCheckLabel" type="String"
+		default="Proof of identity documents" />
+	<aura:attribute name="UniqueClass" type="String" default="" />
+
+	<aura:attribute name="FileUploadChecked" type="Boolean" default="false" />
+	<aura:attribute name="AllowMultiple" type="Boolean" default="false" />
+    <aura:attribute name="maxNumberOfAttachments" type="Integer" default="0" access="public" 
+                    	description="Max number of attachments to be supported. Default to 0 if no such limit needs to be applied"/>
+    <aura:attribute name="allowMoreAttachments" access="private" type="Boolean" default="true" 
+                    	description="Flag to check if more attachments are allowed to be uploaded"/>
+    <aura:attribute name="isRequired" type="Boolean" default="true" access="public"/>
+    
+	<aura:method name="setValidationError" action="{!c.displayUploadCheckError}" access="global" />
+	<aura:method name="resetValidationError" action="{!c.resetUploadCheckError}" access="global" />
+    
+	<div class="slds-grid slds-hide">
+		<div class="slds-col ">
+			<ui:inputText disabled="false" aura:id="NAME_PREFIX_SECTION"
+				label="Section" value="{!v.section}" class="attachment_inputs" />
+		</div>
+		<div class="slds-col">
+			<legend class="slds-form-element__legend slds-form-element__label">Category</legend>
+			<ui:inputSelect class="single" aura:id="NAME_PREFIX_CATEGORY"
+				change="{!c.populateTypeOptions}" />
+		</div>
+		<div class="slds-col">
+			<legend class="slds-form-element__legend slds-form-element__label">Type</legend>
+			<ui:inputSelect class="single" aura:id="NAME_PREFIX_TYPE">
+			</ui:inputSelect>
+		</div>
+	</div>
+
+	<aura:if isTrue="{!v.displayAttachmentHeader}">
+        <label class="slds-form-element__label"> {!v.FileInputLabel} <br/>
+            <aura:unescapedHtml value="{!$Label.c.Upload_Attachment_Warning}" />
+            
+        </label>
+	</aura:if>
+
+	<br />
+	<br />
+	<div class="slds-form-element__control">
+		<ui:inputCheckbox class="customCheckBox" disabled="{!v.readOnly}"
+			aura:id="b0" label="" value="{!v.FileUploadChecked}" />
+        &nbsp;<aura:unescapedHtml value="{!v.FileCheckLabel}"/> 
+        <aura:if isTrue="{!v.isRequired}">
+            &nbsp;<span class="requiredField">*</span>
+        </aura:if>
+        <br /> <span
+			id="{!v.FileCheckLabel+v.UniqueClass+'Error'}" class="customErrorMsg"></span>
+	</div>
+
+	<div class="slds-grid">
+        <!--
+		<div class="slds-col slds-hide">
+			<lightning:input type="file" label=""
+				aura:id="DOCUMENT_ATTACHMENT_COMPONENT" name="file" multiple="true"
+				onchange="{!c.attach}" isLoading="true" />
+		</div>
+        -->
+        
+		<div class="slds-col" style="padding: 0 0 0 2%;">
+           <aura:if  isTrue="{!v.allowMoreAttachments}">
+                <iframe class="slds-p-around_no" id="{!v.uniqueIdentifier}"
+                    src="{!$Label.c.BASE_VF_URL + '?isInternalUser='+ v.isInternalUser +'&amp;parent=' + v.ParentRecordId + '&amp;section=' + v.section + '&amp;category=' + v.category + '&amp;type=' + v.type + '&amp;identifier=' + v.uniqueIdentifier}"
+                    height="100" width="100%" style="border: 0;"
+                    allowtransparency="true" />
+            </aura:if>
+		</div>
+	</div>
+
+</aura:component>

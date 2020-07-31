@@ -1,0 +1,217 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <aura:attribute name="caseId" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="directorPOIUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="applicantAppointmentUploadStatus" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="applicantAppointmentCheck" type="Boolean" default="false" />
+    
+    <aura:attribute name="directorCompanyExtractUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="directorNationalPoliceUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="directorCriminalHistoryUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="directorEndorsementUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    
+    <aura:attribute name="index" type="Integer" />
+    <aura:attribute name="directorIndex" type="String" />
+    
+    <aura:attribute name="nominatedDirectorActionInput" type="boolean" />
+    
+    <aura:attribute name="residentialUnitType" type="String" default=""/>
+    <aura:attribute name="residentialStreet" type="String" />
+    <aura:attribute name="residentialCity" type="String" />
+    <aura:attribute name="residentialState" type="String" />
+    <aura:attribute name="residentialPostalCode" type="String" />
+    <aura:attribute name="residentialCountry" type="String" />
+    
+    <aura:attribute name="phoneNumber" type="string" default="" />
+    <aura:attribute name="emailAddress" type="string" default="" />
+    <aura:attribute name="familyName" type="string" default="" />
+    <aura:attribute name="firstName" type="string" default="" />
+    <aura:attribute name="otherName" type="string" default="" />
+    <aura:attribute name="otherNameDetails" type="string" default=""/>
+    
+    <aura:attribute name="nominatedDirectorLicenceNumber" type="String"/>
+    
+    <aura:attribute name="nominatedDOB" type="string" default="" />
+    <aura:attribute name="nominatedDirectorState" type="string" default="" />
+    <aura:attribute name="nominateDirectorTitle" type="string" default="" />
+    
+    <aura:attribute name="nominatedDirectorRole" type="string" default=""/>
+    <aura:attribute name="applicantCompanyExtractCheck" type="Boolean" default="false"/>
+    <aura:attribute name="applicantIdentityCheck" type="Boolean" default="false"/>
+    <aura:attribute name="applicantNationalPoliceCheck" type="Boolean" default="false"/>
+    <aura:attribute name="applicantCriminalHistoryCheck" type="Boolean" default="false"/>
+    <aura:attribute name="applicantEndorsementCheck" type="Boolean" default="false"/>
+    <aura:attribute name="displayApplicantCriminalHistoryCheck" type="Boolean" default="false"/>
+    <aura:attribute name="displayEndorsementCheck" type="Boolean" default="false"/>
+    
+    <aura:attribute name="invalidDetails" type="boolean" />
+    <aura:method name="validateData" action="{!c.performBlankInputCheck}" access="PUBLIC"/>
+    
+    <aura:attribute name="hasOneMoreDirectorAbove" type="boolean" default="true" />
+    
+    <aura:if isTrue="{!v.hasOneMoreDirectorAbove}">
+        <hr style="margin:0 20px 0 20px;"></hr>
+    </aura:if>
+    
+    <div class="slds-card__body">
+        <div class="slds-form--stacked">
+            
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <legend class="slds-form-element__legend slds-form-element__label">{!$Label.c.Nominated_Director_Title}</legend>
+                    <ui:inputSelect disabled="{!v.readOnly}" class="single" aura:id="InputSelectTitle" value="{!v.nominateDirectorTitle}">
+                        <ui:inputSelectOption text="" label="Please Select"/>
+                        <ui:inputSelectOption text="Mr." />
+                        <ui:inputSelectOption text="Mrs."/>
+                        <ui:inputSelectOption text="Ms." />
+                        <ui:inputSelectOption text="Miss."/>
+                        <ui:inputSelectOption text="Other"/>
+                    </ui:inputSelect>
+                </div>
+                
+                <div class="slds-col">
+                    <div class="slds-form-element__control">
+                        <c:DateOfBirthComponent isReadOnly="{!v.readOnly}" aura:id="DOB" uniqueIdentifier="{!v.directorIndex + 'DOB'}" 
+                                                fieldLabel="{!$Label.c.Nominated_Director_Birth_date}"
+                                                isRequired="true" DOB="{!v.nominatedDOB}"/> 
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="firstGivenFamilyName">{!$Label.c.Nominated_Director_First_given_name}&nbsp;<span class="requiredField">*</span></label>
+                        <ui:inputText disabled="{!v.readOnly}" value="{!v.firstName}" required="true" maxlength="40" class="slds-input" aura:id="firstGivenFamilyName" />
+                    </div>
+                </div>
+                
+                <div class="slds-col">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="familyName">{!$Label.c.Nominated_Director_Family_name}&nbsp;<span class="requiredField">*</span></label>
+                        <ui:inputText disabled="{!v.readOnly}" value="{!v.familyName}" required="true" maxlength="80" class="slds-input upperCaseInput" aura:id="familyName" />
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="otherGivenFamilyName">{!$Label.c.Nominated_Director_Other_given_name}</label>
+                        <ui:inputText disabled="{!v.readOnly}" value="{!v.otherName}" required="true" maxlength="100" class="slds-input" aura:id="otherGivenFamilyName" />
+                    </div>
+                </div>
+                
+                <div class="slds-col">
+                    <div class="slds-form-element nominatedDirectorHandler">
+                        <label class="slds-form-element__label" for="anotherGivenFamilyName">{!$Label.c.Nominated_Director_Ever_been_known_by_another_name}&nbsp;<span class="requiredField">*</span></label>
+                        <br/>
+                        <ui:inputRadio value="{!if(v.nominatedDirectorActionInput == false, true, false)}"  disabled="{!v.readOnly}" aura:id="no_notminatedDirector" class="nominatedDirectorHandler" name="{!v.directorIndex + 'otherNameGroup'}" label="" change="{!c.otherNameChange}"/>&nbsp;No
+                        &nbsp;&nbsp;
+                        <ui:inputRadio value="{!if(v.nominatedDirectorActionInput == true, true, false)}"  disabled="{!v.readOnly}" aura:id="yes_notminatedDirector" class="nominatedDirectorHandler" name="{!v.directorIndex + 'otherNameGroup'}" label="" change="{!c.otherNameChange}"/>&nbsp;Yes, provide details
+                        <br/>
+                        <span id="{!v.directorIndex + '-notminatedDirectorError'}" class="customErrorMsg"></span>
+                        <br/>
+                        <ui:inputTextarea disabled="{!v.readOnly}" maxlength="1000" aura:id="nominatedDirectorInputDetails" class="toggleDisplay"  value="{!v.otherNameDetails}"/>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <div class="slds-form-element">
+                        <c:DriverLicenceComponent isReadOnly="{!v.readOnly}" aura:id="Driver-Licence-Number-Input" uniqueIdentifier="{!v.directorIndex + '-Driver-Licence-Number-Input'}" 
+                                                  fieldLabel="{!$Label.c.Nominated_Director_Australian_Driver_Licence_Number}"
+                                                  isRequired="true" licence="{!v.nominatedDirectorLicenceNumber}"/>
+                    </div>
+                </div>
+                <div class="slds-col">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label label" for="state">{!$Label.c.Nominated_Director_Australian_Driver_Licence_State}&nbsp;<span class="requiredField">*</span></label>
+                        <ui:inputSelect disabled="{!v.readOnly}" label="" aura:id="state" value="{!v.nominatedDirectorState}" class="slds-input" required="true">
+                            <ui:inputSelectOption text="" label="Please Select"/>
+                            <ui:inputSelectOption text="NSW" label="NSW"/>
+                            <ui:inputSelectOption text="ACT" label="ACT"/>
+                            <ui:inputSelectOption text="VIC" label="VIC"/>
+                            <ui:inputSelectOption text="QLD" label="QLD"/>
+                            <ui:inputSelectOption text="SA" label="SA"/>
+                            <ui:inputSelectOption text="NT" label="NT"/>
+                            <ui:inputSelectOption text="TAS" label="TAS"/>
+                            <ui:inputSelectOption text="WA" label="WA"/>
+                        </ui:inputSelect>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-grid">
+                <div class="slds-col">    
+                    <div class="slds-form-element">
+                        <legend class="slds-form-element__legend slds-form-element__label">{!$Label.c.Nominated_Director_Residential_Address}&nbsp;<span class="requiredField">*</span></legend>
+                        <c:AddressInputComponent reviewReadOnly="{!v.readOnly}" aura:id="Residential-Address-Input" unitType="{!v.residentialUnitType}" street="{!v.residentialStreet}"
+                                                 city="{!v.residentialCity}" state="{!v.residentialState}"
+                                                 postalcode="{!v.residentialPostalCode}" country="{!v.residentialCountry}"
+                                                 addressType="{!v.directorIndex + '_NominatedDirector_Residential_Address'}" 
+                                                 fullStreet="{!v.residentialStreet}"/>
+                        
+                    </div>
+                </div>
+                <div class="slds-col">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label label" for="applicantState"><aura:unescapedHtml value="{!$Label.c.Nominated_Director_Role}"/>&nbsp;<span class="requiredField">*</span></label>
+                        <ui:inputSelect disabled="{!v.readOnly}" label="" aura:id="nominatedDirectorRole" value="{!v.nominatedDirectorRole}" class="slds-input" required="true" change="{!c.roleChange}">
+                            <ui:inputSelectOption text="" label="Please Select"/>
+                            <ui:inputSelectOption text="Company Secretary" label="Company Secretary"/>
+                            <ui:inputSelectOption text="Director" label="Director"/>
+                            <ui:inputSelectOption text="Manager" label="Manager"/>
+                        </ui:inputSelect>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <div class="slds-form-element">
+                        <c:EmailAddressComponent isReadOnly="{!v.readOnly}" aura:id="emailAddress" uniqueIdentifier="{!v.directorIndex + '-emailAddress'}" 
+                                                 fieldLabel="{!$Label.c.Nominated_Director_Email}" isRequired="true" email="{!v.emailAddress}"/>
+                    </div>
+                </div>
+                <div class="slds-col">
+                    <div class="slds-form-element">
+                        <c:PhoneComponent isReadOnly="{!v.readOnly}" aura:id="phoneNumber" uniqueIdentifier="{!v.directorIndex + '-phoneNumber'}" fieldLabel="{!$Label.c.Nominated_Director_Daytime_phone_number}" isRequired="true" phoneNumber="{!v.phoneNumber}" />
+                    </div>
+                </div>
+            </div>
+            
+            <aura:if isTrue="{!v.readOnly == false}">
+                <div class="slds-grid">
+                    <div class="slds-col-left">
+                        <c:P2POTAttachment category="POI" uploadStatus="{!v.directorPOIUploadStatus}" uniqueIdentifier="{!'director-poi'+v.index}" section="{!'ND'+v.index}" FileUploadChecked="{!v.applicantIdentityCheck}" FileCheckLabel="Proof of identity" UniqueClass="{!v.directorIndex}" aura:id="Applicant-Identity-Document-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of your supporting documents" AllowMultiple="true" />
+                    </div>
+                    <div class="slds-col-left">
+                        <c:P2POTAttachment category="NPC" uploadStatus="{!v.directorNationalPoliceUploadStatus}" uniqueIdentifier="{!'director-national-police'+v.index}" section="{!'ND'+v.index}" FileUploadChecked="{!v.applicantNationalPoliceCheck}" FileCheckLabel="National Police Check" UniqueClass="{!v.directorIndex}" aura:id="Applicant-Police-Check-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="" AllowMultiple="true" />
+                        <!--<c:P2POTAttachment uploadStatus="{!v.directorCompanyExtractUploadStatus}" uniqueIdentifier="{!'director-company-extract'+v.index}" section="{!'ND'+v.index}" FileUploadChecked="{!v.applicantCompanyExtractCheck}" FileCheckLabel="Copy of the corporation’s company extract" UniqueClass="{!v.directorIndex}" aura:id="Applicant-Company-Extract-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of your proof of identity document" AllowMultiple="true" index="2" />-->
+                    </div>
+                </div>
+            </aura:if>
+            
+            <aura:if isTrue="{!v.readOnly == false}">
+                <div class="slds-grid">
+                    <div class="slds-col-left">
+                       	<c:P2POTAttachment category="AAC" uploadStatus="{!v.applicantAppointmentUploadStatus}" uniqueIdentifier="{!'director-appointment'+v.index}" section="{!'ND'+v.index}" FileUploadChecked="{!v.applicantAppointmentCheck}" FileCheckLabel="{!$Label.c.Director_Manager_appointment_letter_label}" UniqueClass="{!v.directorIndex}" aura:id="Appointment-of-Director-Manager" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="" AllowMultiple="true" />
+                          
+                    </div>
+                    <div class="slds-col-left">
+                        <aura:if isTrue="{!v.displayEndorsementCheck}">
+                            <c:P2POTAttachment category="ECL" uploadStatus="{!v.directorEndorsementUploadStatus}" uniqueIdentifier="{!'director-endorsement'+v.index}" section="{!'ND'+v.index}" FileUploadChecked="{!v.applicantEndorsementCheck}" UniqueClass="{!v.directorIndex}" FileCheckLabel="Copy of endorsement by Director or Company Secretary nominating the manager on Company letterhead" aura:id="Applicant-Endorsement-Check-Upload" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="" AllowMultiple="true" index="2" />
+                        </aura:if>
+                    </div>
+                    
+                </div>
+            </aura:if>
+            
+        </div>
+    </div>
+</aura:component>

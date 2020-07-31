@@ -1,0 +1,23 @@
+<!-- Lightning quick action which on parent case which submits all child cases in lodged/assessment in progess -->
+
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" access="global" controller="SubmitCasesForApproval">
+	
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="returnMessage" type="String" default = "-"/>
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-show"/>
+    
+    <br/> 
+    <div aura:id="submittedCasesList" class="slds-notify slds-notify--alert slds-theme_success slds-theme--alert-texture toggle" role="alert">
+        <span style="color: #ffffff;font-weight: bold;">
+            <i class="fa fa-check" aria-hidden="true"></i>
+            &nbsp;Criminal Charge cases submitted for approval: {!v.returnMessage}.
+        </span>
+    </div>
+    
+    <div aura:id="onBehalfError" class="slds-notify slds-notify--alert slds-theme_error slds-theme--alert-texture toggle" role="alert">
+        <span style="color: #ffffff;font-weight: bold;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            &nbsp;{!v.returnMessage}
+        </span>
+    </div>
+</aura:component>

@@ -1,0 +1,242 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="LevyFormSectionDataController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <aura:attribute name="registrationId" type="String" default="" access="public"/>
+    <aura:attribute name="accountId" type="String" default="" access="public"/>
+    <aura:attribute name="ddrServiceAgreement" type="String" default="" access="public"/>
+    <aura:attribute name="invocationContext" type="String" default="RegistrationForm" access="public"/>
+    
+    <aura:attribute name="registrationRecord" type="Tax_Payer_Registration__c" default="" access="public"/>
+    
+    <aura:attribute name="readOnly" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="isPortalUser" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="displayreadOnly" type="Boolean" default="false" access="public"/>
+    <aura:registerEvent name="loadSection" type="c:LevyFormSectionEvent"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:if isTrue="{!and(not(v.readOnly), v.invocationContext == 'RegistrationForm')}">
+        <c:LevyFormSectionProgressIndicator currentSection="{!$Label.c.Levy_Banking_Details}"/>
+        <br/>
+    </aura:if>
+    
+    <article class="slds-card" id="levyFormBankingDetails">
+        
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/custom-sprite/svg/symbols.svg#custom17'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">   
+                        {!$Label.c.Levy_Banking_Details}
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!v.readOnly}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <aura:if isTrue="{!or(v.registrationRecord.Applied_For_Exemption__c != 'Yes', v.registrationRecord.Annual_Trip_Estimate__c == 'Over 600')}">
+                    
+                    <div class="slds-grid">
+                        
+                        <div style="padding-left:1%;">
+                            
+                            <h2 style="font-size: 18px;font-weight:bold;">   
+                                {!$Label.c.Levy_Banking_Details_Section_Title}
+                            </h2>
+                            
+                            <p>
+                              <aura:if isTrue="{!v.isPortalUser}">  
+                                <aura:unescapedHtml value="{!$Label.c.Levy_Banking_Details_Section_Description_Portal}"/>
+                              </aura:if>
+                              <aura:if isTrue="{!not(v.isPortalUser)}">  
+                                <aura:unescapedHtml value="{!$Label.c.Levy_Banking_Details_Section_Description}"/>
+                              </aura:if>
+                            </p>
+                            
+                        </div>
+                        
+                    </div>
+                    
+                    <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                        <span style="color: #ffffff;">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                        </span>
+                    </div>
+                    
+                    <div class="slds-grid" style="width:60%;">
+                        
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">
+                                {!$Label.c.Levy_Bank_Account_Holder_Name}&nbsp;<span class="requiredField">*</span>
+                            </label>
+                        </div>
+                        
+                        <div class="slds-col">
+                            <ui:inputText blur="{!c.validateAccountHolderName}" disabled="{!v.displayreadOnly}" maxlength="32" aura:id="Bank-Account-Holder-Name-Input" class="CamelCaseInput slds-input" value="{!v.registrationRecord.Bank_Account_Holder_s_Name__c}"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid" style="width:60%;">
+                        
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">
+                                {!$Label.c.Levy_Name_of_Financial_Institution}&nbsp;<span class="requiredField">*</span>
+                            </label>
+                        </div>
+                        
+                        <div class="slds-col">
+                            <ui:inputText disabled="{!v.displayreadOnly}" maxlength="255" aura:id="Name-Of-Financial-Institution_Input" class="CamelCaseInput slds-input" value="{!v.registrationRecord.Financial_Institution_Name__c}"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid" style="width:60%;">
+                        
+                        <c:BSBNumberComponent bsbNumber="{!v.registrationRecord.BSB__c}" 
+                                              bankName="{!v.registrationRecord.Bank_Name__c}" 
+                                              bankSuburb="{!v.registrationRecord.Bank_Suburb__c}"
+                                              isRequired="true"
+                                              isReadOnly="{!v.readOnly}"                                            
+                                              uniqueIdentifier="BSB-Input"
+                                              fieldLabel="{!$Label.c.Levy_BSB_Number}"
+                                              isHorizontalLayout="true"
+                                              isPortalUser="{!v.isPortalUser}"
+                                              aura:id="BSB-Input">
+                        </c:BSBNumberComponent>
+                        
+                    </div>
+                    
+                    <div class="slds-grid" style="width:60%;">
+                        
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">
+                                {!$Label.c.Levy_Bank_Name}
+                            </label>
+                        </div>
+                        
+                        <div class="slds-col">
+                            <ui:inputText disabled="true" maxlength="255" aura:id="Bank-Name-Input" class="CamelCaseInput slds-input" value="{!v.registrationRecord.Bank_Name__c}"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid" style="width:60%;">
+                        
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">
+                                {!$Label.c.Levy_Bank_Suburb}
+                            </label>
+                        </div>
+                        
+                        <div class="slds-col">
+                            <ui:inputText disabled="true" maxlength="255" aura:id="Bank-Suburb-Input" class="CamelCaseInput slds-input" value="{!v.registrationRecord.Bank_Suburb__c}"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid" style="width:60%;">
+                        
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">
+                                {!$Label.c.Levy_Account_Number}&nbsp;<span class="requiredField">*</span>
+                            </label>
+                        </div>
+                        
+                        <div class="slds-col">
+                            <ui:inputText updateOn="keyup" paste="{!c.validateAccountNumber}" blur="{!c.validateAccountNumber}" disabled="{!v.displayreadOnly}" maxlength="11" aura:id="Account-Number-Input" class="slds-input" value="{!v.registrationRecord.Bank_Account_Number__c}"/>
+                        </div>
+                    </div>
+                    
+                    <br/>
+                    
+                    <div class="slds-grid" style="font-size:14px;font-weight:bold;">
+                        Direct Debit Service Agreement
+                    </div>
+                    
+                    <div class="slds-grid" style="border: rgb(79, 129, 189);border-width: 1px;border-style: solid;height: 110px;overflow-y:scroll;border">
+                        
+                        <p class="ddrAgreementBox" style="padding: 1%;">
+                            
+                            <aura:unescapedHtml value="{!v.ddrServiceAgreement}"></aura:unescapedHtml>
+                        </p>
+                    </div>
+                    
+                    <br/>
+                    
+                    <div class="slds-grid" style="font-size:14px;font-weight:bold;">
+                        Declaration&nbsp;<span class="requiredField">*</span>
+                    </div>
+                    
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            
+                            <table> 
+                                <tr>
+                                    <td style="vertical-align: text-top;">
+                                        <ui:inputCheckbox disabled="{!v.readOnly}" aura:id="agreementAcceptanceCheckbox" label="" value="{!v.registrationRecord.Direct_Debit_Declaration__c}" class="privacyCheckBox"/>
+                                    </td>
+                                    <td>
+                                        <aura:unescapedHtml value="{!$Label.c.Levy_Banking_Details_Declaration}"></aura:unescapedHtml>
+                                        <span id="agreementAcceptanceError" class="customErrorMsg"></span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                </aura:if>
+                
+                <aura:if isTrue="{!v.registrationRecord.Applied_For_Exemption__c == 'Yes'}">
+                    
+                    <p>
+                        <aura:unescapedHtml value="{!$Label.c.Levy_Banking_Details_Not_Required}"></aura:unescapedHtml>
+                    </p>
+                </aura:if>
+                
+            </div>
+        </div>
+        <div class="slds-card__footer">
+            
+            <aura:if isTrue="{!and(not(v.readOnly), v.invocationContext == 'RegistrationForm')}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+            <aura:if isTrue="{!and(not(v.readOnly), v.invocationContext == 'RegistrationTab')}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelRegisterationUpdate}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                </ui:button>
+            </aura:if>
+            
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

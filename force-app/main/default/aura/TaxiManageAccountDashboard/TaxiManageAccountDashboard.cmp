@@ -1,0 +1,47 @@
+<aura:component >
+    
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="currentGrid" type="String"/>
+    <aura:handler event="c:TaxiManageAccountNavigationEvent" action="{!c.renderComponentHandler}"/>
+    <aura:handler name="refreshContactEvent" event="c:RefreshContactsEvent" action="{!c.refreshContacts}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <!--<lightning:spinner aura:id="spinner" variant="brand" size="large" />-->
+    
+    <div class="slds-col slds-p-around_small container">
+        <aura:if isTrue="{!v.currentGrid == 'Cases'}">
+            <c:TaxiManageAccountCases accountId="{!v.accountId}"/>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.currentGrid == 'CasesActivityRequestTab'}">
+            <c:TaxiManageAccountCases isApplicationTab="true" accountId="{!v.accountId}"/>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.currentGrid == 'Account'}">
+            <c:TaxiManageAccountAccounts accountId="{!v.accountId}"/> 
+        </aura:if>
+        
+        <aura:if isTrue="{!v.currentGrid == 'Contacts'}">
+            <c:TaxiManageAccountContacts accountId="{!v.accountId}"/>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.currentGrid == 'Licences'}">
+            <c:TaxiManageAccountLicences accountId="{!v.accountId}"/>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.currentGrid == 'Partners'}">
+            <c:TaxiManageAccountPartners accountId="{!v.accountId}"/> 
+        </aura:if>
+        
+        <aura:if isTrue="{!v.currentGrid == 'Payments'}">
+            <c:TaxiManageAccountPayments accountId="{!v.accountId}"/>
+        </aura:if>
+        
+    </div>
+    
+    <p>
+        {!v.body}
+    </p>
+    
+    <div class="slds-backdrop slds-backdrop--hide" aura:id="backdrop"></div> 
+</aura:component>

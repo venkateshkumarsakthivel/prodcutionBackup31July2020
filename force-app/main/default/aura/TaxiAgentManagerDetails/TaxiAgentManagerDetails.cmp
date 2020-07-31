@@ -1,0 +1,128 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="TaxiAgentRegistrationDetailsForm">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="poiUploadStatus" type="boolean" default="false" />
+    <aura:attribute name="caseRegistrationRecord" type="Case" access="public" />
+    <aura:attribute name="secondaryRelatedContactRecord" type="Related_Contact__c" default="{}"/>
+    <aura:attribute name="primaryRelatedContactRecord" type="Related_Contact__c" default="{}"/>
+    <aura:attribute name="entityType" type="String" />
+    <aura:attribute name="relatedContactType" type="String" default="TaxiAgentManagerDetails" />
+    
+    <aura:attribute name="dob" type="String" default="{}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" access="public" /> 
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:registerEvent name="loadSection" type="c:TaxiAgentRegistrationSectionEvent" access="public"/>
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <c:TaxiAgentRegistrationProgressIndicator currentSection="{!$Label.c.Taxi_Agent_Manager_Details}" entityType="Corporation"/>
+    <br/>
+    
+    <article class="slds-card" id="taxiAgentManagerFormDetails">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/custom-sprite/svg/symbols.svg#custom18'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">   
+                        {!$Label.c.Taxi_Agent_Manager_Details}
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">              
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>  
+                
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <label class="slds-form-element__label">
+                            {!$Label.c.Taxi_Agent_First_Given_Name}&nbsp;<span class="requiredField">*</span>
+                        </label>
+                        <ui:inputText maxlength="255" aura:id="Taxiagent-ManagerDetails-First-Given-Name-Input" class="CamelCaseInput slds-input" value="{!v.secondaryRelatedContactRecord.First_Given_Name__c}"/>
+                    </div>
+                    <div class="slds-col">
+                        <label class="slds-form-element__label">
+                            {!$Label.c.Taxi_Agent_Family_Name}&nbsp;<span class="requiredField">*</span>
+                        </label>
+                        <ui:inputText maxlength="255" aura:id="Taxiagent-ManagerDetails-Family-Name-Input" class="CamelCaseInput slds-input" value="{!v.secondaryRelatedContactRecord.Family_Name__c}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <label class="slds-form-element__label">
+                            {!$Label.c.Taxi_Agent_Other_Given_Name}
+                        </label>
+                        <ui:inputText maxlength="255" aura:id="Taxiagent-ManagerDetails-Other-Given-Name-Input" class="CamelCaseInput slds-input" value="{!v.secondaryRelatedContactRecord.Other_Given_Name__c}"/>
+                    </div>
+                    <div class="slds-col">
+                        <c:DateOfBirthComponent isReadOnly="{!v.readOnly}" aura:id="Taxi-Agent-ManagerDetails-DOB-Input" uniqueIdentifier="Taxi-agent-DOB-Input" 
+                                                fieldLabel="{!$Label.c.Taxi_Agent_Date_Of_Birth}"
+                                                isRequired="true" DOB="{!v.dob}"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <c:DriverLicenceComponent isReadOnly="{!v.readOnly}" aura:id="Taxiagent-ManagerDetails-Australian-Driver-Lic-Number-Input" uniqueIdentifier="Taxiagent-Australian-Driver-Lic-Number-Input" 
+                                                  fieldLabel="{!$Label.c.Taxi_Agent_Australian_Driver_Lic_Number}"
+                                                  isRequired="false" licence="{!v.secondaryRelatedContactRecord.Australian_Driver_Licence__c}"/>
+                    </div>
+                    <div class="slds-col">
+                        <label class="slds-form-element__label">{!$Label.c.Taxi_Agent_State_of_Issue}</label>                       
+                        <ui:inputSelect aura:id="Taxi-ManagerDetails-Driver-Licence-Number-State-Input" value="{!v.secondaryRelatedContactRecord.Australian_Driver_Licence_State__c}" class="slds-inputselect" >
+                            <ui:inputSelectOption text="" label="Please Select"/>
+                            <ui:inputSelectOption text="NSW"/>
+                            <ui:inputSelectOption text="ACT"/>
+                            <ui:inputSelectOption text="VIC"/>
+                            <ui:inputSelectOption text="QLD"/>
+                            <ui:inputSelectOption text="SA"/>
+                            <ui:inputSelectOption text="NT"/>
+                            <ui:inputSelectOption text="TAS"/>
+                            <ui:inputSelectOption text="WA"/>
+                        </ui:inputSelect>
+                    </div>
+                </div>
+                               
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <c:P2POTAttachment bypassUserTypeCheck="true" isInternalUser="false" category="POI" uploadStatus="{!v.poiUploadStatus}" uniqueIdentifier="applicant-poi" FileUploadChecked="{!v.caseRegistrationRecord.Proof_Of_Identity_Documents__c}" FileCheckLabel="Proof of identity or court appointment documents" aura:id="Identity-Document-Upload" ParentRecordId="{!v.caseRegistrationRecord.Id}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of your proof of identity or court appointment documents." AllowMultiple="false" section="INDIVIDUAL" index="1" />
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        <div class="slds-card__footer">
+            <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+            </ui:button>
+            
+            <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+            </ui:button>
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

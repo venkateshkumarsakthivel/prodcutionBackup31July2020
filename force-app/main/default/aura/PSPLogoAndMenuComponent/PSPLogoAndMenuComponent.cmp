@@ -1,0 +1,41 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,forceCommunity:profileMenuInterface" access="global" controller="LoggedInUserController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}" afterScriptsLoaded="{!c.setupMenu}"/>
+    <aura:attribute name="renderPSPMenu" type="boolean" default="true"/>
+    <aura:attribute name="userName" type="String" default=""/>
+    <aura:attribute name="taxiCommunityMenu" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>     
+    <div style="margin:0 auto;max-width:1024px;">
+        <div class="custom-Header" style="background: white;width: 100%;">
+            <div class="LogoAndSearchP2PTransport" style="display:inline; position:relative;">
+                <a href="/industryportal/s/secure-portal-home?src=homeMenuPSP"  title="Point to Point Transport Commissioner"> 
+                    <img src="{!$Resource.P2P_PortalLogo}" style="max-width:230px;"/>
+                </a>
+            </div>
+            <div class="open-search" style="display:inline;">
+                <div id='cssmenu' style="margin-right: -42px;">
+                    <ul>
+                        <!--<li aura:id="homeMenuPSP"><a href='/industryportal/s/secure-portal-home?src=homeMenuPSP' title="Home"><span>Home</span></a></li>-->
+                        <li aura:id="myApplicationMenu"><a href='/industryportal/s/asp-application-list?src=myApplicationMenu' title="My Application"><span>My Applications</span></a></li>
+                        <li aura:id="helpMenu"><a href='' onclick='{!c.gotoHelpPage}' title="Help"><span>Help</span></a></li>
+                        <li aura:id="loginMenuPSP" class='last' style="display: none;"><a href='/industryportal/s/login' title="Login"><span>Login</span></a></li>
+                        <li aura:id="nameMenuPSP" class='has-sub last truncateName' style="display: none;">
+                            <a href='#' class="slds-truncate" title="{!v.userName}">
+                                <span id="PSPuserName">
+                                    {!v.userName}
+                                </span>
+                            </a>
+                            <ul style="z-index:1;">
+                                <aura:if isTrue="{!v.taxiCommunityMenu}">
+                                    <li aura:id="taxiCommunityMenu"><a href='/taxilicence/s/secure-portal-home?src=homeMenuPSP' title="Taxi Licence"><span>Taxi Licence</span></a></li>
+                                </aura:if>
+                                <li class='last'><a href='/industryportal/secur/logout.jsp' title="Logout"><span>Logout</span></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

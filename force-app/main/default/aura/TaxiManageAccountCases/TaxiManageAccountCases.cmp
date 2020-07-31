@@ -1,0 +1,234 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiManageAccountCases">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}" afterScriptsLoaded="{!c.doInit}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="customerNumber" type="String" access="private" />
+    <aura:attribute name="body" type="String"/>
+    <aura:attribute name="currentNoticeSortOrderASC" type="Boolean" default="false" />
+    <aura:attribute name="casesList" type="Case[]"/>
+    
+    <aura:dependency resource="markup://c:WithdrawApplicationConfirmBox" />
+    
+    <aura:attribute name="noticeList" type="Notice_Record__c[]"/>
+    
+    <aura:attribute name="accountName" type="String" />
+    <aura:attribute name="isApplicationTab" type="Boolean" default="true"/>
+    <aura:attribute name="baseUrl" type="String" default="$A.get('$Label.c.Community_Base_Url')" />
+    
+    <aura:method name="cancelApp" action="{!c.createCancellationComponent}"/>
+    <aura:handler name="confirmWithdrawApplication" event="c:ConfirmWithdrawApplicationEvent" action="{!c.confirmCancelOrWithdrawApplication}"/>
+    <aura:handler name="redirectToRequestTab" event="c:ToActivityRequestTabSurrenderCase" action="{!c.filterApplication}"/>
+    <aura:handler name="closeInternalReviewModal" event="c:InternalReviewCloseEvent" action="{!c.closeInternalReviewModal}"/>
+    
+    <lightning:spinner variant="brand" aura:id="spinner"  size="large" ></lightning:spinner>
+    <article class="slds-card" id="caseComponent">
+        <div class="slds-page-header">
+            <div class="slds-grid">
+                <div class="slds-col slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                       svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="fleet">
+                            </c:svgIcon>
+                        </div>
+                        <div class="slds-media__body" style="text-align:left;">
+                           <aura:if isTrue="{!v.accountId == ''}"> 
+                            <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.ASP_ACCT_MGMT_Header} - {!v.customerNumber}</p>
+                           </aura:if>
+                           <aura:if isTrue="{!v.accountId != ''}"> 
+                            <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.AGENT_LICENCE_HOLDER_MGMT_Header} - {!v.customerNumber}</p>
+                           </aura:if>
+                           <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Account">{!v.accountName}</h2>
+                        </div>
+                        <!-- This was for Case Creation -->
+                        <!--<a href="{!baseUrl + 'contactsupport?src=helpMenu'}" target="_blank"> -->
+                        <a href="{!baseUrl + 'article/Help-and-Support?src=helpMenu'}" target="_blank">
+                            <ui:button class="slds-button slds-button--neutral headerButtons"> 
+                                <i style="color:#54698d !important;" class="fa fa-question-circle" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;&nbsp;{!$Label.c.ASP_ACCT_MGMT_Request_Help_Btn}
+                            </ui:button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-tabs--scoped" style="padding-top:10px;">
+            <ul class="slds-tabs--scoped__nav" role="tablist" style="float:left;" aura:id="caseSubmenu">
+                <li class="slds-tabs--scoped__item  casesTab" title="Notice Records" role="presentation" aura:id="notice__item">
+                    <a class="slds-tabs--scoped__link " href="javascript:void(0);" role="tab" onclick="{!c.filterShowAllNotices}" tabindex="0" aria-selected="true" aria-controls="tab-scoped-1">Notices</a>
+                </li>
+                <li class="slds-tabs--scoped__item casesTab" title="Application" role="presentation" aura:id="application__item">
+                    <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" onclick="{!c.filterApplication}" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-2">Requests</a>
+                </li>
+            </ul>
+            <div style="clear:both;"></div>
+            <div class="slds-grid slds-grid--vertical">
+                <div class="slds-grow">
+                    <div id="caseTableScrollContainer" style="height:400px;overflow-x:hidden;display:block;">
+                        <aura:if isTrue="{!!v.isApplicationTab}">
+                            <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered  slds-no-row-hover" style="background-color: #003577;">
+                                <thead style="background: #003577;">
+                                    <tr class="slds-line-height--reset">
+                                        <th scope="col"  class="tabCol" style="width:10%" onclick="" id="noticeName">
+                                            <div class="slds-text-title--caps slds-text-align--center" title="Notice Number">
+                                                <span class=" tableheader" id="Notice Number">
+                                                    #
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th scope="col" class="tabCol" style="width:20%">
+                                            <div class="slds-text-title--caps" title="Type of notice">
+                                                <span class=" tableheader" title="Type of notice">Notice Type</span>
+                                            </div>
+                                        </th>
+                                        <th scope="col"  class="tabCol" style="width:15%">
+                                            <div class="slds-text-title--caps" title="Person to whom the notice was served">
+                                                <span class="tableheader" title="Person to whom the notice was served" id="servedTo">
+                                                    Served To
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th scope="col" style="width:15%"  class="tabCol">
+                                            <div class="slds-text-title--caps" title="Method by which the notice was served">
+                                                <span class=" tableheader" title="Method by which the notice was served" id="methodOfService">
+                                                    Method of Service
+                                                </span>
+                                            </div>
+                                        </th>
+                                        <th scope="col" class="tabColSort" onclick="{!c.sortNoticeByIssueDate}">
+                                            <div class="slds-text-title--caps slds-text-align--center" title="Date the notice was issued">
+                                                <span class=" tableheader" title="Date the notice was issued">
+                                                    Date Issued
+                                                    <span>
+                                                        <aura:if isTrue="{!v.currentNoticeSortOrderASC}">
+                                                            &#8593;
+                                                            <aura:set attribute="else">
+                                                                &#8595;
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </th>
+                                        
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody id="noticeTableBody">
+                                </tbody>
+                            </table>
+                            <aura:set attribute="else">
+                                <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered  slds-no-row-hover" style="background-color: #003577;">
+                                    <thead style="background: #003577;">
+                                        <tr class="slds-line-height--reset">
+                                            <th scope="col"  class="tabCol" style="width:10%">
+                                                <div class="slds-text-title--caps slds-text-align--center" title="Application Number">
+                                                    <span class=" tableheader" title="Application Number" id="caseNumber">
+                                                        #
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="tabCol" style="width:20%">
+                                                <div class="slds-text-title--caps" title="Application Type">
+                                                    <span class=" tableheader" title="Application Type">Request</span>
+                                                </div>
+                                            </th>
+                                            <th scope="col"  class="tabCol" style="width:10%">
+                                                <div class="slds-text-title--caps" title="Status">
+                                                    <span class=" tableheader" title="Status" id="Status">
+                                                        Status
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <th scope="col"  class="tabCol" style="width:20%">
+                                                <div class="slds-text-title--caps" title="Payment Status">
+                                                    <span class=" tableheader" title="Payment Status" id="Status">
+                                                        Payment Status
+                                                    </span>
+                                                </div>
+                                            </th>
+                                            <th scope="col" class="tabCol" style="width:15%">
+                                                <div class="slds-text-title--caps slds-text-align--center" title="Date Lodged">
+                                                    <span class="tableheader" title="Date Lodged">Date Lodged</span>
+                                                </div>
+                                            </th>   
+                                            <th scope="col" class="tabCol" style="width:15%">
+                                                <div class="slds-text-title--caps slds-text-align--center" title="Action">
+                                                    <span class="tableheader" title="Action">Action</span>
+                                                </div>
+                                            </th> 
+                                        </tr>
+                                    </thead>
+                                    <tbody id="casesTableBody">
+                                        <aura:iteration var="record" items="{!v.casesList}">
+	                                        <tr class="slds-line-height--reset">
+	                                            <td role="gridcell" class="tabCol">
+	                                                <a data-RecId="{!record.Id}" data-Sub-Type="{!record.Sub_Type__c}" data-Is_WatApp="{!record.Is_WAT_Application__c}" data-Status="{!record.Status}" data-Sub-Status="{!record.Sub_Status__c}" data-Orders="{!record.Orders__r}" data-recordType="{!record.RecordType.Name}" onclick="{!c.handleCaseNumberOnClick}">{!record.CaseNumber}</a>	                                                                                          
+	                                            </td>	                                    
+	                                            <td role="gridcell" class="tabCol">
+	                                                <aura:if isTrue="{!record.RecordType.Name == 'Reviewable Decisions'}">
+	                                                    <ui:outputText class="slds-truncate wrap" value="Internal review"/>
+	                                                <aura:set attribute="else">
+	                                                    <ui:outputText class="slds-truncate wrap" value="{!record.Sub_Type__c}"/>
+	                                                </aura:set>
+                                                    </aura:if>		                                                
+	                                            </td>
+	                                            <td role="gridcell" class="tabCol">
+	                                                <ui:outputText class="slds-truncate wrap" value="{!record.Status}" />
+	                                            </td>
+	                                            
+	                                            <td role="gridcell" class="tabCol">
+                                                    <aura:if isTrue="{!record.RecordType.Name == 'Reviewable Decisions'}">
+                                                        <ui:outputText class="slds-truncate wrap" value="N/A"/>
+	                                                <aura:set attribute="else">
+                                                        <aura:iteration var="ordRecord" items="{!record.Orders__r.records}" indexVar="indVar"> 
+                                                            <aura:if isTrue="{!indVar == 0}">
+                                                                <ui:outputText class="slds-truncate wrap" value="{!ordRecord.Status}" />
+                                                            </aura:if>
+                                                        </aura:iteration>
+	                                                </aura:set>
+                                                    </aura:if> 	                                                      
+	                                            </td>
+	                                            
+	                                            
+	                                            <td role="gridcell" class="tabCol">
+	                                                <div class="slds-truncate slds-text-align--center">
+	                                                    <aura:if isTrue="{!record.Date_Submitted__c != null}">
+	                                                        <ui:outputDate class="slds-truncate wrap" value="{!record.Date_Submitted__c}" />
+	                                                    </aura:if>
+	                                                     <aura:if isTrue="{!and(record.Date_Submitted__c == null, or(record.Sub_Type__c == 'Surrender',record.Sub_Type__c == 'Awaiting Plates'))}">
+	                                                         <ui:outputDate class="slds-truncate wrap" value="{!record.CreateDate}" />
+	                                                     </aura:if>	                                                    
+	                                                </div>	                                                
+	                                            </td>
+	                                            
+	                                            <aura:if isTrue="{!and(or(record.Status == 'Draft',record.Status == 'New'), or(and(record.Sub_Type__c == 'Internal review', or(record.Status=='Draft', record.Status=='New')), record.Sub_Type__c == 'Renewal Application', record.Sub_Type__c == 'New Application' , and(record.Is_WAT_Application__c == true, or(record.Status=='Draft', record.Status=='New'))))}">
+	                                                <td role="gridcell" class="tabCol">
+	                                                    <div class="slds-truncate slds-text-align--center">
+		                                                    <a class="cancelLink" onclick="{!c.createCancellationComponent}" href="javascript:void(0);" title="Cancel" target="_blank" data-RecId="{!record.Id}" data-Status="{!record.Status}" data-Sub_Type__c="{!record.Sub_Type__c}" data-authId="{!record.Authorisation__c}">Cancel</a>
+		                                                </div>                           
+		                                            </td>  
+		                                            <aura:set attribute="else">
+		                                                 <td role="gridcell" class="tabCol">
+                                                             <aura:if isTrue="{!record.Sub_Type__c == 'Internal review'}">
+                                                                 <div class="slds-truncate slds-text-align--center">
+                                                                     <a class="withdrawnLink" onclick="{!c.createWithdrawnComponent}" href="javascript:void(0);" title="Withdraw" target="_blank" data-RecId="{!record.Id}" data-Status="{!record.Status}" data-Sub_Type__c="{!record.Sub_Type__c}" data-authId="{!record.Authorisation__c}">Withdraw</a>
+                                                                 </div>
+                                                             </aura:if>                        
+		                                                 </td>  
+		                                            </aura:set>
+	                                            </aura:if>                                       
+	                                        </tr>
+	                                    </aura:iteration>
+                                    </tbody>
+                                </table>
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

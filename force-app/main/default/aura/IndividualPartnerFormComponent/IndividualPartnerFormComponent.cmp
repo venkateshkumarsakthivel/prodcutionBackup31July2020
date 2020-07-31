@@ -1,0 +1,89 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="isValidFormData" type="Boolean" default="true" />
+    <aura:attribute name="formIndex" type="Integer" default="0"/>
+    <aura:attribute name="relatedContact" type="Related_Contact__c" />
+    
+    <aura:method name="validateFormData" action="{!c.validateFormData}" access="PUBLIC"/>
+    <aura:method name="resetErrorMessages" action="{!c.resetErrorMessages}" access="PUBLIC"/>
+    
+    <article id="individualPartnerForm">
+        
+        <div class="slds-grid">
+            <div class="slds-col" style="width: 50% !important;">
+                <label class="slds-form-element__label">{!$Label.c.Individual_Title}</label>
+                <ui:inputSelect disabled="{!v.readOnly}" 
+                                aura:id="Title-Input" 
+                                value="{!v.relatedContact.Title__c}">
+                    <ui:inputSelectOption text="" label="Please Select"/>
+                    <ui:inputSelectOption text="Mr."/>{!v.readOnly}
+                    <ui:inputSelectOption text="Mrs."/>
+                    <ui:inputSelectOption text="Ms."/>
+                    <ui:inputSelectOption text="Miss."/>
+                    <ui:inputSelectOption text="Other"/>
+                </ui:inputSelect>
+            </div>
+            <div class="slds-col" style="width: 50% !important;">
+            </div>
+        </div>
+        
+        <div class="slds-grid">
+            <div class="slds-col" style="width: 50% !important;">
+                <label class="slds-form-element__label">{!$Label.c.Individual_First_given_name}&nbsp;<span class="requiredField">*</span></label>
+                <ui:inputText maxlength="255" class="sentenceCaseInput slds-input" 
+                              disabled="{!v.readOnly}"
+                              aura:id="First-Given-Name-Input"
+                              value="{!v.relatedContact.First_Given_Name__c}"/>
+            </div>
+            <div class="slds-col" style="width: 50% !important;">
+                <label class="slds-form-element__label">{!$Label.c.Individual_Family_Name}&nbsp;<span class="requiredField">*</span></label>
+                <ui:inputText maxlength="255" class="upperCaseInput slds-input" 
+                              disabled="{!v.readOnly}"
+                              aura:id="Family-Name-Input" 
+                              value="{!v.relatedContact.Family_Name__c}"/>
+            </div>
+        </div>
+        
+        <div class="slds-grid">
+            <div class="slds-col" style="width: 50% !important;">
+                <label class="slds-form-element__label" for="otherGivenFamilyName">{!$Label.c.Lessee_Owner_Other_given_name}</label>
+                <ui:inputText disabled="{!v.readOnly}" required="true" maxlength="255" class="slds-input" 
+                              aura:id="Other-Given-Name-Input"
+                              value="{!v.relatedContact.Other_Given_Name__c}" />
+            </div>
+            <div class="slds-col" style="width: 50% !important;">
+                <c:DateOfBirthComponent isReadOnly="{!v.readOnly}" isRequired="true" fieldLabel="{!$Label.c.Individual_Birthdate}"
+                                        aura:id="DOB-Input" 
+                                        uniqueIdentifier="{!'DOB-Input' + v.formIndex}" 
+                                        DOB="{!v.relatedContact.Date_of_Birth__c}"/>
+            </div>
+        </div>
+        
+        <div class="slds-grid">
+            <div class="slds-col" style="width: 50% !important;">
+                <c:DriverLicenceComponent isReadOnly="{!v.readOnly}" isRequired="false" fieldLabel="Australian driver licence number (if any)"
+                                          aura:id="Driver-Licence-Number-Input" 
+                                          uniqueIdentifier="{!'Driver-Licence-Number-Input' + v.formIndex}" 
+                                          licence="{!v.relatedContact.Australian_Driver_Licence__c}"/>
+            </div>
+            <div class="slds-col" style="width: 50% !important;">
+                <label class="slds-form-element__label">{!$Label.c.Individual_Australian_Driver_Licence_State}</label>
+                <ui:inputSelect disabled="{!v.readOnly}" 
+                                aura:id="Driver-Licence-Number-State-Input" 
+                                value="{!v.relatedContact.Australian_Driver_Licence_State__c}">
+                    <ui:inputSelectOption text="" label="Please Select"/>
+                    <ui:inputSelectOption text="NSW"/>
+                    <ui:inputSelectOption text="ACT"/>
+                    <ui:inputSelectOption text="VIC"/>
+                    <ui:inputSelectOption text="QLD"/>
+                    <ui:inputSelectOption text="SA"/>
+                    <ui:inputSelectOption text="NT"/>
+                    <ui:inputSelectOption text="TAS"/>
+                    <ui:inputSelectOption text="WA"/>
+                </ui:inputSelect>
+            </div>
+        </div>
+        
+    </article>
+</aura:component>

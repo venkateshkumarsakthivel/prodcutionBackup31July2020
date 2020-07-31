@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Use For Add New Row">
+    <aura:attribute name="relatedContact" type="Related_Contact__c" access="public" default="{}"/>
+</aura:event>

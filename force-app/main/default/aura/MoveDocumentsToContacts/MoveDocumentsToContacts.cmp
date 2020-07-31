@@ -1,0 +1,91 @@
+<aura:component controller="CopyDocumentsToContacts"
+                implements="flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" 
+                access="global" >
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+	<aura:attribute name="files" type="FileContentWrapper[]" />
+    
+    <aura:handler name="confirmCopyDocuments" event="c:CopyDocumentsEvent" action="{!c.moveDocuments}"/>
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    
+    <aura:attribute name="cssStyle" type="String" />
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <ltng:require styles="{!$Resource.TaxiLicenceActionStyle}" />
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+   	<aura:handler name="closeApplication" event="c:TaxiFormModalClosureEvent" action="{!c.closeMessageBox}"/>
+    
+    
+    <style>
+    	{!v.cssStyle}
+    </style>
+    
+    <p style="font-weight: bold;">
+        <a href="" onclick="{!c.openMessageBox}">Verify &amp; Copy Documents</a>
+    </p>
+
+    
+    <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aura:id = "messageBox">
+        <div class="slds-modal__container">
+            <div class="slds-modal__header">
+                <lightning:buttonIcon class="customCls" iconName="utility:close" alternativeText="Closing" onclick="{!c.closeMessageBox}" />
+                	
+                <h2 id="header43" class="slds-text-heading--medium">Verify &amp; Copy Documents</h2>
+            </div>
+            <div class="slds-modal__content slds-p-around--medium">
+               
+                <table  class="slds-table slds-table_bordered slds-table_cell-buffer">
+                    <thead>
+                      <tr class="slds-text-heading--label">
+                        <th scope="col"><div class="slds-truncate" title="Documents attached under this case">Case Documents</div></th>
+                          
+                          <th scope="col"><div class="slds-truncate" title="ext"></div></th>
+                        <th scope="col"><div class="slds-truncate" title="Select Contact">Contacts</div></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Use the Apex model and controller to fetch server side data -->
+            <aura:iteration items="{!v.files}" var="fileContent">
+                          <tr>
+                            <!-- <th scope="row"><div class="slds-truncate" title="{!account.AccountID}">{!account.AccountID}</div></th> -->
+                              <td><div class="slds-truncate" title="{!fileContent.contentDocumentName}">
+                                  <aura:if isTrue="{!fileContent.isAttachment}">
+                                  	{!fileContent.contentDocumentName}
+                                  </aura:if>
+                                  <aura:if isTrue="{!fileContent.isContentFile}">
+                                  	{!fileContent.contentDocumentName}.{!fileContent.contentDocumentExtension}
+                                  </aura:if>
+                                </div></td>
+                              <!-- <td><div>{!fileContent.contentDocumentExtension}</div></td> -->
+                              <td>
+                                      <div onclick="{!c.downloadDocument}" data-value="{!fileContent.fileId}">
+                                          <!--<a href="{!'/sfc/servlet.shepherd/document/download/'+ fileContent.fileId}" target="_blank">view</a> -->
+                                          <lightning:button label="View" iconName="utility:preview"/>
+                                      </div>
+                              </td>
+                            
+                            <td><div class="slds-truncate hidelabel">
+                                <lightning:select aura:id="selectField" name="selectField" variant = "label-hidden" value="{!fileContent.contactId}">
+                                    <option value="None">--None--</option>
+                                    <aura:iteration items="{!fileContent.contactList}" var="contact">
+                                        <option value="{!contact.Id}">{!contact.Name}</option>
+                                    </aura:iteration>
+                                </lightning:select>
+                                </div>
+                            </td>
+                          </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>  
+            </div>
+            <div class="slds-modal__footer">
+                <lightning:button label="Copy Documents" onclick="{!c.confirmMoveDocuments}" />
+                <lightning:button label="Cancel" onclick="{!c.closeMessageBox}"/>
+            </div>
+        </div>
+    </div> 
+
+    <div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+    <p>{!v.body}</p>
+</aura:component>

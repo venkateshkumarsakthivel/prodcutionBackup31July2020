@@ -1,0 +1,150 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiFormPaymentDetails">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <aura:attribute name="existingLicence" type="String"/>
+    <aura:attribute name="sellerCaseId" type="String" default=""/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    
+    <aura:attribute name="paymentReferenceNumber" type="String" default="" />
+    <aura:attribute name="selectedPaymentMethod" type="String" default="" />
+    <aura:attribute name="otherPaymentMethod" type="String" default="" />
+    <aura:attribute name="levyDueAmount" type="Decimal" default="0" />
+    
+    <aura:attribute name="cssStyle" type="String" />
+    <style>
+        /* css style added dynamically to hack style of global header*/
+        {!v.cssStyle}
+    </style>
+    
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <aura:handler name="confirmApplicationSubmission" event="c:ConfirmApplicationSubmission" action="{!c.submitApplication}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <c:TransferFormSectionProgressIndicator currentSection="Payment" renderPaymentSection="true"/><br/> 
+    
+    <article class="slds-card">
+        
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon class="head" svgPath="{!$Resource.slds221+'/assets/icons/utility-sprite/svg/symbols.svg#moneybag'}"
+                               category="utility" size="large" name="Continue"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2>       
+                        Payment Details
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                <fieldset>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <table class="feeTable">
+                                <tr class="feetableHeader">
+                                    <th>Description</th>
+                                    <th style="text-align:center;">Amount</th>
+                                </tr>
+                                <tr>
+                                    <td>Levy Due</td>
+                                    <td style="text-align:center;">
+                                        <ui:outputCurrency value="{!v.levyDueAmount}"/>
+                                    </td>
+                                </tr>
+                                <tr style="font-weight: bold;">
+                                    <td>Total</td>
+                                    <td style="text-align:center;">
+                                        <ui:outputCurrency value="{!v.levyDueAmount}"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            <br/><br/>
+                            <aura:if isTrue="{!v.applicationPaymentFrequency != 'Monthly'}">
+                             <p>
+                                Please select the payment method and proceed with payment.
+                                <br/>
+                                The amount due now is <ui:outputCurrency value="{!v.levyDueAmount}"/>.
+                             </p>
+                            </aura:if>
+                            <br/>
+                        </div>
+                    </div>
+                    
+                    <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                        <span style="color: #ffffff;">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                            &nbsp;Please specifiy a payment method.
+                        </span>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <ui:inputRadio value="" disabled="{!v.readOnly}" aura:id="Credit-Card" name="Payment-Method" label="" change="{!c.setPaymentMethod}"/>&nbsp;Credit/Debit Card (Note: Surcharge applies to credit card payment)
+                        </div>
+                    </div>
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <ui:inputRadio value="" disabled="{!v.readOnly}" aura:id="Direct-Debit" name="Payment-Method" label="" change="{!c.setPaymentMethod}"/>&nbsp;Direct Debit
+                        </div>
+                    </div>
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <ui:inputRadio value="" disabled="{!v.readOnly}" aura:id="BPay" name="Payment-Method" label="" change="{!c.setPaymentMethod}"/>&nbsp;BPay
+                        </div>
+                    </div>
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <ui:inputRadio value="" disabled="{!v.readOnly}" aura:id="Others" name="Payment-Method" label="" change="{!c.setPaymentMethod}"/>&nbsp;Others
+                        </div>
+                    </div>
+                    
+                    <aura:if isTrue="{!v.selectedPaymentMethod == 'Others'}">
+                        <aura:if isTrue="{!v.applicationType =='New'}">
+                            <div class="slds-col othertypes">
+                                <ui:inputRadio value="" aura:id="Cheque" name="Other-Payment" label="" change="{!c.setOtherPaymentMethod}"/>&nbsp;Bank Cheque (Bank Cheque to be made payable to Transport for NSW and mailed to Point to Point Commission, PO Box 533, Burwood NSW 1805 with the reference {!v.paymentReferenceNumber})
+                            </div>
+                            <div class="slds-col othertypes">
+                                <ui:inputRadio value="" aura:id="Money-Order" name="Other-Payment" label="" change="{!c.setOtherPaymentMethod}"/>&nbsp;Money Order (Money Order to be made payable to Transport for NSW and mailed to Point to Point Commission, PO Box 533, Burwood NSW 1805 with the reference {!v.paymentReferenceNumber})
+                            </div>
+                            <div class="slds-col othertypes">
+                                <ui:inputRadio value="" aura:id="Contact-P2P-Commission" name="Other-Payment" label="" change="{!c.setOtherPaymentMethod}"/>&nbsp;Contact P2P Commission (Contact our contact centre on XXXXXXXX)
+                            </div>
+                            <aura:set attribute="else">
+                                <div class="slds-col othertypes">
+                                    <ui:inputRadio value="" aura:id="Contact-P2P-Commission" name="Other-Payment" label="" change="{!c.setOtherPaymentMethod}"/>&nbsp;Contact P2P Commission (Contact our contact centre on XXXXXXXX)
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                    </aura:if>
+                    
+                </fieldset>
+            </div>
+        </div>
+        
+        <div class="slds-card__footer">
+            <ui:button class="slds-button slds-button--neutral" press="{!c.cancelApplicationForm}"> 
+                <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+            </ui:button>
+            <ui:button class="slds-button slds-button--neutral" press="{!c.confirmApplicationSubmission}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Lodge
+            </ui:button>
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

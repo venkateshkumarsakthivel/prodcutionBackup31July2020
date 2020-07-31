@@ -1,0 +1,18 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+    
+	 <aura:attribute name="baseUrl" type="String"  />
+     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <center>
+        <div class="contactSupport">
+            <div class="cta_header" id="cta_header" style="padding-left:0%;" data-aura-rendered-by="70:2;a">
+                <span class="cta_header" id="cta_header_span" data-aura-rendered-by="71:2;a"> {!$Label.c.Help_Contact_Support}</span>
+            </div>
+            <br />
+            <a href="{!v.baseUrl}" class="contact-us-button" target="_blank">
+                <ui:button class="slds-button slds-button--neutral headerButtons"> 
+                    <i style="color:#54698d !important; float:right;" aria-hidden="true"></i>{!$Label.c.Contact_Support}</ui:button>
+            </a>
+            
+        </div>
+    </center>
+</aura:component>

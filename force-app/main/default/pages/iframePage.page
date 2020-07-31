@@ -1,0 +1,3 @@
+<apex:page applyHtmlTag="false" applyBodyTag="false" docType="html-5.0" showHeader="false" standardStylesheets="false">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvlpLeqzzuv6klB0PSjbjK2nJW_2lZszs&libraries=places" async="true" defer="true"></script>
+</apex:page>

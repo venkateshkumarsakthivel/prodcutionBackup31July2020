@@ -1,0 +1,50 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiTransferController">
+    
+    <aura:attribute name="existingLicence" type="String"/> 
+    <aura:attribute name="sellerCaseId" type="String"/>
+    <aura:attribute name="sellerCase" type="String" default=""/>
+    
+    <aura:attribute name="renderPaymentSection" type="Boolean" default="false"/>
+    
+    <aura:attribute name="isInternalUser" type="Boolean" default="false"/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <c:TransferFormSectionProgressIndicator currentSection="Review Details"/><br/> 
+    
+    <c:TaxiTransferFormPartA existingLicence="{!v.existingLicence}" sellerCaseId="{!v.sellerCaseId}" readOnly="true" renderOnReviewPage="true"></c:TaxiTransferFormPartA>
+    
+    <c:P2POTAttachments parent="{!v.sellerCaseId}" />
+    
+    <c:TaxiTransferFormPartB existingLicence="{!v.existingLicence}" sellerCaseId="{!v.sellerCaseId}" readOnly="true" renderOnReviewPage="true"></c:TaxiTransferFormPartB>
+    
+    <aura:if isTrue="{!and(not(v.readOnly), not(v.renderPaymentSection))}">
+        <div class="slds-card__footer">
+            <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+            </ui:button>
+            <ui:button class="slds-button slds-button--neutral" press="{!c.lodgeApplication}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Lodge
+            </ui:button>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.renderPaymentSection}" >
+        <div class="slds-card__footer">
+            <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+            </ui:button>
+            <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+            </ui:button>
+        </div>
+    </aura:if>
+    
+    <p>{!v.body}</p>
+</aura:component>

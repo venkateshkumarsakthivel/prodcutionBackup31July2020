@@ -1,0 +1,36 @@
+@font-face {
+    font-family: 'Gotham-Book';
+    src: url(/industryportal/resource/GothamBookRegular);
+}
+.THIS {
+    
+    font-family: 'Gotham-Book' !important;
+}
+
+.THIS .Container{
+    width: 1170px;
+    display: inline-flex;
+    padding-left: 324px;
+    text-align: center !important;
+}
+
+
+.THIS .row{
+    padding-left:4px;
+    padding-right:4px;
+}
+
+.THIS .heading1{
+    font-size : 46px !important;
+    color : #1a3278;
+    font-weight : 700 !important;
+}
+
+.THIS .heading2{
+    font-size : 30px !important;
+    color : #009ed7;
+}
+
+.THIS .heading3{
+    font-size : 14pt !important;
+}

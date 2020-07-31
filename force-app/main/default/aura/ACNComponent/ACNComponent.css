@@ -1,0 +1,40 @@
+.THIS .requiredField {
+    
+    color: red;
+    font-weight: bold;
+}
+
+.THIS .customErrorMsg {
+    
+    color: rgb(194, 57, 52);
+    font-weight:bold;
+    font-size: .875rem;
+}
+
+.THIS .slds-form-element__help {
+    
+    color: rgb(194, 57, 52);
+    font-weight:bold;
+    font-size: .875rem;
+    text-align: left;
+}
+
+.THIS select.slds-has-error {
+    
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgb(194, 57, 52) 0px 0px 0px 1px inset;
+    background-clip: padding-box;
+    border-color: rgb(194, 57, 52);
+}
+
+.THIS input.slds-has-error {
+    
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgb(194, 57, 52) 0px 0px 0px 1px inset;
+    background-clip: padding-box;
+    border-color: rgb(194, 57, 52);
+}
+.THIS .slds-input[disabled]{
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}

@@ -1,0 +1,84 @@
+<apex:page showHeader="false"> 
+    <script src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit' />
+    <div id="widgetId1" class="g-recaptcha" >
+
+    </div>
+
+    <style>
+        body, div{
+            background:transparent !important;
+        },
+    </style>
+    
+    <script type="text/javascript">
+        
+        var onloadCallback = function() {
+            grecaptcha.render("widgetId1", {
+                'sitekey' : '6LfOwCEUAAAAAL6AFMZ2H0WIHEHAGkcKznUalIm2', 
+                'data-size' : 'compact'
+            });
+        };
+    
+    window.addEventListener("message", function(event) {
+        
+        var hostURL = "{!JSENCODE($Label.reCAPTCHA_Lightning_Url)}";
+        console.log('hostURL :' + hostURL);
+        console.log('event.origin : ' + event.origin);
+        console.log(event);
+        
+        if(event.origin !== hostURL){
+            console.log(event.data);            
+            var data = JSON.parse(event.data);
+            console.log(data.message);
+            if(data.message == undefined || data.message == null){
+                return;
+            }
+            var challengeContainer = data.message.m;
+            var message = document.getElementById("g-recaptcha-response").value;
+            console.log('Captcha response: ' + message);
+            if(challengeContainer != undefined && challengeContainer.height != undefined){
+                if(message != "" || challengeContainer.height < 100){
+                    console.log('set iframe height to 150');
+                    parent.postMessage({ action: "resizeIframe", height : "100" }, hostURL);
+                } else {
+                    console.log('set iframe height to ' + challengeContainer.height);
+                    parent.postMessage({ action: "resizeIframe", height : (challengeContainer.height + 50) }, hostURL);
+                }
+                
+            } else {
+                parent.postMessage({ action: "resizeIframe", height : "100" }, hostURL);
+            }
+            
+            return;
+        }
+        
+        if(event.origin == hostURL){
+            
+            if(event.data.action == "alohaCallingCAPTCHA") {  
+                
+                var message = document.getElementById("g-recaptcha-response").value;
+                
+                if (message == "") {
+                    parent.postMessage({ action: "alohaCallingCAPTCHA", alohaResponseCAPTCHA : "NOK" }, hostURL);
+                }
+                else {
+                    parent.postMessage({ action: "alohaCallingCAPTCHA", alohaResponseCAPTCHA : "OK" },  hostURL);
+                }
+            }
+        }
+        
+    }, false);
+    
+    
+    window.addEventListener("click", function(event) {
+        var hostURL = "{!JSENCODE($Label.reCAPTCHA_Lightning_Url)}";
+        console.log('click event fired from captcha');
+        console.log(event);
+        console.log('set iframe height to 100');
+        parent.postMessage({ action: "resizeIframe", height : "100" }, hostURL);
+    }, false);
+    
+    </script>
+    
+    <!--<div class="g-recaptcha" data-sitekey="6LcdtSIUAAAAAKo6JwS8VtnaEwSWXXbaOJLaiUya"></div>-->
+</apex:page>

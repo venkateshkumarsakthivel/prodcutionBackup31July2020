@@ -1,0 +1,79 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="caseId" type="String"/>
+    <aura:attribute name="entityType" type="String"/>
+    <aura:attribute name="applicationType" type="String" default="New"/>
+    <aura:attribute name="applicationSource" type="String" default="PSP"/>
+    
+    <aura:attribute name="sectionNameToRender" type="String" default="sectionA"/>
+    
+    <aura:handler name="loadSection" event="c:ASPFormSectionEvent" action="{!c.updateSectionHandlers}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <br/>
+    <h2 style="width: 100%;margin: 0;padding: 0;text-align: center;">
+        <hr style="display: inline-block;margin: 0 20px 8px 0;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr> 
+         <aura:if isTrue="{!v.applicationType == 'New'}"> 
+          Authorised Service Provider Application 
+         </aura:if>
+         <aura:if isTrue="{!v.applicationType == 'Renewal'}"> 
+          Authorised Service Provider Renewal Application 
+         </aura:if>
+        <hr style="display: inline-block;margin: 0 0 8px 20px;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr>
+    </h2>
+    <br/>
+    <aura:If isTrue="{!v.sectionNameToRender == 'sectionA'}">
+        <c:ASPFormPartA caseId="{!v.caseId}" entityType="{!v.entityType}" applicationType="{!v.applicationType}" applicationSource="{!v.applicationSource}"></c:ASPFormPartA>
+    </aura:If>
+    
+    <aura:if isTrue="{!v.sectionNameToRender == 'sectionB'}">
+        <c:ASPFormPartB caseId="{!v.caseId}" entityType="{!v.entityType}"></c:ASPFormPartB>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.sectionNameToRender == 'sectionAdditionalInfo'}">
+        <c:ASPFormAdditionalInformation caseId="{!v.caseId}" entityType="{!v.entityType}"></c:ASPFormAdditionalInformation>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.sectionNameToRender == 'sectionC'}">
+        <c:ASPFormPartC caseId="{!v.caseId}" entityType="{!v.entityType}"></c:ASPFormPartC>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.sectionNameToRender == 'sectionC-P'}">
+        <c:ASPFormPartC_Partnership caseId="{!v.caseId}" entityType="{!v.entityType}"></c:ASPFormPartC_Partnership>
+    </aura:if>
+    
+    <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Company Partner')}">
+        <c:ASPFormPartC_IndividualPartnership caseId="{!v.caseId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="true"></c:ASPFormPartC_IndividualPartnership>
+    </aura:if>
+    
+    <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Individual Partner')}">
+        <c:ASPFormPartC_IndividualPartnership caseId="{!v.caseId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="false"></c:ASPFormPartC_IndividualPartnership>
+    </aura:if>
+    
+    <!--
+    <aura:if isTrue="{!v.sectionNameToRender == 'sectionE'}">
+        <c:ASPFormPartE caseId="{!v.caseId}" entityType="{!v.entityType}"></c:ASPFormPartE>
+    </aura:if>
+    -->    
+
+    <aura:if isTrue="{!v.sectionNameToRender == 'sectionDVDAccess'}">
+        <c:ASPFormDVDAccess caseId="{!v.caseId}" entityType="{!v.entityType}"></c:ASPFormDVDAccess>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.sectionNameToRender == 'sectionG'}">
+        <c:ASPFormPartG caseId="{!v.caseId}" entityType="{!v.entityType}"></c:ASPFormPartG>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.sectionNameToRender == 'review'}">
+        <c:ASPFormReview isFromPortal="true" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:ASPFormReview>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.sectionNameToRender == 'sectionH'}">
+        <c:PSPBankDetailsForm caseId="{!v.caseId}" entityType="{!v.entityType}"></c:PSPBankDetailsForm>
+    </aura:if>
+    
+</aura:component>

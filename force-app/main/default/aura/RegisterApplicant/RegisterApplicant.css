@@ -1,0 +1,91 @@
+@font-face {
+    font-family: 'Gotham-Book';
+    src: url(/industryportal/resource/GothamBookRegular);
+}
+.THIS {
+    
+    font-family: 'Gotham-Book' !important;
+}
+.THIS iframe{
+    width:100%;
+}
+.THIS .slds-form-element__label{
+	float: left; 
+}
+.THIS.error{
+    color:red;
+}
+.THIS .slds-form-acn{
+     width: 100%;
+    padding-bottom: 5px;
+}
+.THIS .slds-form-element{
+
+    width: 50%;
+    padding-bottom: 5px;
+}
+.THIS .slds-card__footer{
+    padding-right: 43%;
+    margin-top: 1.95rem;
+    padding-bottom: .75rem;
+    text-align: right;
+}
+.THIS .slds-grid{
+    width: 100%;
+    padding-left: 0% !important;
+    margin-top: 1.05rem;
+}
+.THIS .errorMsg{
+    text-align:start;
+}
+
+.THIS .uiInput{
+    height: 2.20rem !important;
+}
+.THIS.temp.cRegisterApplicant{
+   padding-left: 44px;
+}
+.THIS .cRegisterApplicant .slds-grid{
+      width: 100% !important;
+    padding-left: 0% !important;
+}
+.THIS .requiredField{
+    color: red;
+    font-weight: bold;
+}
+
+.THIS.cACNComponent{
+     width: 226%;
+    margin-left: -76%;
+}
+.THIS .slds-card__header {
+    padding-left:26% !important;
+}
+.THIS .slds-form-captcha-hide{
+    display:none;
+}
+.THIS .slds-form-captcha-show{
+    display: block;
+    margin-left: 112px;
+    font-size: 0.785rem;
+    color: rgb(194, 57, 52);
+    font-family: Lato;
+    padding-top: 0.5rem;
+}
+.THIS .slds-captcha{
+    
+}
+.THIS .fa-user-circle{
+    color:#34becd !important
+}
+.THIS .upperCaseInput{
+    text-transform: uppercase;
+}
+.THIS .sentenceCaseInput {
+	
+	text-transform: initial;
+}
+.THIS .CamelCaseInput {
+	
+	text-transform: capitalize;
+}

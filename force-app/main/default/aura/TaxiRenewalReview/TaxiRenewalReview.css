@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'Gotham-Book';
+    src: url(/resource/GothamBookRegular);
+}
+.THIS .slds-icon-standard-contact{
+    background-color: #34becd;
+}
+.THIS .slds-icon-standard-document{
+    background-color: #34becd;
+}
+.THIS .slds-input[disabled] {
+    background-color: #f3f3f3!important;
+    border-color: rgb(208, 208, 208)!important;
+}
+.THIS select[disabled]{
+    background-color: #f3f3f3!important;
+    border-color: rgb(208, 208, 208)!important;
+}

@@ -1,0 +1,107 @@
+<aura:component controller="ASPFormSectionDataController" implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <ltng:require styles="{!$Resource.TaxiLicenceActionStyle}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}"/>
+    
+    <aura:attribute name="caseId" type="String"/>
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="entityType" type="String"/>
+    
+    <aura:attribute name="isValidToResume" type="Boolean" default="true"/>
+    <aura:attribute name="applicationType" type="String" default="New"/>
+    
+    <aura:attribute name="sectionNameToRender" type="String" default="sectionA"/>
+    
+    <aura:registerEvent name="populateApplicationDetails" type="c:PopulateApplicantDetailsEvent"/>
+    
+    <aura:handler name="loadSection" event="c:ASPFormSectionEvent" action="{!c.updateSectionHandlers}"/>
+    <aura:handler name="closeApplication" event="c:TaxiFormModalClosureEvent" action="{!c.closeMessageBox}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="cssStyle" type="String" />
+    
+    <style>
+        /* css style added dynamically to hack style of global header*/
+        {!v.cssStyle}
+    </style>
+    
+    <br/>
+    
+    <p style="font-weight: bold;">
+        <a href="" onclick="{!c.openMessageBox}">Click to view application form</a>
+    </p>
+    
+    <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aura:id = "messageBox">
+        <div class="slds-modal__container">
+            <div class="slds-modal__header">
+                <lightning:buttonIcon class="customCls" iconName="utility:close" alternativeText="Closing" onclick="{!c.closeMessageBox}" />
+                <h2 id="header43" class="slds-text-heading--medium">Authorised Service Provider Application</h2>
+            </div>        
+            <div class="slds-modal__content slds-p-around--medium">
+                
+                <aura:if isTrue="{!v.isValidToResume}">
+                    <div id="aspFormContainer">
+                        <aura:If isTrue="{!v.sectionNameToRender == 'sectionA'}">
+                            <c:ASPFormPartA aura:id="applicantDetails" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}" applicationType="{!v.applicationType}" applicationSource="{!v.applicationSource}"></c:ASPFormPartA>
+                        </aura:If>
+                        
+                        <aura:if isTrue="{!v.sectionNameToRender == 'sectionB'}">
+                            <c:ASPFormPartB caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormPartB>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.sectionNameToRender == 'sectionAdditionalInfo'}">
+                            <c:ASPFormAdditionalInformation caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormAdditionalInformation>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.sectionNameToRender == 'sectionC'}">
+                            <c:ASPFormPartC isFromPortal="false" caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormPartC>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.sectionNameToRender == 'sectionC-P'}">
+                            <c:ASPFormPartC_Partnership caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormPartC_Partnership>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Company Partner')}">
+                            <c:ASPFormPartC_IndividualPartnership caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="true"></c:ASPFormPartC_IndividualPartnership>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Individual Partner')}">
+                            <c:ASPFormPartC_IndividualPartnership caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="false"></c:ASPFormPartC_IndividualPartnership>
+                        </aura:if>
+                        
+                        <!--
+                        <aura:if isTrue="{!v.sectionNameToRender == 'sectionE'}">
+                            <c:ASPFormPartE caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormPartE>
+                        </aura:if>
+                        -->                        
+
+                        <aura:if isTrue="{!v.sectionNameToRender == 'sectionDVDAccess'}">
+                            <c:ASPFormDVDAccess caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormDVDAccess>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.sectionNameToRender == 'sectionG'}">
+                            <c:ASPFormPartG caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormPartG>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.sectionNameToRender == 'review'}">
+                            <c:ASPFormReview caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:ASPFormReview>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.sectionNameToRender == 'sectionH'}">
+                            <c:PSPBankDetailsForm accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:PSPBankDetailsForm>
+                        </aura:if>
+                    </div>
+                </aura:if>
+                
+                <aura:if isTrue="{!not(v.isValidToResume)}">
+                    <c:ASPFormReview aura:id="reviewASPForm" caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}" withdrawnCase="true"></c:ASPFormReview>
+                </aura:if>
+            </div>
+            <div class="slds-modal__footer">
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+</aura:component>

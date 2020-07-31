@@ -1,0 +1,37 @@
+<!-- This component is used in upload drivers using csv functionality -->
+
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="BulkUploadFleet">
+    <aura:attribute name="fileToUpload" type="String" />
+    <aura:attribute name="successUploads" type="Integer" default="0" />
+    <aura:attribute name="baseUrl" type="String" default="$A.get('$Label.c.Community_Base_Url')" />
+    <aura:registerEvent name="createFleetEntity" type="c:CreateFleetEntityEvent"/>
+    <!--<aura:handler name="init" action="{!c.doInit}" value="{!this}" />-->
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide "/>
+    
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" aura:id="modalDiv">
+        <div class="slds-modal__container">
+            <div class="slds-modal__header">
+                <!--<button class="slds-button slds-modal__close slds-button- -icon-inverse" title="Close">
+           <span class="slds-assistive-text">Close</span>
+         </button>-->
+                <a href="{!baseUrl + 'article/bulk-upload-vehicles?popup=false'}" style="float:right;" title="Bulk vehicle template" target="_blank">Bulk vehicle template</a>
+                <h2 id="header43" class="slds-text-heading--medium">Upload Vehicles</h2>
+                
+            </div>
+            
+            <div class="slds-modal__content slds-p-around--medium">
+                <center>
+                    <input type="file" class="file" accept=".csv" aura:id="file" value="{!v.fileToUpload}"/>
+                    <ui:button class="slds-button slds-button--neutral" press="{!c.readFile}"> Upload Vehicles </ui:button>
+                </center>
+            </div>
+            
+            <div class="slds-modal__footer">
+                <button class="slds-button slds-button--neutral" onclick="{!c.destroyComponent}">Cancel</button>
+            </div>
+        </div>
+    </div> 
+    <div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+    
+</aura:component>

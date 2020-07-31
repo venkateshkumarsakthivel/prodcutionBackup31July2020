@@ -1,0 +1,132 @@
+<template>
+        <div class="page-header slds-m-bottom_x-small" >
+
+            <lightning-button-stateful
+                                        label-when-off={hiddenLabel}
+                                        label-when-on={shownLabel}
+                                        label-when-hover={togglelabel}
+                                        icon-name-when-off="utility:chevronright"
+                                        icon-name-when-on="utility:chevrondown"
+                                        icon-name-when-hover="utility:choice"
+                                        variant={stateButtonVariant}
+                                        selected={buttonState}
+                                        onclick={changeButtonState}>
+                                    </lightning-button-stateful>
+
+            <!--lightning-icon icon-name={iconName} alternative-text="opp" title="object"></lightning-icon-->
+                <h1 class="slds-m-left_medium slds-page-header__title slds-m-right_small slds-align-middle slds-truncate"  title="Opportunities">
+                    {pluralLabel}
+                </h1>
+
+                <div style="display:flex;position:absolute;right:1rem">
+
+                    <button style="color:#1b5297"
+                    class="slds-button slds-button_icon 
+                    slds-button_icon-border-filled
+                     slds-m-left_x-small" 
+                     title="Clear filter"
+                     onclick={refreshRecord}>
+                        <svg class={refreshButtonClass} aria-hidden="true">
+                            <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg?cache=9.28.0#refresh"></use>
+                        </svg>
+                    </button>
+                        <lightning-button   label={filterLabel} 
+                                            icon-name="utility:filterList" 
+                                            onclick={filter}
+                                            class="slds-m-left_x-small">
+                            </lightning-button>
+                        <lightning-button-stateful
+                                            label-when-off={sortLabel}
+                                            label-when-on={sortbyLabel}
+                                            label-when-hover=""
+                                            icon-name-when-off="utility:sort"
+                                            icon-name-when-on="utility:sort"
+                                            icon-name-when-hover="utility:sort"
+                                            variant={sortButtonVariant}
+                                            selected={sortButtonState}
+                                            onclick={showOptionsToSort}
+                                            class="slds-m-left_x-small">
+                                        </lightning-button-stateful>
+                    <template if:true={showSortOptions}>
+                        <lightning-combobox 
+                                            name="sort"
+                                            label={sortbyLabel}
+                                            value={sortBy}
+                                            variant="label-hidden"
+                                            options={sortFields}
+                                            onchange={sortChildRecords} 
+                                            class="slds-m-left_x-small">
+                                </lightning-combobox>
+
+                                <lightning-button-icon class="slds-m-left_x-small"
+                                                    icon-name={sortOrderIcon}
+                                                    variant="border-filled" 
+                                                    alternative-text="Order" 
+                                                    title="Order"
+                                                    name="order"
+                                                    onclick={changeSortOrder}>
+                                                    </lightning-button-icon>
+
+                    </template>
+                    <template if:true={ifAdmin}>
+                    <lightning-button   label={configureLabel} 
+                                        icon-name="utility:setup" 
+                                        onclick={configure}
+                                        class="slds-m-left_x-small">
+                    </lightning-button>
+                </template>
+        </div>
+        </div>  
+
+        <template if:true={buttonState}>
+            <div class="slds-m-around_none">
+                <template if:true={isLoaded} for:each={records} for:item="record">
+                    <div class="slds-m-bottom_x-small" key={record.Id}>
+                        <c-display-card-component   fields={fields}
+                                                    child-object-icon={childObjectIcon}
+                                                    record={record}
+                                                    columns={columns}
+                                                    buttons={buttonsToShow}
+                                                    onbuttonclick={cardButtonClicked}
+                                                    filters={filters} 
+                                                    container-width={containerWidth}> 
+                                                                              
+                        </c-display-card-component>
+                    </div>
+                </template>
+
+                <template if:true={noRecords}>
+                    <lightning-card>
+                        <h1 style="padding-left:2rem">No records found...</h1>
+                    </lightning-card>
+                </template>
+             </div>
+        </template>
+
+        
+        <template if:true={configuring}>
+            <c-configure-child-visualiser onclosequickaction={closeModalAction}
+                                          object-name={childObjectName}
+                                          parent-object-name={objectApiName}
+                                          predefined-values={configuringFields}
+                                          is-update={customSettingAlreadyPresent}
+                                          record-id={recordId}
+                                          fields={sortFields}
+                                          >
+
+            </c-configure-child-visualiser>
+        </template>
+        <template if:true={filtering}>
+            <c-display-filter-component   ontransferfilteredlist={setFilteredList}
+                                          onclosefilter={closeFilter}
+                                          onclosequickaction={closeModalAction}
+                                          field-set-name={fieldSetName}
+                                          record-id={recordId}
+                                          child-object-name={childObjectName}
+                                          related-by-field={relatedField}
+                                          fields={sortFields}
+                                          >
+
+            </c-display-filter-component>
+        </template>
+</template>

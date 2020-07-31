@@ -1,0 +1,80 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ApplicantRegisterController" >
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="validationError" type="Boolean" required="false" default="false"/>
+	<aura:attribute name="showError" type="Boolean" required="true" description="" default="false" access="private"/>
+	<aura:attribute name="emailAddress" type="String" access="private"/>
+	<aura:attribute name="mobileNumber" type="String" access="private"/>
+	
+    <aura:attribute name="errorMessage" type="String" required="false" description="" access="private"/>
+    
+    <div class="temp">
+    <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <c:svgIcon svgPath="/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#contact" category="standard" size="large" name="contact"/>
+                        </div>
+                        <div class="slds-media__body">
+                            <h2>       
+                                Taxi Licence Registration
+                            </h2>
+                        </div>
+                    </header>
+                </div>
+        		<center>
+                 <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+           			 <div class="slds-form--stacked">
+                            <div class="slds-form-element" aura:id="firstNameContent">
+                                <label class="slds-form-element__label" for="firstName">{!$Label.c.Taxi_Registration_First_Name}&nbsp;<span class="requiredField">*</span></label>
+                                   <ui:inputText value="" required="true" maxlength="26" class="slds-input" aura:id="firstName" />
+                                        <span aura:id="firstNameError" class="errorMsg slds-form-element__help"></span>
+                            </div>
+                            <div class="slds-form-element" aura:id="lastNameContent">
+                                <label class="slds-form-element__label" for="lastName">{!$Label.c.Taxi_Registration_Last_Name}&nbsp;<span class="requiredField">*</span></label>
+                                <ui:inputText value="" maxlength="26" class="slds-input lastName" aura:id="lastName" />
+                                        <span aura:id="lastNameError" class="errorMsg slds-form-element__help"></span>
+                              </div>
+                            <div class="slds-form-element" aura:id="mobileNumberContent">
+                                <c:PhoneComponent isRequired="true" isMobile="true" phoneNumber="{!v.mobileNumber}" fieldLabel="{!$Label.c.Taxi_Registration_Mobile}" uniqueIdentifier="mobile" aura:id="MobileNumber"/>
+                            </div>
+                            <div class="slds-form-element" aura:id="emailAddressContent">
+                                <c:EmailAddressComponent isRequired="true" email="{!v.emailAddress}" fieldLabel="{!$Label.c.Taxi_Registration_Email_Address}" uniqueIdentifier="emailAddress" aura:id="EmailAddress"/>
+                            </div>
+							<div class="slds-form-element" id="applicationTypeConten">
+								<div class="slds-col" >
+								<label class="slds-form-element__label">{!$Label.c.Taxi_Licence_Application_Type}&nbsp;<span class="requiredField">*</span></label>
+								</div>
+								<div class="slds-col" style="display:inline-block; width:100%;">
+									<input type="radio" name="applicationtype" aura:id="Taxi" id="Taxi" onchange="{!c.setApplicationType}" />Taxi Licence
+									&nbsp;&nbsp;&nbsp;
+									<input  type="radio" name="applicationtype" aura:id="Wheelchair" id="Wheelchair" onchange="{!c.setApplicationType}" />Wheelchair Accessible Taxi-Cab (WAT) Licence
+									<br/>
+									<span id="applicationTypeError" class="customErrorMsg"></span>
+								</div>
+							</div>
+                             <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="entityType">{!$Label.c.Taxi_Registration_Entity_Type}&nbsp;<span class="requiredField">*</span></label>
+                                
+                                 <ui:inputSelect class="InputSelectSingle" aura:id="InputSelectSingle" change="{!c.onSingleSelectChange}">
+                                     <ui:inputSelectOption text="" label="Please Select"  value="true"/>
+									 <ui:inputSelectOption text="Individual"  label="Individual"/>
+                                     <ui:inputSelectOption text="Corporation" label="Corporation"/>
+                                 </ui:inputSelect> 
+                                 
+                        	</div>
+							
+                         <div class="slds-card__footer">
+                             <ui:button class="slds-button slds-button--neutral" press="{!c.navigateToHome}"> 
+                               Cancel
+                             </ui:button>
+                             <ui:button class="slds-button slds-button--neutral" aura:id="submitButton" press="{!c.applicantRegister}"> 
+                               Register
+                             </ui:button>
+                         </div>
+                      </div>   
+                  </div>
+     		</center>
+   		 </article>
+        </div>
+</aura:component>

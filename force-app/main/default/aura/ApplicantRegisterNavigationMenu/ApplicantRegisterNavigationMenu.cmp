@@ -1,0 +1,16 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <aura:registerEvent name="filterEvent" type="c:ApplicantRegisterNavigation"/> 
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <center> 
+        <div class="slds-card__footer">
+            <ui:button class="slds-button slds-button--neutral"  aura:id="CancelButton" press="{!c.renderButtonClick}"> 
+                Cancel
+            </ui:button>
+            <ui:button class="slds-button slds-button--neutral registerButton" aura:id="submitButton" press="{!c.renderButtonClick}"> 
+                Register
+            </ui:button>
+        </div>
+    </center>
+</aura:component>

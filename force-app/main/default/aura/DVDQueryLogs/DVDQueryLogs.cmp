@@ -1,0 +1,116 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPDashboardController" >
+    
+    <aura:attribute name="dvdQueryGroupList" type="DVD_Query_Group__c[]"/>
+    
+    <aura:attribute name="ShowCriminalCharge" type="boolean" default="false"/>
+    <aura:attribute name="ShowLicenceEligibility" type="boolean" default="false"/>
+    <aura:attribute name="ShowP2pEligibility" type="boolean" default="false"/>
+    <aura:attribute name="ShowSeriousDrivingOffences" type="boolean" default="false"/>
+    <aura:attribute name="ShowVehicleCheck" type="boolean" default="false"/>
+    <aura:attribute name="taxiLicenceCheck" type="Boolean" default="false" />
+    <aura:attribute name="hideInspectionDateCheck" type="boolean" default="false"/>
+	<aura:attribute name="hideTenureCheck" type="boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.loadLogs}"/>
+    <aura:handler event="c:RefreshDVDQueryLogs" action="{!c.loadLogs}"/> 
+    <aura:handler name="updateDVDCount" event="c:DVDLogsCountUpdateEvent" action="{!c.handleDVDCountUpdate}" />
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" />
+    
+    <div class="slds-grid slds-grid--vertical  scrollable tableTop">
+        <div class="slds-scrollable slds-grow">
+            <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered slds-no-row-hover slds-scrollable--none" style="background: #003577;">
+                <thead style="{!v.dvdQueryGroupList.length > 7 ? 'display:block; width: calc(100% - 17px);background: #003577;' : 'background: #003577;'}">
+                    
+                    <tr class="slds-line-height--reset">   
+                        
+                        <th aria-label="CreatedDate" class="slds-text-title--caps tabText" scope="col">
+                            <span class="slds-align--absolute-center tableheader" title="Created Date">Created Date</span>
+                        </th>                        
+                        <th aria-label="Run Type" class="slds-text-title--caps tabText" scope="col">
+                            <span class="slds-align--absolute-center tableheader" title="Run Type">Type</span> 
+                        </th>
+                        
+                        <th aria-label="Requested by" class="slds-text-title--caps tabText" scope="col">
+                            <span class="slds-align--absolute-center tableheader"  title="Requested By">Requested by</span> 
+                        </th>
+                        
+                        <th aria-label="Status"  class="slds-text-title--caps tabText" scope="col">
+                            <span class="slds-align--absolute-center tableheader" title="Status">Status</span> 
+                        </th>                        
+                        <!--
+                        <th aria-label="Green"  class="slds-text-title- -caps tabColIcon" scope="col">
+                            <span class="slds-align- -absolute-center tableheader" title="Green">Green</span>
+                        </th>
+                        
+                        <th aria-label="Red"  class="slds-text-title- -caps tabColIcon" scope="col">
+                            <span class="slds-align- -absolute-center tableheader" title="Red">Red</span>
+                        </th>
+                        
+                        <th aria-label="White" class="slds-text-title- -caps tabColIcon" scope="col">
+                            <span class="slds-align- -absolute-center tableheader" title="White">White</span> 
+                        </th>
+                        -->
+                        <th aria-label="Export"  class="slds-text-title--caps tabColIcon" scope="col">
+                            <span class="slds-align--absolute-center tableheader" title="Export">Export</span>
+                        </th>
+                    </tr>
+                </thead> 
+            </table>
+            <div style="height:400px;overflow:auto;display:block;">
+                <table class="slds-table slds-table--fixed-layout slds-table--bordered slds-no-row-hover" style="font-weight:bold;">
+                    <tbody>
+                        <aura:iteration var="queryGroup" items="{!v.dvdQueryGroupList}">                
+                            <tr class="slds-hint-parent">
+                                <td role="gridcell" class="tabText">
+                                    <div class="slds-truncate slds-align--absolute-center wrap" title="Created Date">
+                                        <ui:outputDateTime value="{!queryGroup.CreatedDate}" /></div>
+                                </td>
+                                <td role="gridcell" class="tabText">
+                                    <div class="slds-truncate slds-align--absolute-center  wrap" title="Run Type">{!queryGroup.Run_Type__c}</div>
+                                </td>
+                                <td role="gridcell" class="tabText">
+                                    <div class="slds-truncate slds-align--absolute-center wrap" title="Requested By">
+                                        <ui:outputText value="{!queryGroup.Requester__r.Name}"/>
+                                    </div>
+                                </td>
+                                <td role="gridcell" class="tabText">
+                                    
+                                    <!--{!queryGroup.Status__c}-->
+                                    <c:CircularProgress theme="green" themeBeforeThreshold="green" themeAfterThreshold="green" size="small" recordId="{!queryGroup.Id}" sObjectName="DVD_Query_Group__c" totalProgress="{!queryGroup.Eligibility_Check_Total_Count__c}" actualProgress="{!queryGroup.Total__c}" resultFormat="Mix" dvdGroupStatus="{!queryGroup.Status__c}" threshold="0"/>
+                                </td>
+                                <!--
+                                <td role="gridcell" class="tabColIcon">
+                                    <div class="slds-truncate slds-align- -absolute-center wrap" title="Green" id="{!queryGroup.Id + '_greenCount'}">
+                                      {!queryGroup.Eligibility_Y__c}
+                                    </div>
+                                </td>
+                                <td role="gridcell" class="tabColIcon">
+                                    <div class="slds-truncate slds-align- -absolute-center wrap" title="Red" id="{!queryGroup.Id + '_redCount'}">
+                                      {!queryGroup.Eligibility_N__c}
+                                    </div>
+                                </td>
+                                <td role="gridcell" class="tabColIcon">
+                                    <div class="slds-truncate slds-align- -absolute-center wrap" title="White" id="{!queryGroup.Id + '_whiteCount'}">
+                                      {!queryGroup.Eligibility_Unknown__c}
+                                    </div>
+                                </td>  
+-->
+                                <td role="gridcell" class="tabColIcon">
+                                    
+                                    <aura:if isTrue="{!queryGroup.isExportAllowed__c}">
+                                        <div class="download slds-truncate slds-align--absolute-center wrap" title="Export Group" onclick="{!c.exportDVDQueryGroup}" data-group_id="{!queryGroup.Id}" data-dvd_entity_type="{!queryGroup.Run_Type__c}">
+                                            <i style="color:#54698d !important;" class="fa fa-download" aria-hidden="true"></i>
+                                            <!--<c:svgIcon class="dashboard_icon" svgPath="/industry/resource/slds221/assets/icons/utility-sprite/svg/symbols.svg#download" category="utility" size="x-small" name="download"/>-->
+                                        </div> 
+                                    </aura:if>
+                                    
+                                </td>                          
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>      
+</aura:component>

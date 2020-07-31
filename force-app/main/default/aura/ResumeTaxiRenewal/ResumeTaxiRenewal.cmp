@@ -1,0 +1,42 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" controller="TaxiFormSectionDataController" access="global" >
+	
+    <aura:attribute name="caseId" type="String"/>
+    <aura:attribute name="entityType" type="String"/>
+    <aura:attribute name="sectionNameToRender" type="String" default="review"/>
+    
+    <aura:attribute name="paymentInProgress" type="Boolean" default="false"/>
+    
+    <aura:handler name="loadSection" event="c:ASPFormSectionEvent" action="{!c.updateSectionHandlers}"/>
+    
+    <aura:if isTrue="{!v.sectionNameToRender == 'review'}">
+       <c:TaxiFormExternalReview isFromPortal="true" caseId="{!v.caseId}" entityType="{!v.entityType}" withdrawnCase="true"></c:TaxiFormExternalReview>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.sectionNameToRender == 'sectionF'}">
+       <c:TaxiFormPaymentDetails applicationType="New" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormPaymentDetails>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.paymentInProgress == true}">
+        <div class="slds-card__footer">
+            
+            <ui:button class="slds-button slds-button--neutral" press="{!c.cancelApplicationForm}"> 
+                <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Finish Later
+            </ui:button>
+            
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.paymentInProgress == false}">
+        <div class="slds-card__footer">
+            
+            <ui:button class="slds-button slds-button--neutral" press="{!c.cancelApplicationForm}"> 
+                <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Finish Later
+            </ui:button>
+            <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+            </ui:button>
+            
+        </div>
+    </aura:if>
+    
+</aura:component>

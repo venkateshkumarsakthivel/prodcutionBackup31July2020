@@ -1,0 +1,202 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" controller="LevyNewAssessmentController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.TaxiLicenceActionStyle}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="levyStartPeriod" type="String" access="public" default=""/>
+    <aura:attribute name="levyEndPeriod" type="String" access="public" default=""/>
+    <aura:attribute name="rebateApprovalDate" type="String" access="public" default=""/>
+    <aura:attribute name="assessmentCategory" type="String" access="public" default=""/>
+    <aura:attribute name="assessmentReasonCode" type="String" access="public" default=""/>
+    <aura:attribute name="assessmentDescription" type="String" access="public" default=""/>
+    
+    <aura:attribute name="registrationRecord" type="Tax_Payer_Registration__c" default="" access="public"/>
+    <aura:attribute name="rebateApproved" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="preventReassessmentCreation" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="matchingAssessments" type="Assessment__c[]" default="" access="public"/>
+    
+    <aura:attribute name="exemptionApproved" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="exemptionApprovalDate" type="String" access="public" default=""/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-show"/>
+    
+    <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+        <span style="color: #ffffff;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+        </span>
+        <br/>
+    </div>
+    
+    <div id="matchingAssessmentErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+        <span style="color: #ffffff;">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            &nbsp;{!$Label.c.Levy_New_Assessment_Reassessment_Prevention}
+        </span>
+        <br/>
+    </div>
+    
+    <div class="slds-grid">
+        <div class="slds-col">
+            <label class="slds-form-element__label" >{!$Label.c.Levy_New_Assessment_Start_Period}&nbsp;<span class="requiredField">*</span></label>
+            <ui:inputDate change="{!c.validateStartDate}" format="dd/MM/yyyy" value="{!v.levyStartPeriod}" class="slds-input" displayDatePicker="true"/>
+        </div>
+        <div class="slds-col">
+            <label class="slds-form-element__label" >{!$Label.c.Levy_New_Assessment_End_Period}</label>
+            <ui:inputDate format="dd/MM/yyyy" value="{!v.levyEndPeriod}" class="slds-input" disabled="true"/>
+        </div>
+    </div>
+    
+    <div class="slds-grid">
+        <div class="slds-col">
+            <label class="slds-form-element__label" >{!$Label.c.Levy_New_Assessment_Category}&nbsp;<span class="requiredField">*</span></label>
+            <ui:inputSelect class="slds-input" disabled="{!v.readOnly}" aura:id="assessmentCategory" value="{!v.assessmentCategory}">
+                <ui:inputSelectOption text="" label="Please Select"/>
+                <ui:inputSelectOption text='Audit &amp; Compliance'/>
+                <ui:inputSelectOption text="Other"/>
+            </ui:inputSelect>
+        </div>
+        <div class="slds-col">
+            <label class="slds-form-element__label" >{!$Label.c.Levy_New_Assessment_Reason_Code}&nbsp;<span class="requiredField">*</span></label>
+            <ui:inputSelect class="slds-input" disabled="{!v.readOnly}" aura:id="assessmentReasonCode" value="{!v.assessmentReasonCode}">
+                <ui:inputSelectOption text="" label="Please Select"/>
+                <ui:inputSelectOption text="Other"/>
+            </ui:inputSelect>
+        </div>
+    </div>
+    
+    <div class="slds-grid" style="width:100%;padding: 2%;">
+        <div style="width: 80% !important;">
+            <legend class="slds-form-element__label">{!$Label.c.Levy_New_Assessment_Reason_Description}&nbsp;<span class="requiredField">*</span></legend>
+            <ui:inputTextarea aura:id="assessmentReasonDescription" maxlength="2000" 
+                              value="{!v.assessmentDescription}"/>
+        </div>
+        <div style="width: 20% !important;margin-left: 10px;">
+        </div>
+    </div>
+    
+    <aura:if isTrue="{!and(v.matchingAssessments.length == 0, v.levyStartPeriod != '')}">
+        <br/>
+        <div class="slds-grid">
+            <div class="slds-col">
+            </div>
+            <div class="slds-col">
+                <div id="noMatchingRecords" style="padding:.5rem;" class="slds-notify slds-notify--alert slds-theme--warning slds-theme--alert-texture" role="alert">
+                    <span style="color: #000000;font-size:13px;font-weight:bold;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;<aura:unescapedHtml value="{!$Label.c.Levy_New_Assessment_No_Matching_Assessments}"></aura:unescapedHtml>
+                    </span>
+                    <br/><br/>
+                </div>
+            </div>
+            <div class="slds-col">
+            </div>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.matchingAssessments.length > 0}">
+        
+        <br/>
+        <div style="overflow-x:hidden;display: block;">
+            
+            <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered " style="background-color: #eef1f6;">
+                <thead style="{!v.matchingAssessments.length > 20 ? 'display:block; width: calc(100% - 17px);background: #003577;' : 'background: #003577;'}">
+                    <tr class="slds-line-height--reset">
+                        <th aria-label="Period" class="tabCol" scope="col">
+                            <span class="slds-align--absolute-center tableheader" title="Assessment Number">
+                                ASSESSMENT NUMBER
+                            </span> 
+                        </th>
+                        <th aria-label="Type" class="tabCol" scope="col">
+                            <span class="slds-float_left tableheader" title="Type">
+                                TYPE
+                            </span> 
+                        </th>
+                        <th aria-label="Issued" class="tabCol" scope="col">
+                            <span class="slds-align--absolute-center tableheader" title="Status">
+                                STATUS
+                            </span> 
+                        </th>                    
+                        <th aria-label="Assessed Liability" class="tabCol" scope="col">
+                            <span class="slds-align--absolute-center tableheader" title="TSP Trip Count">
+                                TSP TRIP COUNT
+                            </span>
+                        </th>
+                        <th aria-label="Status" class="tabCol" scope="col">
+                            <span class="slds-align--absolute-center tableheader" title="BSP Trip Count">
+                                BSP TRIP COUNT
+                            </span>
+                        </th>
+                        <th aria-label="Raise an objection" class="tabCol" scope="col">
+                            <span class="slds-align--absolute-center tableheader" title="Issue Date">
+                                ISSUE DATE
+                            </span> 
+                        </th>
+                        <th aria-label="Raise an objection" class="tabCol" scope="col">
+                            <span class="slds-float_right tableheader" title="Total Levy Amount">
+                                TOTAL LEVY AMOUNT
+                            </span> 
+                        </th>
+                    </tr>
+                </thead> 
+                <tbody>
+                    <aura:iteration var="record" items="{!v.matchingAssessments}">
+                        <tr class="slds-line-height--reset">
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputText class="slds-align--absolute-center" value="{!record.Name}"/>
+                            </td>
+                            
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputText class="slds-float_left" value="{!record.Assessment_Type__c}"/>
+                            </td>
+                            
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputText class="slds-align--absolute-center" value="{!record.Status__c}"/>
+                            </td>
+                            
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputNumber class="slds-align--absolute-center" value="{!record.TSP_Transaction_Count__c}"/>
+                            </td>
+                            
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputNumber class="slds-align--absolute-center" value="{!record.BSP_Transaction_Count__c}"/>
+                            </td>
+                            
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputDate format="dd/MM/yyyy" class="slds-align--absolute-center" value="{!record.Issue_Date__c}"/>
+                            </td>
+                            
+                            <td role="gridcell" class="tabCol">
+                                <ui:outputNumber class="slds-float_right" value="{!'$'+record.Total_Levy_Amount__c}"/>
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.levyStartPeriod != ''}">
+        
+        <div class="slds-card__footer" style="border-top:0px;">
+            
+            
+            <ui:button class="slds-button slds-button--neutral" press="{!c.cancelAssessmentCreation}"> 
+                <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true" ></i>&nbsp;&nbsp;Cancel
+            </ui:button>
+            
+            
+            <aura:if isTrue="{!not(v.preventReassessmentCreation)}"> 
+                <ui:button class="slds-button slds-button--neutral" press="{!c.createCase}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true" ></i>&nbsp;&nbsp;Create
+                </ui:button>
+            </aura:if>
+            
+        </div>
+    </aura:if>
+    
+</aura:component>

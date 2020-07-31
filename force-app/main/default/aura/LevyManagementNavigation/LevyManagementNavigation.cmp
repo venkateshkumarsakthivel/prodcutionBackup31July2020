@@ -1,0 +1,25 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+ <aura:registerEvent name="filterEvent" type="c:LevyManagementNavigationEvent"/> 
+	<aura:attribute name="renderPartners" type="Boolean" default="false"/>
+    
+    <div class="slds-grid slds-grid--vertical slds-navigation-list--vertical" style="color: #000000;">
+        <ul class="navigations">
+            <li style="padding: 0 0 0.5rem 0rem;" class="ActivitiesListItem ListItem" aura:id="ActivitiesListItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Activities" id="Activities" onclick="{!c.renderfilter}">Activities</a>
+            </li>
+            <li style="padding: 0.5rem 0 0.5rem 0rem;" class="RegistrationListItem ListItem slds-is-active" aura:id="RegistrationListItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Registration" id="Registration" onclick="{!c.renderfilter}">Registration</a>
+            </li>
+			 <li style="padding: 0.5rem 0 0.5rem 0rem;" class="ReturnsListItem ListItem" aura:id="ReturnsListItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Returns" id="Returns" onclick="{!c.renderfilter}">Returns</a>
+            </li>
+             <li style="padding: 0.5rem 0 0.5rem 0rem;" class="AssessmentsListItem ListItem" aura:id="AssessmentsListItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Assessments" id="Assessments" onclick="{!c.renderfilter}">Assessments</a>
+            </li>
+             <li style="padding: 0.5rem 0 0.5rem 0rem;" class="HelpListItem ListItem" aura:id="HelpListItem">
+                <a href="javascript:void(0);" class="slds-navigation-list--vertical__action slds-text-link--reset link" aria-describedby="entity-header" aura:id="Help" id="Help" onclick="{!c.renderfilter}">Help</a>
+            </li>
+            
+        </ul>
+    </div>
+</aura:component>

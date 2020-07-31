@@ -1,0 +1,138 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TaxiRenewalApplicationController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>    
+    
+    <aura:attribute name="entityType" type="String" access="public" />
+    <aura:attribute name="displayNextSection" type="Boolean" default="true" />
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="true" />
+    <aura:attribute name="readOnly" type="Boolean" default="false" access="public"/>
+    <aura:attribute type="String" name="renewalAuthorisationName" />
+    <aura:attribute type="String" name="renewalAuthorisationStartDate" />
+    <aura:attribute type="Double" name="applicationFee" default="0"/>
+    <aura:attribute type="String" name="renewalAuthorisationEndDate" />
+    <aura:attribute type="Double" name="licenceFee" default="0"/>
+    <aura:attribute type="String" name="operationArea" />
+    <aura:attribute type="String" name="licenceClass" />
+    <aura:attribute type="String" name="operatingLocations" />
+    <aura:attribute type="String" name="licenceType" />
+    <aura:attribute type="String" name="plateNumber" />
+    <aura:attribute name="caseId" type="String" default="" access="public"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:method name="initialize" action="{!c.doInit}"  />
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:method name="fetchApplicationDetails" action="{!c.fetchApplicationDetails}" access="PUBLIC"/>
+    <aura:if isTrue="{!not(v.readOnly)}">
+      <c:LicenceRenewalProgressIndicator currentSection="{!$Label.c.Licence_Details_Header}" />
+      <br/>
+    </aura:if>
+    
+    <article class="slds-card" id="formPartA">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#account'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">   
+                        {!$Label.c.Licence_Details_Header}                      
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">                             
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+                
+			<div class="slds-section slds-is-open" aura:id="sectiontitle">
+				<h5 class="slds-section__title" style="font-size: 1.0rem;" title="Click to expand or collapse">
+					<button class="slds-button slds-section__title-action" onclick="{!c.toggleSectionContent}" style="background-color: #003577;color: #ffffff;">
+						<aura:if isTrue="{!v.isSectionExpanded}">
+							<i class="fa fa-minus" style="font-size: 0.875rem;" aria-hidden="true"></i>
+							<aura:set attribute="else">
+								<i class="fa fa-plus" style="font-size: 0.875rem;" aria-hidden="true"></i>
+							</aura:set>
+						</aura:if>
+						&nbsp;&nbsp;{!$Label.c.All_Applicant_Application_Checklist}
+					</button>
+				</h5>
+				<div class="slds-section__content" style="border-width: 1px;border-style: solid;border-color: rgb(208, 208, 208);border-top: 0;">
+					<p class="slds-form- -stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+						<p>
+							<aura:unescapedHtml value="{!$Label.c.Taxi_Renewal_Checklist_1}"/>							
+						</p>
+					</p>
+				</div>
+			</div>
+			<div class="slds-grid">
+                <div class="slds-col">                    
+                    <label class="slds-form-element__label">{!$Label.c.Licence_Number}</label>
+                    <ui:inputText disabled="true" aura:id="Licence-Number" class="slds-input" value="{!v.renewalAuthorisationName}"/>
+                </div>
+                <div class="slds-col">
+                    <label class="slds-form-element__label">{!$Label.c.Licence_Start_Date}</label>
+                    <ui:inputDate class="slds-input" disabled="true" format="dd/MM/yyyy" value="{!v.renewalAuthorisationStartDate}"/>				
+                </div>
+			</div>
+			
+			
+			<div class="slds-grid">
+                <div class="slds-col">                    
+                    <label class="slds-form-element__label">{!$Label.c.Licence_Renewal_Fee}</label>
+                    <ui:inputCurrency class="slds-input" disabled="true" value="{!v.applicationFee}"/>
+                </div>
+                <div class="slds-col">
+                    <label class="slds-form-element__label">{!$Label.c.Licence_End_Date}</label>
+                    <ui:inputDate class="slds-input" disabled="true" format="dd/MM/yyyy" value="{!v.renewalAuthorisationEndDate}"/>				
+                </div>				
+			</div>
+			
+			<div class="slds-grid">
+                <div class="slds-col">
+                    <label class="slds-form-element__label">{!$Label.c.Licence_Type}</label>
+                    <ui:inputText class="slds-input" disabled="true" value="{!v.licenceType}"/>
+                </div>
+                <div class="slds-col">                    
+                    <label class="slds-form-element__label">{!$Label.c.Operation_Area}</label>
+                    <ui:inputText disabled="true" class="slds-input" value="{!v.operationArea}"/>
+                </div>
+			</div>
+            
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <label class="slds-form-element__label">{!$Label.c.Licence_Class}</label>
+                    <ui:inputText class="slds-input" disabled="true" value="{!v.licenceClass}"/>
+                </div>
+                <div class="slds-col">                    
+                    <label class="slds-form-element__label">{!$Label.c.Operating_Locations}</label>
+                    <ui:inputText disabled="true" class="slds-input" value="{!v.operatingLocations}"/>
+                </div>
+			</div>
+            
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <label class="slds-form-element__label">{!$Label.c.Licence_Fee}</label>
+                    <ui:inputCurrency class="slds-input" disabled="true" value="{!v.licenceFee}"/>
+                </div>
+                <div class="slds-col">                    
+                    <label class="slds-form-element__label">{!$Label.c.Licence_Plate_Number}</label>
+                    <ui:inputText disabled="true" aura:id="Plate-Number" class="slds-input" value="{!v.plateNumber}"/>
+                </div>
+			</div>
+            
+        </div>
+        <!-- Footer component-->
+        <div class="slds-card__footer">            
+            <aura:if isTrue="{!v.displayNextSection}">
+            <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+            </ui:button>
+            </aura:if>                        
+        </div>
+    </article>
+</aura:component>

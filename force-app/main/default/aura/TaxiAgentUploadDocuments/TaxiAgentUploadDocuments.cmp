@@ -1,0 +1,73 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="TaxiAgentRegistrationDetailsForm">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="poiUploadStatus" type="boolean" default="false" />
+    <aura:attribute name="entityType" type="String" default="Individual" />
+    <aura:attribute name="primaryRelatedContactRecord" type="Related_Contact__c" default="{}"/>
+    <aura:attribute name="secondaryRelatedContactRecord" type="Related_Contact__c" default="{}"/>
+    <aura:attribute name="caseRegistrationRecord" type="Case" access="public" default="{}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" access="public" /> 
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:registerEvent name="loadSection" type="c:TaxiAgentRegistrationSectionEvent" access="public"/>
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <c:TaxiAgentRegistrationProgressIndicator currentSection="{!$Label.c.Taxi_Agent_Upload_Document}" entityType="Individual"/>
+    <br/>
+    
+    <article class="slds-card" id="taxiAgentUploadDocument">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/custom-sprite/svg/symbols.svg#custom18'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">   
+                        {!$Label.c.Taxi_Agent_Upload_Document}
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>  
+                
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <c:P2POTAttachment bypassUserTypeCheck="true" isInternalUser="false" category="POI" uploadStatus="{!v.poiUploadStatus}" uniqueIdentifier="applicant-poi" FileUploadChecked="{!v.caseRegistrationRecord.Proof_Of_Identity_Documents__c}" FileCheckLabel="Proof of identity or court appointment documents" aura:id="Identity-Document-Upload" ParentRecordId="{!v.caseRegistrationRecord.Id}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of your proof of identity or court appointment documents." AllowMultiple="false" section="INDIVIDUAL" index="1" />
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        <div class="slds-card__footer">
+            <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+            </ui:button>
+            
+            <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+            </ui:button>
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

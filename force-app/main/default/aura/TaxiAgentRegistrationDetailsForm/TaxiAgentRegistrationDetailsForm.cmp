@@ -1,0 +1,265 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="TaxiAgentRegistrationDetailsForm">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="false" access="public"/>
+    <aura:attribute name="entityType" type="String" default="Individual"/>
+    <aura:attribute name="iframeHeight" type="Integer" default="100" access="public"/>
+    <aura:attribute name="isCaptchavalid" type="Boolean" required="false" default="false" access="public"/>
+    
+    <aura:attribute name="caseRegistrationRecord" type="Case" access="public" default="{}"/>
+    <aura:attribute name="primaryRelatedContactRecord" type="Related_Contact__c" default="{}"/>
+    <aura:attribute name="dob" type="String" default="{}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" access="public" /> 
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:registerEvent name="loadSection" type="c:TaxiAgentRegistrationSectionEvent" access="public"/>
+    
+    <c:TaxiAgentRegistrationProgressIndicator currentSection="{!$Label.c.Taxi_Agent_Registration_Details}" entityType="{!v.entityType}"/>
+    <br/>
+    
+    <article class="slds-card" id="taxiAgentFormDetails">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/custom-sprite/svg/symbols.svg#custom18'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">   
+                        {!$Label.c.Taxi_Agent_Registration_Details}
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <div class="slds-section slds-is-open" aura:id="sectiontitle">
+                    <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Click to expand or collapse">
+                        <button class="slds-button slds-section__title-action" onclick="{!c.toggleSectionContent}" style="background-color: #003577;color: #ffffff;">
+                            <aura:if isTrue="{!v.isSectionExpanded}">
+                                <i class="fa fa-minus" style="font-size: 0.875rem;color:#ffffff !important" aria-hidden="true"></i>
+                                <aura:set attribute="else">
+                                    <i class="fa fa-plus" style="font-size: 0.875rem;color:#ffffff !important" aria-hidden="true"></i>
+                                </aura:set>
+                            </aura:if>
+                            &nbsp;&nbsp;{!$Label.c.Taxi_Agent_Agent_Checklist}
+                        </button>
+                    </h5>
+                    <div class="slds-section__content" style="border-width: 1px;border-style: solid;border-color: rgb(208, 208, 208);border-top: 0;">
+                        
+                        <p class="slds-form- -stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+                            <p>
+                                {!$Label.c.Taxi_Agent_Registration_Checklist_1}
+                            </p>
+                            <p>
+                                <br/>{!$Label.c.Taxi_Agent_Registration_Checklist_2}
+                            </p>
+                            <p>
+                                <br/>{!$Label.c.Taxi_Agent_Registration_Checklist_3}
+                            </p>
+                            <p>
+                                <br/>{!$Label.c.Taxi_Agent_Registration_Checklist_4}
+                            </p>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="slds-col">
+                    <div style="display:inline;">
+                        <legend class="slds-form-element__label">{!$Label.c.Taxi_Agent_Entity_Type}&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <ui:inputRadio  aura:id="Individual" change="{!c.toggleEntityType}" name="addNewTaxiAgent" label=""  value="{!if(v.entityType == 'Individual' ,true, false)}"/> Individual &nbsp;&nbsp;&nbsp;
+                            <ui:inputRadio  aura:id="Corporation" change="{!c.toggleEntityType}" name="addNewTaxiAgent" label="" value="{!if(v.entityType == 'Corporation' ,true, false)}"/> Corporation
+                        </legend>
+                    </div>
+                </div>
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>  
+                
+                <aura:if isTrue="{!v.entityType == 'Individual'}">
+                    <!--  <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">
+                                {!$Label.c.Taxi_Agent_Title}
+                            </label>
+                            <ui:inputSelect class="CamelCaseInput slds-input" disabled="{!v.readOnly}" aura:id="Title-Input" value="{!v.primaryRelatedContactRecord.Title__c}">
+                                <ui:inputSelectOption text="" label="Please Select"/>
+                                <ui:inputSelectOption text="Mr."/>
+                                <ui:inputSelectOption text="Mrs."/>
+                                <ui:inputSelectOption text="Ms."/>
+                                <ui:inputSelectOption text="Miss."/>
+                                <ui:inputSelectOption text="Other"/>
+                            </ui:inputSelect>
+                        </div>
+                        <div class="slds-col">
+                        </div>
+                    </div> -->
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">
+                                {!$Label.c.Taxi_Agent_First_Given_Name}&nbsp;<span class="requiredField">*</span>
+                            </label>
+                            <ui:inputText maxlength="255" aura:id="Taxiagent-First-Given-Name-Input" class="CamelCaseInput slds-input" value="{!v.primaryRelatedContactRecord.First_Given_Name__c}"/>
+                        </div>
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">
+                                {!$Label.c.Taxi_Agent_Family_Name}&nbsp;<span class="requiredField">*</span>
+                            </label>
+                            <ui:inputText maxlength="255" aura:id="Taxiagent-Family-Name-Input" class="CamelCaseInput slds-input" value="{!v.primaryRelatedContactRecord.Family_Name__c}"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">
+                                {!$Label.c.Taxi_Agent_Other_Given_Name}
+                            </label>
+                            <ui:inputText maxlength="255" aura:id="Taxiagent-Other-Given-Name-Input" class="CamelCaseInput slds-input" value="{!v.primaryRelatedContactRecord.Other_Given_Name__c}"/>
+                        </div>
+                        <div class="slds-col">
+                            <c:DateOfBirthComponent isReadOnly="{!v.readOnly}" aura:id="Taxi-agent-DOB-Input" uniqueIdentifier="Taxi-agent-DOB-Input" 
+                                                    fieldLabel="{!$Label.c.Taxi_Agent_Date_Of_Birth}"
+                                                    isRequired="true" DOB="{!v.dob}"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <c:DriverLicenceComponent isReadOnly="{!v.readOnly}" aura:id="Taxiagent-Australian-Driver-Lic-Number-Input" uniqueIdentifier="Taxiagent-Australian-Driver-Lic-Number-Input" 
+                                                      fieldLabel="{!$Label.c.Taxi_Agent_Australian_Driver_Lic_Number}"
+                                                      isRequired="false" licence="{!v.primaryRelatedContactRecord.Australian_Driver_Licence__c}"/>
+                        </div>
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">{!$Label.c.Taxi_Agent_State_of_Issue}</label>                       
+                            <ui:inputSelect aura:id="Taxi-Driver-Licence-Number-State-Input" value="{!v.primaryRelatedContactRecord.Australian_Driver_Licence_State__c}" class="slds-inputselect" >
+                                <ui:inputSelectOption text="" label="Please Select"/>
+                                <ui:inputSelectOption text="NSW"/>
+                                <ui:inputSelectOption text="ACT"/>
+                                <ui:inputSelectOption text="VIC"/>
+                                <ui:inputSelectOption text="QLD"/>
+                                <ui:inputSelectOption text="SA"/>
+                                <ui:inputSelectOption text="NT"/>
+                                <ui:inputSelectOption text="TAS"/>
+                                <ui:inputSelectOption text="WA"/>
+                            </ui:inputSelect>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <c:PhoneComponent isReadOnly="{!v.readOnly}" 
+                                              aura:id="Taxi-Agent-Individual-Daytime-Phone-Input" 
+                                              uniqueIdentifier="Taxi-Agent-Individual-Daytime-Phone-Input"
+                                              fieldLabel="Daytime Phone Number" 
+                                              isRequired="true" 
+                                              phoneNumber="{!v.primaryRelatedContactRecord.Daytime_Phone__c}" />
+                        </div>
+                        <div class="slds-col">
+                            <c:EmailAddressComponent isReadOnly="{!v.readOnly}" 
+                                                     aura:id="Taxi-Agent-Individual-Email-Input" 
+                                                     uniqueIdentifier="Taxi-Agent-Email-Input"
+                                                     fieldLabel="{!$Label.c.Taxi_Agent_Notice_Email_Add}" 
+                                                     isRequired="true" 
+                                                     email="{!v.primaryRelatedContactRecord.Email__c}"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">{!$Label.c.Taxi_Agent_Residential_Address}</label>                       
+                            <c:AddressInputComponent reviewReadOnly="{!v.readOnly}" 
+                                                     aura:id="Taxi-Agent-Individual-Residential-Address-Input" 
+                                                     street="{!v.primaryRelatedContactRecord.Notice_Address_Street__c}" city="{!v.primaryRelatedContactRecord.Notice_Address_City__c}" addressType="Notice_Address"
+                                                     state="{!v.primaryRelatedContactRecord.Notice_Address_State__c}" postalcode="{!v.primaryRelatedContactRecord.Notice_Address_Postal_Code__c}"
+                                                     isAustraliaAddress="true" isInternationalAddress="false"
+                                                     fullStreet="{!v.primaryRelatedContactRecord.Notice_Address_Street__c}"/>
+                        </div>
+                        <div class="slds-col">
+                            
+                        </div>
+                    </div>
+                </aura:if>
+                
+                <aura:if isTrue="{!v.entityType == 'Corporation'}">
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <c:ACNComponent aura:id="Taxi-Agent-ACN-Input" uniqueIdentifier="Taxi-Agent-ACN-Input" 
+                                            fieldLabel="{!$Label.c.Taxi_Agent_ACN_or_ARBN}" corporateName="{!v.primaryRelatedContactRecord.Corporation_Name__c}"
+                                            isRequired="true" acn="{!v.primaryRelatedContactRecord.ACN__c}"/>
+                        </div>
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">{!$Label.c.Corporation_Registered_Business_Name}</label>
+                            <ui:inputText maxlength="255" disabled="true" aura:id="Business-Name-Input" class="CamelCaseInput slds-input" value="{!v.primaryRelatedContactRecord.Corporation_Name__c}"/>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <c:PhoneComponent isReadOnly="{!v.readOnly}" 
+                                              aura:id="Taxi-Agent-Daytime-Corporation-Phone-Input" 
+                                              uniqueIdentifier="Taxi-Agent-Daytime-Corporation-Phone-Input"
+                                              fieldLabel="Daytime Phone Number" 
+                                              isRequired="true"
+                                              phoneNumber="{!v.primaryRelatedContactRecord.Daytime_Phone__c}" />
+                        </div>
+                        <div class="slds-col" >
+                            <c:EmailAddressComponent isReadOnly="{!v.readOnly}" 
+                                                     aura:id="Taxi-Agent-Corporation-Email-Input" 
+                                                     uniqueIdentifier="Taxi-Agent-Email-Input"
+                                                     fieldLabel="{!$Label.c.Taxi_Agent_Notice_Email_Add}" 
+                                                     isRequired="true" 
+                                                     email="{!v.primaryRelatedContactRecord.Email__c}"/>
+                            
+                        </div> 
+                    </div>
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <label class="slds-form-element__label">{!$Label.c.Taxi_Agent_Residential_Address}&nbsp;<span class="requiredField">*</span></label>                       
+                            <c:AddressInputComponent reviewReadOnly="{!v.readOnly}" 
+                                                     aura:id="Taxi-Agent-Corporation-Residential-Address-of-corporation" 
+                                                     street="{!v.primaryRelatedContactRecord.Notice_Address_Street__c}" city="{!v.primaryRelatedContactRecord.Notice_Address_City__c}" addressType="Notice_Address"
+                                                     state="{!v.primaryRelatedContactRecord.Notice_Address_State__c}" postalcode="{!v.primaryRelatedContactRecord.Notice_Address_Postal_Code__c}"
+                                                     fullStreet="{!v.primaryRelatedContactRecord.Notice_Address_Street__c}" isAustraliaAddress="true" isInternationalAddress="false" hasFocus="true" />
+                        </div>
+                        <div class="slds-col">
+                        </div>
+                    </div>
+                </aura:if>
+                
+                
+                <!-- reCAPTCHA implemenation to fix static js issue -->
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <div class="slds-form-element slds-captcha" style="margin-top: 2.3rem;">
+                            <iframe id="captchaContainer" aura:id="vfFrameRecaptcha" src="{!$Label.c.reCAPTCHA_Visual_Force_Url + '/captcha/apex/captcha'}" scrolling="auto"  frameborder="0" width="100%" height="{!v.iframeHeight + 'px'}" allowtransparency="true" />
+                            <span aura:id="CaptchaError" class="errorMsg slds-form-captcha-hide">{!$Label.c.Applicant_Registration_Captcha_Error}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slds-card__footer">           
+            <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+            </ui:button>
+        </div>
+    </article>
+</aura:component>

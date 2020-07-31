@@ -1,0 +1,41 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,forceCommunity:profileMenuInterface" access="global" controller="LoggedInUserController">
+    
+    <aura:attribute name="primaryMenuName" type="String" default="Account"/>
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}" afterScriptsLoaded="{!c.setupMenu}"/>
+    <aura:attribute name="userName" type="String" default=""/>
+    <aura:attribute name="aspCommunityMenu" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>     
+    <div style="margin:0 auto;max-width:1024px;" class="slds-no-print">
+        <div class="custom-Header" style="background: white;width: 100%;">
+            <div class="LogoAndSearchP2PTransport" style="display:inline; position:relative;">
+                <a href="/taxilicence/s/manage-profile?src=accountMenu"  title="Point to Point Transport Commissioner"> 
+                    <img src="{!$Resource.P2P_PortalLogo}" style="max-width:230px;"/>
+                </a>
+            </div>
+            <div class="open-search" style="display:inline;">
+                <div id='cssmenu' style="margin-right: -42px;">
+                    <ul>
+                        <li aura:id="accountMenu"><a href='/taxilicence/s/manage-profile?src=accountMenu' title="{!v.primaryMenuName}"><span>{!v.primaryMenuName}</span></a></li>
+                        <li aura:id="helpMenu"><a href='' onclick='{!c.gotoHelpPage}' title="Help"><span>Help</span></a></li>                            
+                        <li aura:id="loginMenu" class='last' style="display: none;"><a href='/taxilicence/s/login' title="Login"><span>Login</span></a></li>
+                        <li aura:id="nameMenu" class='has-sub last truncateName' style="display: none;">
+                            <a href='#' class="slds-truncate" title="{!v.userName}">
+                                <span id="PSPuserName">
+                                    {!v.userName}
+                                </span>
+                            </a>
+                            <ul style="z-index:1;">
+                                <aura:if isTrue="{!v.aspCommunityMenu}">
+                                    <li aura:id="aspCommunityMenu"><a href='/industryportal/s/secure-portal-home?src=homeMenuPSP' title="Authorisation"><span>Authorisations</span></a></li>
+                                </aura:if>
+                                <li class='last'><a href='/taxilicence/secur/logout.jsp' title="Logout"><span>Logout</span></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

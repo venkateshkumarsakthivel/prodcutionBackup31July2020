@@ -1,0 +1,9 @@
+<aura:event type="COMPONENT" description="Event template">
+    <aura:attribute name="sectionName" type="String" access="global"/>
+    <aura:attribute name="caseId" type="String" access="global"/>
+    <aura:attribute name="entityType" type="String" access="global"/>
+    <aura:attribute name="existingLicence" type="String" access="global"/>
+    <aura:attribute name="sellerCaseId" type="String" access="global"/>
+    <aura:attribute name="readOnly" type="Boolean" access="global"/>
+    <aura:attribute name="isInternalUser" type="Boolean" access="global"/>
+</aura:event>

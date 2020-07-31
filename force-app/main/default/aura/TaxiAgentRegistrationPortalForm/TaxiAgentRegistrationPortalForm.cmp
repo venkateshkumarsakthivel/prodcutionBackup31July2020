@@ -1,0 +1,43 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="caseRegistrationRecord" type="Case" default="" access="public"/>
+    <aura:attribute name="primaryRelatedContactRecord" type="Related_Contact__c" default="{}"/>
+    <aura:attribute name="secondaryRelatedContactRecord" type="Related_Contact__c" default="{}"/>
+    <aura:attribute name="entityType" type="String" />
+    <aura:attribute name="primaryDOB" type="String" default=""/>
+    <aura:attribute name="secondaryDOB" type="String" default=""/>
+    
+    <aura:attribute name="sectionNameToRender" type="String" default="sectionA" access="public"/>
+    
+    <aura:handler name="loadSection" event="c:TaxiAgentRegistrationSectionEvent" action="{!c.updateSectionHandlers}"/>
+    
+    <!--
+    <br/>
+    <h2 style="width: 100%;margin: 0;padding: 0;text-align: center;font-size: 26px;">
+        <hr style="display: inline-block;margin: 0 20px 8px 0;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr> 
+          {!$Label.c.Levy_Registration_Application_Title}
+         <hr style="display: inline-block;margin: 0 0 8px 20px;height: 3px;content: ' ';text-shadow: none;background-color: #000;width: 220px;"></hr>
+    </h2>
+    <br/>
+    -->
+    
+    <aura:If isTrue="{!v.sectionNameToRender == 'sectionA'}">
+        <c:TaxiAgentRegistrationDetailsForm dob="{!v.primaryDOB}" caseRegistrationRecord="{!v.caseRegistrationRecord}" primaryRelatedContactRecord="{!v.primaryRelatedContactRecord}" entityType="{!v.entityType}"></c:TaxiAgentRegistrationDetailsForm>
+    </aura:If>
+    
+    <aura:If isTrue="{!v.sectionNameToRender == 'sectionB'}">
+        <c:TaxiAgentManagerDetails dob="{!v.secondaryDOB}" caseRegistrationRecord="{!v.caseRegistrationRecord}" primaryRelatedContactRecord="{!v.primaryRelatedContactRecord}" secondaryRelatedContactRecord="{!v.secondaryRelatedContactRecord}" entityType="{!v.entityType}"></c:TaxiAgentManagerDetails>
+    </aura:If>
+    
+    <aura:If isTrue="{!v.sectionNameToRender == 'sectionC'}">
+        <c:TaxiAgentUploadDocuments caseRegistrationRecord="{!v.caseRegistrationRecord}" primaryRelatedContactRecord="{!v.primaryRelatedContactRecord}" secondaryRelatedContactRecord="{!v.secondaryRelatedContactRecord}" entityType="{!v.entityType}"></c:TaxiAgentUploadDocuments>
+    </aura:If>
+    
+    <aura:If isTrue="{!v.sectionNameToRender == 'sectionD'}">
+        <c:TaxiAgentRegistrationPrivacyDeclarationStatement caseRegistrationRecord="{!v.caseRegistrationRecord}" primaryRelatedContactRecord="{!v.primaryRelatedContactRecord}" secondaryRelatedContactRecord="{!v.secondaryRelatedContactRecord}" entityType="{!v.entityType}"></c:TaxiAgentRegistrationPrivacyDeclarationStatement>
+    </aura:If>
+    
+</aura:component>

@@ -1,0 +1,9 @@
+<aura:component extensible="true" abstract="true">
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require scripts="{!$Resource.UnderscoreJS}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="entities" type="sObject[]" />
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    {!v.body}
+</aura:component>

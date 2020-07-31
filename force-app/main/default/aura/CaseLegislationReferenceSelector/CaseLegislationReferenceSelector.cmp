@@ -1,0 +1,41 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" controller="LegislationSearchController">
+    <aura:attribute name="recordtype" type="String" access="public" description="recordtype"/>
+    <aura:attribute name="caseId" type="String" access="public" description="caseId"/>
+    <aura:attribute name="recordId" type="String" access="public" description="recordId"/>
+    <aura:attribute name="caseLegislation" type="object[]" default="" access="public" description="List of Legislation Records in Case"/>
+    <aura:attribute name="matchingLegislation" type="object[]" default="" access="public" description="Matching List of Legislation Records"/>
+    <aura:attribute name="addedLegislation" type="object[]"  access="public" description="List of Legislation Records that are added"/>
+    <aura:attribute name="existingLegislation" type="object[]"  access="public" description="List of Legislation Records that are existing"/>
+    <aura:attribute name="columns" type="List" default="" access="private" description="Legislation Record Columns"/>
+    
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }"/>
+    <aura:handler event="c:existLegislationEvent" action="{!c.existLegislationEventHandler}" />
+    <aura:handler event="c:cancelChangesEvent" action="{!c.cancelChangesEventHandler}" />
+    <aura:handler event="c:saveChangesEvent" action="{!c.saveChangesEventHandler}" />
+    <aura:handler event="c:removeLegislationEvent" action="{!c.removeLegislationEventHandler}" />
+    <aura:registerEvent name="addLegislation" type="c:AddLegislationEvent"/>
+     <aura:attribute name="loaded" type="Boolean" default="false" />
+    
+    <div class="slds-form-element">    
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem>
+                <p class="slds-text-title_bold slds-p-bottom_small">Related Case Legislations:</p>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12">
+                <aura:if isTrue="{! v.loaded }">
+                    <lightning:spinner alternativeText="Loading" size="medium" variant="brand"/>
+                </aura:if>
+                <div style="height:190px;max-height:250px">
+                <lightning:datatable
+                                     columns="{!v.columns}"
+                                     data="{!v.matchingLegislation}"
+                                     keyField="Id"
+                                     onrowaction="{!c.handleRowAction}"
+                                     onrowselection = "{!c.rowSelected}"
+                                     hideCheckboxColumn = "true"
+                                     />                
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

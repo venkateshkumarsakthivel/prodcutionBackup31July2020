@@ -1,0 +1,120 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller='TaxiLicenceSurrenderController'>
+    
+    <aura:attribute name='developer' type='String' default='Developer'/>
+    <aura:attribute name="options" type="List" default="[{'label': 'Yes', 'value': true},{'label': 'No', 'value': false}]"/>
+    <aura:attribute name="value" type="String" default="none"/>
+    <aura:attribute name="checkbox-1" type="boolean" default='false' />
+    <aura:attribute name="confirmationBox" type="boolean" default='false' />
+    <aura:attribute name="record_Id" type="String"/>
+    <aura:attribute name="account_Id" type="String"/>
+    <aura:attribute name="OrderCount" type="String"/>
+    <aura:attribute name="TotalDueAmount" type="Currency"/>
+    <aura:attribute name="PlatesReturned" type="boolean" default='false' />
+    <aura:attribute name="HasPendingOrders" type="boolean" default='false' />
+    <aura:attribute name="recordName" type="String"/>
+    <aura:attribute name="recordPlateNumber" type="String"/>
+    <aura:attribute name="surrenderDate" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="confirmCreateSurrenderCase" event="c:createSurrenderCase" action="{!c.createCase}"/>
+    <aura:handler name="HideConfirmationBoxSpinnerOnCancel" event="c:CloseSurrenderConfirmationModalBox" action="{!c.hideSpinnerOnCancel}"/>
+    <aura:registerEvent name="closeSurrenderForm" type="c:CloseTaxiSurrenderForm"/>
+    <aura:registerEvent name="closeSurrenderFormonly" type="c:CloseTaxiSurrenderFormRedirect"/>
+    
+    
+    <article id="OccurrenceForm" > 
+        <div>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+                <div class="slds-modal__container" style = "width: 70%; height: 90%">
+                    <header class="slds-modal__header" >
+                        <p align='right' class="slds-text-body_small slds-line-height_reset">Fields marked with <span class="slds-required">*</span> are mandatory</p>
+                        <div class="slds-media ">
+                            <div class="slds-media__figure">
+                                <span class="slds-icon_container slds-icon-standard-avatar">
+                                    <c:svgIcon class="slds-icon slds-icon_container"
+                                               svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#work_order'}"  category="standard" size="large" name="fleet">
+                                    </c:svgIcon>
+                                </span>
+                            </div>
+                            <span>
+                                <div class = 'slds-form-element__label '>
+                                    <h1 align = 'left' class="slds-page-header__title slds-text-heading_medium slds-hyphenate" style = "font-size : 26px" ><b>Surrender of Taxi Licence</b></h1>
+                                    <h5 align = 'left' style = '{font-size: medium;}' class="slds-text"> Note: Complete this form to notify the Point to Point Transport Commissioner that the Taxi Licence is being voluntarily surrendered</h5>
+                                </div>
+                            </span>
+                        </div>
+                    </header>
+                    <lightning:spinner aura:id="spinner1" variant="brand" size="large" class=" slds-hide"/>
+                    
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-grid">  
+                            <div class="slds-col slds-size--1-of-2">
+                                <label class="slds-form-element__label" style = "font-size: 16px;">Licence #: </label>
+                                <ui:outputText class="slds-form-element__label outputTextSize" value="{!v.recordName}" />
+                            </div>
+                            
+                            <div class="slds-col slds-size--2-of-2" >
+                                <label class="slds-form-element__label" style = "font-size: 16px;">Plate #: </label>
+                                <ui:outputText class="slds-form-element__label outputTextSize" value="{!v.recordPlateNumber}" />
+                            </div> 
+                        </div>
+                        <br />
+                        <br />
+                        <div class="slds-col slds-size--1-of-2">
+                        <h3 class = "slds-form-element__legend slds-form-element__label" style = "font-size: 16px;"><b>When do you want to surrender?</b> <span class="slds-required">*</span></h3>
+                        <lightning:input 
+                         type="Date"
+                         name="DateTime"
+                         aura:id="DateTime" 
+                          value="{!v.surrenderDate}" 
+                          onchange="{! c.dateChange }"/>
+                         
+                         
+                        </div>
+                        <br />    
+                        
+                        
+                        <aura:if isTrue="{!v.HasPendingOrders}">
+                            <h3 style = "font-size: 16px;">You have {!v.OrderCount} outstanding monthly payments of ${!v.TotalDueAmount} that will be required to be paid.</h3>
+                            <br />
+                            <br />
+                        </aura:if> 
+                        
+                        
+                        
+                        <h3 style = "font-size: 16px;">{!$Label.c.Taxi_Surrender_Message_2}</h3>
+                        <br />
+                        
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <span class="slds-checkbox">
+                                    <input type="checkbox" name="options" id="checkbox-1" value="on" onclick= '{!c.clickCheckbox}'/>
+                                    <label class="slds-checkbox__label" for="checkbox-1">
+                                        <span class="slds-checkbox_faux"></span>
+                                        <span class="slds-form-element__label" style = "font-size: 16px;">{!$Label.c.Taxi_Surrender_Declaration_1}</span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div>
+                        <footer class="slds-modal__footer">
+                            <ui:button class="slds-button slds-button--neutral"  press="{!c.cancelForm}"> 
+                                <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                            </ui:button>
+                            <ui:button aura:id="submitButton" class="slds-button slds-button--neutral" press="{!c.submitSurrenderForm}"> 
+                                <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Submit
+                            </ui:button>
+                        </footer>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </article>
+    <div style="border:thin">
+        {!v.body}
+    </div>
+    <div class="slds-backdrop slds-backdrop--open" aura:id="backdrop"></div>  
+</aura:component>

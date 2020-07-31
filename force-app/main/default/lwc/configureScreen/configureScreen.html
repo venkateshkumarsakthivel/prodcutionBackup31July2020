@@ -1,0 +1,115 @@
+<template>
+    <div class="slds-grid slds-m-top_medium">
+        <div class="slds-col">
+            <lightning-input type="text"
+                             label="Unique Name of Setup"
+                             name="uniqueName"
+                             field-level-help="Enter the unique name given while dropping this component on record detail page"
+                             value={uniqueName}
+                             onchange={setValue}
+                             ></lightning-input>
+        </div>
+    </div>    
+
+    <div class="slds-grid slds-m-top_medium">
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-input type="number"
+                             label="Number of Columns"
+                             field-level-help="Enter the number of columns to display"
+                             name="columns"
+                             value={columns}
+                             onchange={setValue}
+                             ></lightning-input>
+        </div>
+
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-combobox class="slds-p-left_small"
+                            name="childObjectName"
+                            label="Child Object Name"
+                            field-level-help="Select child object"
+                            value={childObjectName}
+                            options={childObjectList}
+                            onchange={setValue} >
+                </lightning-combobox>
+        </div>
+    </div>
+
+    <div class="slds-grid slds-m-top_medium slds-m-bottom_medium">
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-input
+                             label="Field Set Name"
+                             name="fieldSetName"
+                             field-level-help="Enter the API name of field set"
+                             value={fieldSetName}
+                             onchange={setValue}>
+                            </lightning-input>
+        </div>
+
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-combobox class="slds-p-left_small"
+                                name="relatedField"
+                                label="Related By Field"
+                                field-level-help="Select the relation field of parent and child object"
+                                value={relatedField}
+                                options={relatedFieldList}
+                                onchange={setValue} >
+                    </lightning-combobox>
+        </div>
+    </div>
+
+    <div class="slds-grid slds-m-top_medium slds-m-bottom_medium">
+        <div class="slds-col slds-size_1-of-4">
+            <lightning-combobox
+                                name="buttonsPresent"
+                                label="Do you want to add buttons?"
+                                value={buttonsPresent}
+                                options={boolean}
+                                onchange={setValue} >
+                    </lightning-combobox>
+        </div>
+    </div>
+
+   <template if:true={showButtonTable}>
+       <div style="display:flex">
+            <p class="slds-text-title slds-m-bottom_small"
+            style="margin-top:0.3rem">
+                Button Information:
+            </p>
+            <lightning-helptext class="slds-m-left_x-small"
+            content="You can add upto 5 buttons"
+            ></lightning-helptext>
+       </div>
+
+        <div class="slds-grid">
+            <template for:each={buttonLabels} for:item="label">
+                    <div key={label} class="slds-text-title slds-col slds-p-horizontal_small slds-size_1-of-6">
+                        {label}
+                    </div>
+            </template>
+        </div>
+        <template for:each={buttons} for:item="button" for:index="index">
+                    <c-button-row key={button.label} 
+                                index={index} 
+                                row={button} 
+                                buttons={buttons}
+                                onaddremoverow={addRemoveRow}></c-button-row>
+        </template>
+    </template>
+    <div style="display:flex">
+        <p class="slds-text-title slds-m-bottom_small" 
+        style="margin-top:0.3rem">
+            Color Filter:
+         </p>
+         <lightning-helptext  class="slds-m-left_x-small"
+         content="Add color filter if you want to highlight some records based on specific field value."
+         ></lightning-helptext>
+    </div>
+
+    <c-color-component pre-defined-values={filters}
+                    record-id={recordId}
+                    fields={fields}
+                    related-field={relatedField}
+                    child-object-name ={childObjectName}
+                    field-set-name ={fieldSetName}
+    ></c-color-component>
+</template>

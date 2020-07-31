@@ -1,0 +1,62 @@
+<apex:page showHeader="false" cache="false" sidebar="false" applyBodyTag="false" applyHtmlTag="false" controller="P2POTAttachmentController">
+    <style type="text/css">
+        .slds-notify_arxxus_toast  {
+        color: #fff;
+        display: -ms-inline-flexbox;
+        display: inline-flex;
+        -ms-flex-align: left;
+        align-items: left;
+        position: relative;
+        background: rgba(84,105,141,.95);
+        font-weight: 300;
+        border-radius: .25rem;
+        padding: .25rem 3rem .25rem 1.5rem;
+        min-width: 25rem;
+        text-align: left;
+        -ms-flex-pack: start;
+        justify-content: flex-start;
+        }
+    </style>
+    <apex:slds />
+    <script type="text/javascript">
+        console.log("Welcome2");
+        var isInternalUser = "{!$CurrentPage.parameters.isInternalUser}";
+        console.log(isInternalUser);
+        var hostURL = '';
+        if(isInternalUser == 'true'){
+            console.log("is internal console user");
+            hostURL = "{!JSENCODE($Label.Attachment_Console_Url)}";
+        } else {
+            console.log("is not internal console user");
+            hostURL = "{!JSENCODE($Label.reCAPTCHA_Lightning_Url)}";
+        }
+        
+        parent.postMessage({ "status": "{!success}", "uniqueIdentifier" : "{!identifier}", "attachmentId" : "{!attachId}"}, hostURL);
+        
+    </script>
+    <div class="slds-scope" style="text-align: left; margin: auto;">
+        <apex:form id="attachmentForm">
+        <div class="slds-grid slds-wrap">
+            <div id="error_message_container" class="slds-col slds-notify_container slds-is-relative slds-{!show}">
+                <div class="slds-notify slds-notify_arxxus_toast slds-theme_{!success}" role="alert">
+                    <div class="slds-notify__content">
+                        <h2 class="slds-text-heading_small"><apex:outputText value="{!message}"></apex:outputText></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+            <apex:actionFunction name="uploadDocument" action="{!uploadFromPage}" >
+                <apex:param name="parent" assignTo="{!parent}" value="" />
+            </apex:actionFunction>
+            <div class="slds-grid slds-wrap slds-m-top_medium ">
+                <div class="slds-col slds-size_1-of-3">
+                    <apex:inputfile id="fileSelectedForUpload" value="{!attachment.Body}" filename="{!attachment.Name}" size="{!attachment.BodyLength}" contentType="{!attachment.ContentType}"></apex:inputfile>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                    <apex:commandButton styleClass="slds-button slds-button--neutral slds-button slds-button--neutral uiButton" value="Upload" action="{!uploadFromPage}" id="uploadCommandButton" />
+                </div>
+            </div>
+        </apex:form>
+    </div>
+</apex:page>

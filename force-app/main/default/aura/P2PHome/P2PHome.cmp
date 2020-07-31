@@ -1,0 +1,27 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+<div class="Container" >
+    
+      <c:NavigationCard title="Register to become a Service Provider" 
+                        description="To become an authorised service provider you need to create a login to the industry portal where you can complete an application."
+                        buttontext="Register"
+                        buttonhref="/industryportal/s/applicant-registration"
+                        image="{!$Resource.p2p300x200 + '/p2p300x200/CityTraffic-300x200.jpg'}"
+                        hovertext="Register to become a Service Provider"/>
+
+      <c:NavigationCard title="Authorised Service Provider Portal" 
+                        description="The industry portal allows you to apply to become authorised as a service provider, to manage your account details and to access the Driver Vehicle Dashboard."
+                        buttontext="Login"
+                        buttonhref="/industryportal/s/login/"
+                        image="{!$Resource.p2p300x200 + '/p2p300x200/PassingTaxi-300x200.jpg'}"
+                        hovertext="Authorised Service Provider Portal"/>
+
+      <c:NavigationCard title="Need Help? Contact Us." 
+                        description="If you require assistance with your application or authorisation please contact us."
+                        buttontext="Contact Us"
+                        buttonhref=""
+                        image="{!$Resource.p2p300x200 + '/p2p300x200/TaxiRank-300x200.jpg'}"
+                        hovertext="Need Help? Contact Us."/>
+
+</div>
+	
+</aura:component>

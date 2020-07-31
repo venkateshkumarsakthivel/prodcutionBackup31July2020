@@ -1,0 +1,58 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+    
+    <aura:attribute name="paymentRefNumber" type="String" default=""/>
+    
+    <div class="slds-grid slds-grid_pull-padded-medium grid-center">
+        <div class="slds-size_1-of-2 slds-medium-size_1-of-12 slds-large-size_2-of-12">
+            <img src="{!$Resource.BPAY_LOGO}" style="height:105px;"/>
+        </div>
+        <div class="color-blue slds-p-horizontal_small slds-size_1-of-2 slds-medium-size_5-of-6 slds-large-size_10-of-12 slds-p-around_small">
+            <table style="font-size:14px;" class="slds-table slds-no-row-hover table-border-blue slds-border_top  slds-border_bottom slds-border_left slds-border_right">
+                <tbody>
+                        <tr>
+                            <td class="slds-cell-buffer_right slds-cell-buffer_left slds-text-align_left">
+                                <div class="slds-truncate color-blue slds-text-heading_small">
+                                    <strong style="font-size:14px;">Biller Code:</strong>
+                                </div>
+                            </td>
+                            <td class="slds-cell-buffer_right slds-cell-buffer_left slds-text-align_left">
+                                <div class="slds-truncate color-blue" style="font-size:14px;">
+                                    {!$Label.c.Bpay_Biller_Code}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="slds-cell-buffer_right slds-cell-buffer_left slds-text-align_left">
+                                <div class="slds-truncate color-blue slds-text-heading_small">
+                                    <strong style="font-size:14px;">Ref:</strong>
+                                </div>
+                            </td>
+                            <td class="slds-cell-buffer_right slds-cell-buffer_left slds-text-align_left">
+                                <div class="slds-truncate color-blue" style="font-size:14px;">
+                                    {!v.paymentRefNumber}
+                                </div>
+                            </td>
+                        </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="slds-grid slds-grid_pull-padded-medium slds-m-around_large grid-center">
+        <div class="slds-p-horizontal_small slds-size_1-of-1">
+            <div class="slds-text-align_center slds-text-heading_medium color-blue" style="font-size:15px;">
+                <strong>Telephone &amp; Internet Banking – BPAY®</strong>
+            </div>
+        </div>
+    </div>
+    <div class="slds-m-top_large slds-grid slds-grid_pull-padded-medium grid-center">
+        <div class="slds-p-horizontal_small slds-size_1-of-1">
+            <p class="color-blue">
+                Contact your bank or financial institution to make this
+                payment from your cheque, savings, debit, credit card
+                or transaction account. More info: www.bpay.com.au
+                Any payment must be for the exact amount of this
+                invoice and be made by the due date. Otherwise, any
+                amount paid will not be accepted and will be returned.</p>
+        </div>
+    </div>
+</aura:component>

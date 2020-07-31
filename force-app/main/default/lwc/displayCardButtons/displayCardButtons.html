@@ -1,0 +1,32 @@
+<template>
+
+    <ul class='slds-button-group-list'>
+        <template for:each={buttonList} for:item="button" for:index="index">
+          <li key={button}>
+        <lightning-button  
+                            key={button}
+                            name={index}
+                            label={button.label} 
+                            variant={button.buttonVariant}
+                            class="card-buttons"
+                            icon-name={button.buttonIcon} 
+                            onclick={buttonListAction}></lightning-button>
+        </li>
+        </template>
+    <template if:true={showDropdown}>
+        <li>    
+            <lightning-button-menu class="card-buttons-dropdown">
+                <template for:each={menuList} for:item="button" for:index="index">
+                <lightning-menu-item key={button.Id}
+                                    name={index}
+                                    prefix-icon-name={button.buttonIcon}
+                                    label={button.label}
+                                    onclick={menuAction}>
+                </lightning-menu-item>
+                </template>
+                </lightning-button-menu>
+        </li>
+    </template>
+    </ul>
+
+</template>

@@ -1,0 +1,14 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" access="global" controller="ReturnAuthorisationController">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div aura:id="returnSuccess" style="width: 100%;" class="toggle">             
+        <div class="slds-align--absolute-center">
+            <b>You are about to surrender an authorisation/licence, click confirm to continue.</b>    
+        </div> 
+        <br></br><br></br>
+        <div class="slds-align--absolute-center">
+            <ui:button class="slds-button slds-button_brand" press="{!c.confirmAndClose}">Confirm</ui:button>
+        </div>
+    </div>        
+</aura:component>

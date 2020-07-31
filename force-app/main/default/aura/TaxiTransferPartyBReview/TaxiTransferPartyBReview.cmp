@@ -1,0 +1,41 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="TransferPartyBDetailsController" >
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="caseId" type="String" />
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="entityType" type="String"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <aura:attribute name="cssStyle" type="String" />
+    
+    <style>
+        /* css style added dynamically to hack style of global header*/
+        {!v.cssStyle}
+    </style>
+    
+    
+    <c:TaxiFormSectionProgressIndicator isTransferPartyB="true" currentSection="review" entityType="{!v.entityType}"/>
+      
+    <c:TaxiTransferPartyBDetails aura:id="tenderDetails" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"  readOnly="true" />
+ <!--<c:TaxiTransferPartyBPrivacyStatement readOnly="true" caseId="{!v.caseId}" entityType="{!v.entityType}" ></c:TaxiTransferPartyBPrivacyStatement> -->
+	
+    
+	<div class="slds-card__footer">
+		
+		<ui:button class="slds-button slds-button--neutral" press="{!c.finishLater}"> 
+            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Finish Later
+        </ui:button>
+		<ui:button class="slds-button slds-button--neutral" press="{!c.renderPrevSection}"> 
+			<i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+		</ui:button>
+		<ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+			<i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+		</ui:button>
+		
+	</div>
+    
+</aura:component>

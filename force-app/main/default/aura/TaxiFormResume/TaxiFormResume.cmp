@@ -1,0 +1,156 @@
+<aura:component controller="TaxiFormSectionDataController" implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    
+    <ltng:require styles="{!$Resource.TaxiLicenceActionStyle}" />
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="caseId" type="String"/>
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="entityType" type="String"/>
+    <aura:attribute name="applicationType" type="String" default="New"/>
+    <aura:attribute name="sectionNameToRender" type="String" default="sectionA"/>
+    
+    <aura:attribute name="isValidToResume" type="Boolean" default="false"/>
+    <aura:attribute name="isRenew" type="Boolean" default="false"/>
+    <aura:attribute name="isWAT" type="String" default="NA"/>
+    
+    <aura:handler name="loadSection" event="c:ASPFormSectionEvent" action="{!c.updateSectionHandlers}"/>
+    <aura:handler name="closeApplication" event="c:TaxiFormModalClosureEvent" action="{!c.closeMessageBox}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="cssStyle" type="String" />
+    
+    <style>
+        /* css style added dynamically to hack style of global header*/
+        {!v.cssStyle}
+    </style>
+    
+    <br/>
+    
+    <p style="font-weight: bold;">
+        <a href="" onclick="{!c.openMessageBox}">Click to view application form</a>
+    </p>
+    
+    <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aura:id = "messageBox">
+        <div class="slds-modal__container">
+            <div class="slds-modal__header">
+                <lightning:buttonIcon class="customCls" iconName="utility:close" alternativeText="Closing" onclick="{!c.closeMessageBox}" />
+                <aura:if isTrue="{!v.isRenew}">
+                	<h2 id="header43" class="slds-text-heading--medium">Taxi Licence Renewal Application</h2>
+                    <aura:set attribute="else">
+                    	<h2 id="header43" class="slds-text-heading--medium">Taxi Licence Application</h2>
+                    </aura:set>
+                </aura:if>                
+            </div>        
+            <div class="slds-modal__content slds-p-around--medium">
+                
+               
+                    <div id="taxiFormContainer">
+                        <aura:if isTrue="{!and(v.isValidToResume, v.isRenew)}">
+							<c:TaxiRenewalForm aura:id="renewalLicenceDetails" sectionNameToRender="licenceDetails" caseId="{!v.caseId}" readOnly="false"/>
+						<aura:set attribute="else">
+						<aura:if isTrue="{!and(v.isValidToResume, v.isWAT == 'No')}">
+                            
+                            <aura:If isTrue="{!v.sectionNameToRender == 'sectionA'}">
+                                <c:TaxiFormTenderDetails aura:id="tenderDetails" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}" disabledInput="true"></c:TaxiFormTenderDetails>
+                            </aura:If>
+                            
+                            <aura:If isTrue="{!v.sectionNameToRender == 'sectionB'}">
+                                <c:TaxiFormIndividual accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormIndividual>
+                            </aura:If>
+                            
+                            <aura:If isTrue="{!v.sectionNameToRender == 'sectionC'}">
+                                <c:TaxiFormCorporation accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormCorporation>
+                            </aura:If>
+                            
+                            <aura:if isTrue="{!v.sectionNameToRender == 'sectionC-P'}">
+                                <c:TaxiFormCorporatePartnership accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormCorporatePartnership>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Company Partner')}">
+                                <c:TaxiFormIndividualPartnership accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="true"></c:TaxiFormIndividualPartnership>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Individual Partner')}">
+                                <c:TaxiFormIndividualPartnership accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="false"></c:TaxiFormIndividualPartnership>
+                            </aura:if>
+                            
+                            <aura:If isTrue="{!v.sectionNameToRender == 'sectionD'}">
+                                <c:TaxiFormNominatedDirector caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:TaxiFormNominatedDirector>
+                            </aura:If>
+                            
+                            <aura:if isTrue="{!v.sectionNameToRender == 'review'}">
+                                <c:TaxiFormReview accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormReview>
+                            </aura:if>
+                            
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!and(v.isValidToResume, v.isWAT == 'Yes')}">
+                            
+                            <aura:If isTrue="{!v.sectionNameToRender == 'sectionA'}">
+                                <c:TaxiFormWATLicenceDetails aura:id="LicenceDetails" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormWATLicenceDetails>
+                            </aura:If>
+                            
+                            <aura:If isTrue="{!v.sectionNameToRender == 'sectionB'}">
+                                <c:TaxiFormIndividual isWAT="true" isFromPortal="true" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormIndividual>
+                            </aura:If>
+                            
+                            <aura:If isTrue="{!v.sectionNameToRender == 'sectionC'}">
+                                <c:TaxiFormCorporation isWAT="true" accountId="{!v.accountId}" isFromPortal="true" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormCorporation>
+                            </aura:If>
+                            
+                            <aura:if isTrue="{!v.sectionNameToRender == 'sectionC-P'}">
+                                <c:TaxiFormCorporatePartnership isWAT="true" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormCorporatePartnership>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Company Partner')}">
+                                <c:TaxiFormIndividualPartnership isWAT="true" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="true"></c:TaxiFormIndividualPartnership>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!and(v.sectionNameToRender == 'sectionB-P', v.entityType == 'Individual Partner')}">
+                                <c:TaxiFormIndividualPartnership isWAT="true" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}" askUserChoiceForPartnershipData="false"></c:TaxiFormIndividualPartnership>
+                            </aura:if>
+                            
+                            <aura:If isTrue="{!v.sectionNameToRender == 'sectionD'}">
+                                <c:TaxiFormNominatedDirector isWAT="true" isFromPortal="true" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormNominatedDirector>
+                            </aura:If>
+                            
+                            <aura:if isTrue="{!v.sectionNameToRender == 'sectionE'}">
+                                <c:TaxiFormPrivacyStatement isWAT="true" isFromPortal="true" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}"></c:TaxiFormPrivacyStatement>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.sectionNameToRender == 'review'}">
+                                <c:TaxiFormWATReview caseId="{!v.caseId}" accountId="{!v.accountId}" entityType="{!v.entityType}"></c:TaxiFormWATReview>
+                            </aura:if>
+                            
+                        </aura:if>
+                        
+						</aura:set>
+						</aura:if>
+						
+                        
+                    </div>
+					
+					<aura:if isTrue="{!and(not(v.isValidToResume), v.isRenew)}">
+						<!--<c:TaxiRenewalReview isReviewOnly="true" aura:id="reviewRenewal" accountId="{!v.accountId}"  caseId="{!v.caseId}" entityType="{!v.entityType}"/>-->
+                        <c:TaxiRenewalForm sectionNameToRender="review" aura:id="reviewRenewal" caseId="{!v.caseId}" />
+					<aura:set attribute="else">
+					<aura:if isTrue="{!and(not(v.isValidToResume), v.isWAT == 'No')}">
+						<c:TaxiFormReview aura:id="reviewTaxiForm" accountId="{!v.accountId}" caseId="{!v.caseId}" entityType="{!v.entityType}" withdrawnCase="true"></c:TaxiFormReview>
+					</aura:if>
+					
+					<aura:if isTrue="{!and(not(v.isValidToResume), v.isWAT == 'Yes')}">
+						<c:TaxiFormWATReview aura:id="reviewTaxiWATForm" caseId="{!v.caseId}" entityType="{!v.entityType}" withdrawnCase="true"></c:TaxiFormWATReview>
+					</aura:if>
+					</aura:set>
+					</aura:if>
+                
+                
+            </div>
+            <div class="slds-modal__footer">
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+</aura:component>

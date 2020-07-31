@@ -1,0 +1,217 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPAuthRenewalFormController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="caseId" type="String" default=""/>
+    <aura:attribute name="isTSPAuth" type="Boolean" default="false"/>
+    <aura:attribute name="isBSPAuth" type="Boolean" default="false"/>
+    <aura:attribute name="tspAuth" type="Authorisation__c" default="{}"/>
+    <aura:attribute name="bspAuth" type="Authorisation__c" default="{}"/>
+    
+    <aura:attribute name="isTSPAuthSelected" type="Boolean" default="false"/>
+    <aura:attribute name="isBSPAuthSelected" type="Boolean" default="false"/>
+    
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="withdrawnCase" type="Boolean" default="false"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPAuthRenewalFormSectionEvent"/>
+
+    <aura:method name="fetchApplicationDetails" action="{!c.fetchApplicationDetails}" access="PUBLIC"/>
+    
+    <!--<aura:if isTrue="{!and(and(not(v.readOnly), not(v.reviewEdit)), not(v.withdrawnCase))}">-->
+        <c:ASPAuthRenewalFormSectionProgressIndicator currentSection="{!$Label.c.ASP_Auth_Renewal_Header_Auth_Details}" />
+        <br/>
+    <!--</aura:if>-->
+    
+    <article class="slds-card" id="formPartA">
+        
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#contact'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">       
+                        {!$Label.c.ASP_Auth_Renewal_Header_Auth_Details}
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with&nbsp;<span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!and(v.readOnly == true, v.withdrawnCase == false)}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                    <div style="float:right">
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                            <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                        </ui:button>
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        
+        <hr style="margin: 0 auto;"/>
+        
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slds-grid">
+            <div class="slds-col">
+                <label class="slds-form-element__label">{!$Label.c.All_Applicant_Service_Type}&nbsp;<span class="requiredField">*</span></label>
+                <br/>
+                <input disabled="{!or(v.readOnly, and(v.isTSPAuth == false, v.isBSPAuth == true))}" checked="{!v.isTSPAuthSelected}" type="radio" name="authType" aura:id="Taxi" id="Taxi" onchange="{!c.authTypeChange}" /> Taxi Service
+                &nbsp;
+                <input disabled="{!or(v.readOnly, and(v.isTSPAuth == true, v.isBSPAuth == false))}" checked="{!v.isBSPAuthSelected}" type="radio" name="authType" aura:id="Booking" id="Booking" onchange="{!c.authTypeChange}" /> Booking Service
+                &nbsp;
+                <input disabled="{!or(v.readOnly, not(and(v.isTSPAuth, v.isBSPAuth)))}" checked="{!and(v.isTSPAuthSelected, v.isBSPAuthSelected)}" type="radio" name="authType" aura:id="Taxi-and-Booking" id="Taxi and Booking" onchange="{!c.authTypeChange}" /> <div style="display: inline-flex;width: 158px;margin-left:5px;">Combined (Taxi and Booking Service)</div>
+                <br/>
+                <span id="authTypeError" class="customErrorMsg"></span>
+            </div>
+            
+            <div class="slds-col">
+            </div>
+        </div>
+
+        <aura:if isTrue="{!and(v.isTSPAuthSelected == true, v.isBSPAuthSelected == false)}">
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <div style="border:1px solid #d4d4d4;padding: 15px 15px 15px 15px;">
+                        <article class="slds-tile">
+                            <label class="slds-form-element__label slds-text-align_center">{!v.tspAuth.Name}</label>
+                            <div class="slds-tile__detail">
+                                <dl class="slds-list_horizontal slds-wrap">
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">Start Date</dt>
+                                    <dd class="slds-item_detail slds-truncate" title="">
+                                        <ui:outputDate value="{!v.tspAuth.Start_Date__c}" format="dd-MM-yyyy"/>
+                                    </dd>
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">End Date</dt>
+                                    <dd class="slds-item_detail slds-truncate" title="">
+                                        <ui:outputDate value="{!v.tspAuth.End_Date__c}" format="dd-MM-yyyy"/>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="slds-col"></div>
+            </div>
+        </aura:if>
+
+        <aura:if isTrue="{!and(v.isTSPAuthSelected == false, v.isBSPAuthSelected == true)}">
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <div style="border:1px solid #d4d4d4;padding: 15px 15px 15px 15px;">
+                        <article class="slds-tile">
+                            <label class="slds-form-element__label slds-text-align_center">{!v.bspAuth.Name}</label>
+                            <div class="slds-tile__detail">
+                                <dl class="slds-list_horizontal slds-wrap">
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">Start Date</dt>
+                                    <dd class="slds-item_detail slds-truncate" title="">
+                                        <ui:outputDate value="{!v.bspAuth.Start_Date__c}" format="dd-MM-yyyy"/>
+                                    </dd>
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">End Date</dt>
+                                    <dd class="slds-item_detail slds-truncate" title="">
+                                        <ui:outputDate value="{!v.bspAuth.End_Date__c}" format="dd-MM-yyyy"/>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="slds-col"></div>
+            </div>
+        </aura:if>
+
+        <aura:if isTrue="{!and(v.isTSPAuthSelected == true, v.isBSPAuthSelected == true)}">
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <div style="border:1px solid #d4d4d4;padding: 15px 15px 15px 15px;">
+                        <article class="slds-tile">
+                            <label class="slds-form-element__label slds-text-align_center">{!v.tspAuth.Name}</label>
+                            <div class="slds-tile__detail">
+                                <dl class="slds-list_horizontal slds-wrap">
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">Start Date</dt>
+                                    <dd class="slds-item_detail slds-truncate" title="">
+                                        <ui:outputDate value="{!v.tspAuth.Start_Date__c}" format="dd-MM-yyyy"/>
+                                    </dd>
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">End Date</dt>
+                                    <dd class="slds-item_detail slds-truncate" title="">
+                                        <ui:outputDate value="{!v.tspAuth.End_Date__c}" format="dd-MM-yyyy"/>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                
+                <div class="slds-col">
+                    <div style="border:1px solid #d4d4d4;padding: 15px 15px 15px 15px;">
+                        <article class="slds-tile">
+                            <label class="slds-form-element__label slds-text-align_center">{!v.bspAuth.Name}</label>
+                            <div class="slds-tile__detail">
+                                <dl class="slds-list_horizontal slds-wrap">
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">Start Date</dt>
+                                    <dd class="slds-item_detail slds-truncate" title="">
+                                        <ui:outputDate value="{!v.bspAuth.Start_Date__c}" format="dd-MM-yyyy"/>
+                                    </dd>
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">End Date</dt>
+                                    <dd class="slds-item_detail slds-truncate" title="">
+                                        <ui:outputDate value="{!v.bspAuth.End_Date__c}" format="dd-MM-yyyy"/>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+        
+        <div class="slds-card__footer">
+            
+            <!--<aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">-->
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            <!--</aura:if>-->
+            
+            <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                </ui:button>
+            </aura:if>
+            
+        </div>
+        
+    </article>
+</aura:component>

@@ -1,0 +1,52 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+    
+    <aura:attribute name="currentSection" type="String" default="{!$Label.c.Levy_General_Details}" access="public"/>
+    
+    <div class="slds-grid" >
+        <div class="slds-tabs--path" role="application">
+            <ul class="slds-tabs--path__nav" role="tablist">
+                
+                
+                <li title="{!$Label.c.Levy_General_Details}" class="{!v.currentSection != $Label.c.Levy_General_Details ? 'slds-tabs--path__item  slds-is-current' : 'slds-tabs--path__item  slds-is-customcomplete'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-96" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Levy_General_Details}</span>
+                    </a>
+                </li>
+                
+                <li title="{!$Label.c.Levy_Exemption_or_Rebate}" class="{!v.currentSection == $Label.c.Levy_General_Details ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.Levy_Exemption_or_Rebate ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Levy_Exemption_or_Rebate}</span>
+                    </a>
+                </li>
+                
+                <li title="{!$Label.c.Levy_Banking_Details}" 
+                    class="{!v.currentSection == $Label.c.Levy_General_Details 
+                            || v.currentSection == $Label.c.Levy_Exemption_or_Rebate ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.Levy_Banking_Details ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Levy_Banking_Details}</span>
+                    </a>
+                </li>
+                
+                <li title="{!$Label.c.Levy_Privacy_Statement_and_Declaration}" 
+                    class="{!v.currentSection == $Label.c.Levy_General_Details 
+                            || v.currentSection == $Label.c.Levy_Exemption_or_Rebate 
+                            || v.currentSection == $Label.c.Levy_Banking_Details ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.Levy_Privacy_Statement_and_Declaration ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Levy_Privacy_Statement_and_Declaration}</span>
+                    </a>
+                </li>
+                
+                <li title="{!$Label.c.Levy_Review_and_Submit}" 
+                    class="{!v.currentSection == $Label.c.Levy_General_Details 
+                            || v.currentSection == $Label.c.Levy_Exemption_or_Rebate 
+                            || v.currentSection == $Label.c.Levy_Banking_Details
+                            || v.currentSection == $Label.c.Levy_Privacy_Statement_and_Declaration ? 'slds-tabs--path__item  slds-is-incomplete' : v.currentSection == $Label.c.Levy_Review_and_Submit ? 'slds-tabs--path__item  slds-is-customcomplete' : 'slds-tabs--path__item  slds-is-current'}" role="presentation">
+                    <a class="slds-tabs--path__link" id="tabs-path-100" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+                        <span class="slds-tabs--path__title">{!$Label.c.Levy_Review_and_Submit}</span>
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</aura:component>

@@ -1,0 +1,81 @@
+.THIS .uiInput--default .form-element__label {
+    color: #696969;
+    line-height: 1.375;
+    margin-bottom: .25rem;
+    float: left; 
+    font-weight:bold;
+}
+
+.THIS .slds-form-element__label {
+    
+    display: inline-block;
+    color: rgb(105, 105, 105);
+    font-size: 0.875rem;
+    line-height: 1.375;
+    margin-right: 0.75rem;
+    margin-bottom: 0.25rem;
+    text-align: left;
+    
+    /*
+    white-space: normal;
+    font-size: 12px;
+    text-align: center;
+    color: rgb(105, 105, 105); */
+}
+
+.THIS .requiredField {
+    color: red;
+    font-weight: bold;
+}
+
+.THIS .formbox {
+    width:70%;
+    text-align: left;
+}
+
+.THIS .customCheckBox {
+    display: inline-block;
+    float: left;    
+}
+
+.THIS .toggleDisplay {
+    display: none;
+}
+
+.THIS input.uiInput--checkbox[type=checkbox][disabled] {
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+
+.THIS input[type=checkbox][disabled]:checked {
+    background-color: rgb(21, 137, 238) !important;
+}
+
+.THIS .slds-input[type=checkbox][disabled]{
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+
+.THIS .slds-input[type=textarea][disabled]{
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+
+.THIS .uiInput--textarea.textarea[disabled] {
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+
+.THIS .uiInput--checkbox input[type=checkbox][disabled] {
+    background-color: #F3F3F3 !important;
+    border-color: rgb(208, 208, 208) !important;
+}
+.THIS .slds-input[disabled]{
+    background-color: #f3f3f3!important;
+    border-color: rgb(208, 208, 208)!important;
+}
+
+.THIS .customCheckBox {
+    display: inline-block;
+    float: left;    
+}

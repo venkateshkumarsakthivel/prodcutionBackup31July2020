@@ -1,0 +1,93 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" controller="AuditNewNoticeController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}"/>
+    <ltng:require styles="{!$Resource.TaxiLicenceActionStyle}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+    
+    <aura:attribute name="auditCaseRecordTypeDevName" type="String" />
+    <aura:attribute name="selectedNoticeType" type="String" />
+    <aura:attribute name="selectNoticeSubType" type="String" />
+    <aura:attribute name="auditNoticeConfigMetadataRecord" type="Audit_Notice_Records_Config__mdt"/>
+    <aura:attribute name="noticeCreationMsg" type="String" default=''/>
+    <aura:attribute name="relatedCase" type="Case" />
+    <aura:attribute name="isManualNotice" type="Boolean" default='false'/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div style="position:relative">
+        <lightning:spinner aura:id="spinner" variant="brand" size="medium" class="slds-hide"/>
+    </div>
+    
+    <section id="auditNoticeForm" aura:id="auditNoticeForm" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        
+        <div class="slds-modal__container">
+            
+            <header class="slds-modal__header">
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">New Notice Record</h2>
+                <div class="slds-no-flex sectionTitleNote" style="float:right!important">
+                    Fields marked with <span class="requiredField">*</span> are mandatory.
+                </div>
+            </header>
+            
+            
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!v.noticeCreationMsg}
+                    </span>
+                </div>
+                <br/>
+                
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <div style="display:inline;">   
+                            <legend class="slds-form-element__label">
+                                Manual Notice
+                                <div style="display:inline-block;font-weight:normal;">
+                                    <ui:inputcheckbox aura:id="isManualNotice" class="customCheckBox" value="{!v.isManualNotice}"/>
+                                </div>
+                            </legend>
+                        </div>
+                    </div>
+                    <div class="slds-col">
+                        
+                    </div>
+                </div>
+                
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <label class="slds-form-element__label" for="noticeType">Notice Type&nbsp;<span class="requiredField">*</span></label>
+                        <ui:inputSelect aura:id="noticeType" change="{!c.onNoticeTypeChange}">
+                            <ui:inputSelectOption text="--- None ---"/>
+                            <aura:if isTrue="{!v.auditCaseRecordTypeDevName == 'Audit'}">
+                                <ui:inputSelectOption text="Audit Notice"/>
+                            </aura:if>
+                            <ui:inputSelectOption text="S72 - Require information (Tax)"/>
+                            <ui:inputSelectOption text="S83 - Improvement Notice"/>
+                            <ui:inputSelectOption text="S87 - Prohibition Notice"/>
+                            <ui:inputSelectOption text="S118 - Notice to inspect"/>
+                            <ui:inputSelectOption text="S121 - Notice to produce"/>
+                        </ui:inputSelect>
+                    </div>
+                    <div class="slds-col">
+                        <label class="slds-form-element__label" for="noticeSubType">Notice Sub Type&nbsp;<span class="requiredField">*</span></label>
+                        <ui:inputSelect aura:id="noticeSubType" change="{!c.onNoticeSubTypeChange}">
+                            <ui:inputSelectOption text="--- None ---"/>
+                        </ui:inputSelect>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <footer class="slds-modal__footer">
+                <lightning:button class="slds-button slds-button_neutral" onclick="{!c.handleCancle}">Cancel</lightning:button>
+                <lightning:button class="slds-button slds-button_brand" onclick="{!c.handleNext}">Next</lightning:button>
+            </footer>
+            
+            
+        </div>
+    </section>
+    <div aura:id="backdrop" class="slds-backdrop slds-backdrop_open"></div>
+</aura:component>

@@ -1,0 +1,384 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ASPFormSectionDataController" >
+    
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="false" />
+    <aura:attribute name="associatePOIUploadStatus" type="Boolean" default="false" />
+    <aura:attribute name="caseId" type="String" default=""/>
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="contactId" type="String" default=""/>
+    <aura:attribute name="entityType" type="String" default=""/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="associateDataProvided" type="Boolean"/>
+    <aura:attribute name="withdrawnCase" type="Boolean" default="false"/>
+    
+    <aura:attribute name="closeAssociateActionInput" type="boolean" />  
+    
+    
+    <aura:attribute name="residentialUnitType" type="String" default=""/>
+    <aura:attribute name="residentialStreet" type="String" />
+    <aura:attribute name="residentialCity" type="String" />
+    <aura:attribute name="residentialState" type="String" />
+    <aura:attribute name="residentialPostalCode" type="String" />
+    <aura:attribute name="residentialCountry" type="String" />
+    
+    <aura:attribute name="familyName" type="string" default="" />
+    <aura:attribute name="firstName" type="string" default="" />
+    <aura:attribute name="otherName" type="string" default="" />
+    <aura:attribute name="otherNameDetails" type="string" default=""/>
+    
+    <aura:attribute name="closeAssociateDOB" type="string" default="" />
+    <aura:attribute name="closeAssociateTitle" type="string" default="" />  
+    
+    <aura:attribute name="closeAssociateActionInput2" type="boolean" />  
+    
+    <aura:attribute name="residentialUnitType2" type="String" default=""/>
+    <aura:attribute name="residentialStreet2" type="String" />
+    <aura:attribute name="residentialCity2" type="String" />
+    <aura:attribute name="residentialState2" type="String" />
+    <aura:attribute name="residentialPostalCode2" type="String" />
+    <aura:attribute name="residentialCountry2" type="String" />
+    
+    <aura:attribute name="familyName2" type="string" default="" />
+    <aura:attribute name="firstName2" type="string" default="" />
+    <aura:attribute name="otherName2" type="string" default="" />
+    <aura:attribute name="otherNameDetails2" type="string" default=""/>
+    
+    <aura:attribute name="closeAssociateDOB2" type="string" default="" />
+    <aura:attribute name="closeAssociateTitle2" type="string" default="" />
+    
+    <aura:attribute name="closeAssociateActionInput3" type="boolean" />
+    
+    <aura:attribute name="residentialUnitType3" type="String" default=""/>
+    <aura:attribute name="residentialStreet3" type="String" />
+    <aura:attribute name="residentialCity3" type="String" />
+    <aura:attribute name="residentialState3" type="String" />
+    <aura:attribute name="residentialPostalCode3" type="String" />
+    <aura:attribute name="residentialCountry3" type="String" />
+    
+    <aura:attribute name="familyName3" type="string" default="" />
+    <aura:attribute name="firstName3" type="string" default="" />
+    <aura:attribute name="otherName3" type="string" default="" />
+    <aura:attribute name="otherNameDetails3" type="string" default=""/>
+    
+    <aura:attribute name="closeAssociateDOB3" type="string" default="" />
+    <aura:attribute name="closeAssociateTitle3" type="string" default="" />
+    
+    <aura:attribute name="hasFirstAssociate" type="Boolean" default="true"/>
+    <aura:attribute name="hasSecondAssociate" type="Boolean" default="false"/>
+    <aura:attribute name="hasThirdAssociate" type="Boolean" default="false"/>
+    
+    <aura:attribute name="aspCase" type="String"/>
+    <aura:attribute name="aspAssociate" type="String"/>
+    
+    <aura:registerEvent name="loadSection" type="c:ASPFormSectionEvent"/>
+    <aura:registerEvent name="closeApplication" type="c:TaxiFormModalClosureEvent"/>
+    
+    <aura:dependency resource="markup://c:ModalMessageConfirmBox" />
+    <aura:handler name="confirmPreviousPage" event="c:ConfirmPreviousPageEvent" action="{!c.renderPrevSection}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    
+    <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit), not(v.withdrawnCase))}">
+        <c:ASPFormSectionProgressIndicator currentSection="{!$Label.c.Close_Associate_Header}" entityType="{!v.entityType}"/>
+        <br/>
+    </aura:if>
+    
+    <article class="slds-card" id="formPartF">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#contact'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">       
+                        {!$Label.c.Close_Associate_Header}
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with&nbsp;<span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!and(v.readOnly == true, v.withdrawnCase == false)}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                    <div style="float:right">
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                            <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                        </ui:button>
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        <hr style="margin: 0 auto;"/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                
+                <div class="slds-section" aura:id="sectiontitle">
+                    <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Click to expand or collapse">
+                        <button class="slds-button slds-section__title-action" onclick="{!c.toggleSectionContent}" style="background-color: #003577;color: #ffffff;">
+                            <aura:if isTrue="{!v.isSectionExpanded}">
+                                <i class="fa fa-minus" style="font-size: 0.875rem;" aria-hidden="true"></i>
+                                <aura:set attribute="else">
+                                    <i class="fa fa-plus" style="font-size: 0.875rem;" aria-hidden="true"></i>
+                                </aura:set>
+                            </aura:if>
+                            &nbsp;&nbsp;Additonal Information
+                        </button>
+                    </h5>
+                    <div class="slds-section__content" style="border-width: 1px;border-style: solid;border-color: rgb(208, 208, 208);border-top: 0;">
+                        <p class="slds-form- -stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+                            Provide the name, and if known, the address, date of birth and sex of close associates:
+                            <ul class="slds-list--dotted">
+                                <li class="slds-item">
+                                    who have been convicted of or have current proceedings against them for a disqualifying offence, or
+                                </li>
+                                <li class="slds-item">
+                                    who previously held an authorisation that has been cancelled, or
+                                </li>
+                                <li class="slds-item">
+                                    whose accreditation or authorisation to operate a taxi-cab network was cancelled or recently refused because they were not of good repute or fit and proper.
+                                </li>
+                            </ul>
+                            <br/>
+                            <a href="{!$Label.c.Disqualifying_Offence_Url}" target="_blank">Definitions of 'Close Associate' and 'Disqualifying Offences'</a>
+                        </p>
+                    </div>
+                </div>
+                
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div>
+                
+                
+                <fieldset>
+                    
+                    <aura:if isTrue="{!v.entityType == 'Individual'}">
+                        <div class="slds-grid">
+                            <div class="slds-col" style="width: 50% !important;">
+                                <label class="slds-form-element__label">
+                                    {!$Label.c.Close_Associate_Individual_Info_Provided}&nbsp;<span class="requiredField">*</span>
+                                </label>
+                                <br/>
+                            </div>
+                            <div class="slds-col" style="width: 50% !important;">
+                                <ui:inputRadio value="{!if(v.associateDataProvided == false, true, false)}" disabled="{!v.readOnly}" aura:id="NoAssociate" name="associateGroup" label="" change="{!c.associateChange}"/>&nbsp;No
+                                &nbsp;&nbsp;
+                                <ui:inputRadio value="{!if(v.associateDataProvided == true, true, false)}" disabled="{!v.readOnly}" aura:id="YesAssociate" name="associateGroup" label="" change="{!c.associateChange}"/>&nbsp;Yes, provide details
+                                <br/>
+                                <span id="NoAssociateError" class="customErrorMsg"></span>
+                            </div>
+                        </div>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.entityType == 'Company'}">
+                        <div class="slds-grid">
+                            <div class="slds-col" style="width: 50% !important;">
+                                <label class="slds-form-element__label">
+                                    {!$Label.c.Close_Associate_Corporation_Info_Provided}&nbsp;<span class="requiredField">*</span>
+                                </label>
+                                <br/>
+                            </div>
+                            <div class="slds-col" style="width: 50% !important;">
+                                <ui:inputRadio value="{!if(v.associateDataProvided == false, true, false)}" disabled="{!v.readOnly}" aura:id="NoAssociate" name="associateGroup" label="" change="{!c.associateChange}"/>&nbsp;No
+                                &nbsp;&nbsp;
+                                <ui:inputRadio value="{!if(v.associateDataProvided == true, true, false)}" disabled="{!v.readOnly}" aura:id="YesAssociate" name="associateGroup" label="" change="{!c.associateChange}"/>&nbsp;Yes, provide details
+                                <br/>
+                                <span id="NoAssociateError" class="customErrorMsg"></span>
+                            </div>
+                        </div>
+                    </aura:if>
+                    
+                </fieldset>
+                
+                <aura:if isTrue="{!v.associateDataProvided}">
+                    <aura:if isTrue="{!v.hasFirstAssociate}">
+                        <fieldset>
+                            <div class="slds-grid">
+                                <div class="slds-col">
+                                    <legend class="slds-form-element__legend slds-form-element__label">{!$Label.c.Close_Associate_Title}&nbsp;<span class="requiredField">*</span></legend>
+                                    <ui:inputSelect disabled="{!v.readOnly}" class="single" aura:id="InputSelectTitle" value="{!v.closeAssociateTitle}">
+                                        <ui:inputSelectOption text="" label="Please Select"/>
+                                        <ui:inputSelectOption text="Mr." />
+                                        <ui:inputSelectOption text="Mrs."/>
+                                        <ui:inputSelectOption text="Ms." />
+                                        <ui:inputSelectOption text="Miss."/>
+                                        <ui:inputSelectOption text="Other"/>
+                                    </ui:inputSelect>
+                                </div>
+                                <div class="slds-col">
+                                    <c:DateOfBirthComponent isReadOnly="{!v.readOnly}" aura:id="DOB" uniqueIdentifier="DOB-Input" 
+                                                            fieldLabel="{!$Label.c.Close_Associate_Birthdate}"
+                                                            isRequired="true" DOB="{!v.closeAssociateDOB}"/>
+                                </div>
+                                
+                            </div>
+                            <div class="slds-grid">
+                                <div class="slds-col">
+                                    <label class="slds-form-element__label" for="firstGivenFamilyName">{!$Label.c.Close_Associate_First_Name}&nbsp;<span class="requiredField">*</span></label>
+                                    <ui:inputText disabled="{!v.readOnly}" value="{!v.firstName}" required="true" maxlength="40" class="slds-input" aura:id="firstGivenFamilyName" />
+                                </div>
+                                <div class="slds-col">
+                                    <label class="slds-form-element__label" for="familyName">{!$Label.c.Close_Associate_Last_Name}&nbsp;<span class="requiredField">*</span></label>
+                                    <ui:inputText disabled="{!v.readOnly}" value="{!v.familyName}" required="true" maxlength="80" class="slds-input upperCaseInput" aura:id="familyName" />
+                                </div>
+                                
+                            </div>
+                            <div class="slds-grid">
+                                
+                                <div class="slds-col">
+                                    <label class="slds-form-element__label" for="otherGivenFamilyName">{!$Label.c.Close_Associate_Other_given_name}</label>
+                                    <ui:inputText disabled="{!v.readOnly}" value="{!v.otherName}" required="true" maxlength="255" class="slds-input" aura:id="otherGivenFamilyName" />
+                                    <span aura:id="otherGivenFamilyNameError" class="slds-form-element__help"></span>
+                                </div>
+                                
+                                <div class="slds-col">
+                                </div>
+                            </div>
+                            
+                            <div class="slds-grid">
+                                <div class="slds-col" style="width: 50% !important;">
+                                    <label class="slds-form-element__label">{!$Label.c.Close_Associate_Ever_been_known_by_another_name}&nbsp;<span class="requiredField">*</span></label>
+                                    <br/>
+                                </div>
+                                <div class="slds-col" style="width: 50% !important;">
+                                    <ui:inputRadio value="{!if(v.closeAssociateActionInput == false, true, false)}" disabled="{!v.readOnly}" aura:id="no_closeAssociate" class="closeAssociateHandler" name="otherNameGroup" label="" change="{!c.otherNameChange}"/>&nbsp;No
+                                    &nbsp;&nbsp;
+                                    <ui:inputRadio value="{!if(v.closeAssociateActionInput == true, true, false)}" disabled="{!v.readOnly}" aura:id="yes_closeAssociate" class="closeAssociateHandler" name="otherNameGroup" label="" change="{!c.otherNameChange}"/>&nbsp;Yes, provide details
+                                    <br/>
+                                    <span id="closeAssociateError" class="customErrorMsg"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-grid" style="padding-left: 2%;width:80%;display:block;">
+                                <ui:inputTextarea disabled="{!v.readOnly}" aura:id="closeAssociateInputDetails" maxlength="1000" 
+                                                  class="{!if(v.closeAssociateActionInput == true, '', 'toggleDisplay')}"
+                                                  value="{!v.otherNameDetails}"/>
+                            </div>
+                            
+                            <div class="slds-grid">
+                                <div class="slds-col">
+                                    <legend class="slds-form-element__legend slds-form-element__label">{!$Label.c.Close_Associate_Residential_Address}&nbsp;<span class="requiredField">*</span></legend>
+                                    <c:AddressInputComponent reviewReadOnly="{!v.readOnly}" aura:id="Residential-Address-Input" unitType="{!v.residentialUnitType}" street="{!v.residentialStreet}" city="{!v.residentialCity}" 
+                                                             state="{!v.residentialState}" postalcode="{!v.residentialPostalCode}" country="{!v.residentialCountry}" 
+                                                             addressType="CloseAssociate_Residential_Address"
+                                                             fullStreet="{!v.residentialStreet}"
+                                                             />
+                                </div>
+                                <div class="slds-col">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <aura:if isTrue="{!v.readOnly == false}">
+                            <fieldset>
+                                <div class="slds-grid">
+                                    <div class="slds-col">
+                                    		<c:P2POTAttachment category="POI" uploadStatus="{!v.associatePOIUploadStatus}" uniqueIdentifier="associate-poi" ParentRecordId="{!v.caseId}" acceptedFileTypes=".pdf" FileInputLabel="Attach copies of your proof of identity document" AllowMultiple="true" section="CLOSE_ASSOC_1" index="1" />
+                                    </div>
+                                    <div class="slds-col"></div>
+                                </div>
+                            </fieldset>                    
+                        </aura:if>
+                    </aura:if>
+                    
+                    <div class="slds-card__footer" style="margin-top: 0px;">
+                        <aura:if isTrue="{!and(v.hasSecondAssociate, not(v.readOnly), v.hasFirstAssociate)}">
+                            <ui:button class="slds-button slds-button--neutral" press="{!c.removeFirstRow}"> 
+                                <i style="color:#54698d !important;" class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Remove Associate
+                            </ui:button>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!and(not(v.hasSecondAssociate), not(v.readOnly))}">
+                            <ui:button class="slds-button slds-button--neutral" press="{!c.addMore}"> 
+                                <i style="color:#54698d !important;" class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add Associate
+                            </ui:button>
+                        </aura:if>
+                    </div>
+                    
+                    <aura:if isTrue="{!v.hasSecondAssociate}">
+                        <c:ASPFormPartFAdditionalDetails readOnly="{!v.readOnly}" closeAssociateActionInput="{!v.closeAssociateActionInput2}"
+                                                         residentialUnitType="{!v.residentialUnitType2}" residentialStreet="{!v.residentialStreet2}" residentialCity="{!v.residentialCity2}"
+                                                         residentialState="{!v.residentialState2}" residentialPostalCode="{!v.residentialPostalCode2}"
+                                                         residentialCountry="{!v.residentialCountry2}" familyName="{!v.familyName2}" firstName="{!v.firstName2}"
+                                                         otherName="{!v.otherName2}" otherNameDetails="{!v.otherNameDetails2}" closeAssociateDOB="{!v.closeAssociateDOB2}"
+                                                         closeAssociateTitle="{!v.closeAssociateTitle2}" associateIndex="associate2" aura:id="associate2"
+                                                         index="2"
+                                                         hasOneMoreAssociateAbove="{!v.hasFirstAssociate}"/>
+                        
+                        
+                        <div class="slds-card__footer">
+                            <aura:if isTrue="{!not(v.readOnly)}">
+                                <ui:button class="slds-button slds-button--neutral" press="{!c.removeSecondRow}"> 
+                                    <i style="color:#54698d !important;" class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Remove Associate
+                                </ui:button>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!and(not(v.hasThirdAssociate), not(v.readOnly))}">
+                                <ui:button class="slds-button slds-button--neutral" press="{!c.addMore}"> 
+                                    <i style="color:#54698d !important;" class="fa fa-user-plus" aria-hidden="true"></i>&nbsp;&nbsp;Add Associate
+                                </ui:button></aura:if>
+                        </div>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.hasThirdAssociate}">
+                        <c:ASPFormPartFAdditionalDetails readOnly="{!v.readOnly}" closeAssociateActionInput="{!v.closeAssociateActionInput3}"
+                                                         residentialUnitType="{!v.residentialUnitType3}" residentialStreet="{!v.residentialStreet3}" residentialCity="{!v.residentialCity3}"
+                                                         residentialState="{!v.residentialState3}" residentialPostalCode="{!v.residentialPostalCode3}"
+                                                         residentialCountry="{!v.residentialCountry3}" familyName="{!v.familyName3}" firstName="{!v.firstName3}"
+                                                         otherName="{!v.otherName3}" otherNameDetails="{!v.otherNameDetails3}" closeAssociateDOB="{!v.closeAssociateDOB3}"
+                                                         closeAssociateTitle="{!v.closeAssociateTitle3}" associateIndex="associate3" aura:id="associate3"
+                                                         index="3"
+                                                         hasOneMoreAssociateAbove="{!or(v.hasFirstAssociate, v.hasSecondAssociate)}"/>
+                        
+                        <aura:if isTrue="{!not(v.readOnly)}">
+                            <div class="slds-card__footer">
+                                <ui:button class="slds-button slds-button--neutral" press="{!c.removeThirdRow}"> 
+                                    <i style="color:#54698d !important;" class="fa fa-trash" aria-hidden="true"></i>&nbsp;&nbsp;Remove Associate
+                                </ui:button>
+                            </div>
+                        </aura:if>
+                    </aura:if>
+                </aura:if> 
+            </div>
+        </div>
+        <div class="slds-card__footer">
+            
+            <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveForm}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Finish Later
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.confirmPrevSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Previous
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                    <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+                </ui:button>
+            </aura:if>
+            
+            <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                </ui:button>
+                <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                </ui:button>
+            </aura:if>
+            
+        </div>
+    </article>
+    <p>{!v.body}</p>
+</aura:component>

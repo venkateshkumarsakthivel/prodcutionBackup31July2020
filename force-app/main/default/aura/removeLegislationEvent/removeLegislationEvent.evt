@@ -1,0 +1,4 @@
+<!-- c:removeLegislationEvent-->
+<aura:event type="APPLICATION" description="Removed Legislation from Case or Notice Record" >
+    <aura:attribute name="removedLegislation" type="String"/>
+</aura:event>

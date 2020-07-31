@@ -1,0 +1,182 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" controller="HelpRequestListController" access="global" >
+
+<aura:attribute name="helpRequests" type="Case[]"/>
+<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+<aura:handler name="submittedHelpRequestEvent"   action="{!c.closeAndRefreshList}" event="c:HelpRequestSubmitEvent" />
+
+<aura:attribute name="body" type="String"/>
+    
+    <div class="Container" >
+    <div class="slds-page-header">
+      <div class="slds-grid">
+        <div class="slds-col slds-has-flexi-truncate">
+          <div class="slds-media slds-no-space slds-grow">
+            <div class="slds-media__figure">
+              <c:svgIcon class="slds-icon slds-icon-standard-user"
+                svgPath="/assets/icons/standard-sprite/svg/symbols.svg#user" category="standard" size="small" name="helprequests">
+              </c:svgIcon>
+            </div>
+            <div class="slds-media__body">
+              <p class="slds-text-title--caps slds-line-height--reset">My Help Requests</p>
+              <h1 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Help Requests">Help Requests</h1>
+            </div>
+          </div>
+        <div class="case-actions">
+          <button class="slds-button slds-button--neutral p2pbutton" onclick="{!c.refresh}">Refresh</button>
+          <button class="slds-button slds-button--neutral p2pbutton" onclick="{!c.createHRForm}">New Help Request</button>
+		</div>
+        </div>
+        </div>
+    </div>
+
+      <div class="slds-grid slds-grid--vertical">
+        <div class="slds-scrollable slds-grow">
+          <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered slds-table--resizable-cols slds-no-row-hover slds-scrollable--none">
+            <thead>
+              <tr class="slds-line-height--reset">
+                <th aria-label="LastName" class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col">
+                  <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="-1">
+                    <span class="slds-assistive-text">Case Number</span>
+                    <span class="slds-truncate" title="Name">Case Number</span>
+                    <div class="slds-icon_container">
+                      <c:svgIcon class="slds-icon slds-icon--x-small slds-icon-text-default slds-is-sortable__icon" 
+                        svgPath="/assets/icons/utility-sprite/svg/symbols.svg#arrowdown">
+                      </c:svgIcon>
+                    </div>
+                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true"></span>
+                  </a>
+                  <div class="slds-resizable">
+                    <label for="cell-resize-handle-741" class="slds-assistive-text">Case Number column width</label>
+                    <input type="range" min="20" max="1000" class="slds-resizable__input slds-assistive-text" id="cell-resize-handle-741" tabindex="-1" />
+                    <span class="slds-resizable__handle">
+                      <span class="slds-resizable__divider"></span>
+                    </span>
+                  </div>
+                </th>
+                <th aria-label="DOB" class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col">
+                  <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="-1">
+                    <span class="slds-assistive-text">Sort </span>
+                    <span class="slds-truncate" title="Subject">Subject</span>
+                    <div class="slds-icon_container">
+                      <c:svgIcon class="slds-icon slds-icon--x-small slds-icon-text-default slds-is-sortable__icon" 
+                        svgPath="/assets/icons/utility-sprite/svg/symbols.svg#arrowdown">
+                      </c:svgIcon>
+                    </div>
+                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true"></span>
+                  </a>
+                  <div class="slds-resizable">
+                    <label for="cell-resize-handle-742" class="slds-assistive-text">Subject column width</label>
+                    <input type="range" min="20" max="1000" class="slds-resizable__input slds-assistive-text" id="cell-resize-handle-742" tabindex="-1" />
+                    <span class="slds-resizable__handle">
+                      <span class="slds-resizable__divider"></span>
+                    </span>
+                  </div>
+                </th>
+                <th aria-label="Drivers License" class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col">
+                  <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="-1">
+                    <span class="slds-assistive-text">Sort </span>
+                    <span class="slds-truncate" title="Priority Price">Priority</span>
+                    <div class="slds-icon_container">
+                      <c:svgIcon class="slds-icon slds-icon--x-small slds-icon-text-default slds-is-sortable__icon" 
+                        svgPath="/assets/icons/utility-sprite/svg/symbols.svg#arrowdown">
+                      </c:svgIcon>
+                    </div>
+                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true"></span>
+                  </a>
+                  <div class="slds-resizable">
+                    <label for="cell-resize-handle-743" class="slds-assistive-text">Priority column width</label>
+                    <input type="range" min="20" max="1000" class="slds-resizable__input slds-assistive-text" id="cell-resize-handle-743" tabindex="-1" />
+                    <span class="slds-resizable__handle">
+                      <span class="slds-resizable__divider"></span>
+                    </span>
+                  </div>
+                </th>
+                <th aria-label="License Check" class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col">
+                  <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="-1">
+                    <span class="slds-assistive-text">Sort </span>
+                    <span class="slds-truncate" title="Status">Status</span>
+                    <div class="slds-icon_container">
+                      <c:svgIcon class="slds-icon slds-icon--x-small slds-icon-text-default slds-is-sortable__icon" 
+                        svgPath="/assets/icons/utility-sprite/svg/symbols.svg#arrowdown">
+                      </c:svgIcon>
+                    </div>
+                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true"></span>
+                  </a>
+                  <div class="slds-resizable">
+                    <label for="cell-resize-handle-744" class="slds-assistive-text">Status column width</label>
+                    <input type="range" min="20" max="1000" class="slds-resizable__input slds-assistive-text" id="cell-resize-handle-744" tabindex="-1" />
+                    <span class="slds-resizable__handle">
+                      <span class="slds-resizable__divider"></span>
+                    </span>
+                  </div>
+                </th>
+                <th aria-label="Criminal Check" class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col">
+                  <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="-1">
+                    <span class="slds-assistive-text">Sort </span>
+                    <span class="slds-truncate" title="Date Time Opened">Date Time Opened</span>
+                    <div class="slds-icon_container">
+                      <c:svgIcon class="slds-icon slds-icon--x-small slds-icon-text-default slds-is-sortable__icon" 
+                        svgPath="/assets/icons/utility-sprite/svg/symbols.svg#arrowdown">
+                      </c:svgIcon>
+                    </div>
+                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true"></span>
+                  </a>
+                  <div class="slds-resizable">
+                    <label for="cell-resize-handle-741" class="slds-assistive-text">Date Time Opened column width</label>
+                    <input type="range" min="20" max="1000" class="slds-resizable__input slds-assistive-text" id="cell-resize-handle-741" tabindex="-1" />
+                    <span class="slds-resizable__handle">
+                      <span class="slds-resizable__divider"></span>
+                    </span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+<aura:iteration var="helpRequest" items="{!v.helpRequests}">                
+              <tr class="slds-hint-parent">
+                <th scope="row">
+                  <div class="slds-truncate" title="CaseNumber">{!helpRequest.CaseNumber}</div>
+                </th>
+                <td role="gridcell">
+                    <div class="slds-truncate" title="Subject">{!helpRequest.Subject}</div>
+                </td>
+                <td role="gridcell">
+                  <div class="slds-truncate" title="Status">{!helpRequest.Priority}</div>
+                </td>
+                <td role="gridcell">
+                  <div class="slds-truncate" title="Status">{!helpRequest.Status}</div>
+                </td>
+                <td role="gridcell">
+                  <div class="slds-truncate" title="Status">{!helpRequest.CreatedDate}</div>
+                </td>
+              </tr>
+</aura:iteration>
+            </tbody>
+          </table> 
+          </div>
+    </div>
+</div>
+    
+    
+<!-- modal popup -->
+<div class="slds">
+    <div aria-hidden="true" role="dialog" class="slds-modal slds-modal--prompt slds-fade-in-hide" aura:id="modaldialog">
+         <div class="slds-modal__container">
+            <div class="slds-modal__header slds-theme--info">
+                <button class="slds-button slds-button--icon-inverse slds-notify__close" onclick="{!c.hideHRForm}">
+                    <c:svgIcon svgPath="/resource/slds221/assets/icons/action-sprite/svg/symbols.svg#close" 
+                       category="action" size="x-small" name="close"/>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 class="slds-text-heading--medium">New Help Request</h2>
+            </div>
+            <div class="slds-modal__content slds-p-around--medium">
+                <div>
+                    <p>{!v.body}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="slds-backdrop slds-backdrop--hide" aura:id="backdrop"></div>    
+</aura:component>

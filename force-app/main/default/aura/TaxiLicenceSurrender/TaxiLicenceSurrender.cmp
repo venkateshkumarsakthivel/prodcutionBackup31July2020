@@ -1,0 +1,16 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" access="global" controller="TaxiLicenceSurrenderController">
+    
+    <style>
+        .slds-modal__container{display:none;}    
+    </style>
+    
+    <aura:attribute name="decisionReason" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="selectedAuthorization" type="Authorisation__c" />
+    <aura:attribute name="suspensionCaseCreated" type='Case' />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:spinner variant="brand" size="medium" aura:id="spinner"/>
+    
+</aura:component>

@@ -1,0 +1,15 @@
+.THIS th.slds-column-sort  {
+    cursor: pointer;
+}
+.THIS th.slds-column-sort-asc:after  {
+    content: "\2193";
+    color: #fff;
+    display: inherit;
+    font-size: 12px;
+}
+
+.THIS th.slds-column-sort-desc:after  {
+    content: "\2191";
+    color: #fff;
+    display: inherit;
+}

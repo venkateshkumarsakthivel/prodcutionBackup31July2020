@@ -1,0 +1,262 @@
+<aura:component  implements="forceCommunity:availableForAllPageTypes" access="global" controller="InternalReviewAppFormController">
+    
+    <!-- Attributes -->
+    <aura:attribute name="isSectionExpanded" type="Boolean" default="true" />
+    <aura:attribute name="reviewFormWrpObj" type="InternalReviewAppFormController.InternalReviewAppWrapper"/>
+    <aura:attribute name="record_Id" type="String"/>
+    <aura:attribute name="readOnly" type="Boolean" default="false"/>
+    <aura:attribute name="reviewEdit" type="Boolean" default="false"/>
+    <aura:attribute name="portalContextName" type="String" description="Indicate the current context of the portal whether its Taxi or ASP"/>
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="isConsole" type="Boolean" default="false"/>
+    <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}"/>
+    <aura:attribute name="aspStatusList" type="String[]" default=""/>
+    <aura:attribute name="taxiStatusList" type="String[]" default=""/>
+    <aura:attribute name="authLookupValidationError" type="boolean"/>
+    <aura:attribute name="date" type="Date" access="GLOBAL"/>
+        
+    <!-- Event Registration -->
+    <aura:registerEvent name="closeInternalReviewModal" type="c:InternalReviewCloseEvent" />
+    <aura:registerEvent name="loadSection" type="c:InternalReviewAppFormSectionEvent"/>
+    
+    <!-- Event handler -->
+    <aura:handler name="init" value="{!this}" action="{!c.loadData}"/>
+    
+    <aura:method name="fetchApplicationDetails" action="{!c.fetchApplicationDetails}" access="PUBLIC"/>
+    
+    <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds-hide"/>
+    <aura:if isTrue="{!and(v.readOnly == false, v.reviewEdit==false)}">        
+	    <c:InternalReviewAppSectionProgress currentSection="Internal review application details"/>
+        <br/>
+    </aura:if>   	
+	
+	<div class="slds-box">
+	<article class="slds-card" id="InternalreviewAppDetails">
+	    <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <c:svgIcon svgPath="{!$Resource.slds221+'/assets/icons/standard-sprite/svg/symbols.svg#account'}" 
+                               category="standard" size="large" name="contact"/>
+                </div>                
+                <div class="slds-media__body">
+                    <h2 style="font-size: 1.5em;">                         
+                        {!$Label.c.Internal_Review_Chevron_Title_1}                   
+                    </h2>
+                </div>
+            </header>
+            <div class="slds-no-flex sectionTitleNote">
+                Fields marked with <span class="requiredField">*</span> are mandatory.
+                <br/><br/>
+                <aura:if isTrue="{!and(v.readOnly == true, v.reviewFormWrpObj.csObj.Status == 'Draft')}">
+                    <div style="float:right"> 
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.editCurrentSection}"> 
+                            <i style="color:#54698d !important;" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit
+                        </ui:button>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+                    <div style="float:right">   
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+                            <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+                        </ui:button>
+                        <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+                            <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+                        </ui:button>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+                
+        <hr/>
+        <div class="slds-card__body" style="padding: 25px 25px 0 25px;">
+            <div class="slds-form--stacked">
+                <div class="slds-section slds-is-open" aura:id="sectiontitle">
+                    <h5 class="slds-section__title" style="font-size: 1.0rem;" title="Click to expand or collapse">
+                        <button class="slds-button slds-section__title-action" onclick="{!c.toggleSectionContent}" style="background-color: #003577;color: #ffffff;">
+                            <aura:if isTrue="{!v.isSectionExpanded}">
+                                <i class="fa fa-minus" style="font-size: 0.875rem;color:#ffffff !important" aria-hidden="true"></i>
+                                <aura:set attribute="else">
+                                    <i class="fa fa-plus" style="font-size: 0.875rem;color:#ffffff !important" aria-hidden="true"></i>
+                                </aura:set>
+                            </aura:if>
+                            &nbsp;&nbsp;Internal Review Application Details
+                        </button>
+                    </h5>
+                    <div class="slds-section__content" style="border-width: 1px;border-style: solid;border-color: rgb(208, 208, 208);border-top: 0;">
+                        
+                            <p class="slds-form- -stacked slds-p-around--medium slds-m-bottom--x-small" aura:id="sectioncontent">
+                                
+                                <p>
+                                    <b><i>Point to Point Transport (Taxis and Hire Vehicles) Act 2016</i></b> 
+                                </p>
+                                <p>
+                                    <b><i>Administrative Decisions Review Act 1997</i></b>
+                                </p>
+                                <br/>
+                                <p>
+                                    Complete this application to seek an internal review of a reviewable decision.
+                                </p>
+                                <br/>
+                                <p>
+                                    Under section 145 of the <i>Point to Point Transport (Taxis and Hire Vehicles) Act 2016</i> a person may apply to the NSW Civil and Administrative Tribunal (NCAT) for an administrative review under the <i>Administrative Decisions Review Act 1997</i>, if they are aggrieved by a decision to:
+                                </p>
+                                <br/>
+                                    <ul>
+                                      <li>&bull;&nbsp;refuse an application for authorisation or a taxi licence</li>
+                                      <li>&bull;&nbsp;suspend or cancel an authorisation or taxi licence</li>
+                                      <li>&bull;&nbsp;impose, revoke or vary a condition of an authorisation or taxi licence</li>
+                                      <li>&bull;&nbsp;not authorise a service provider under Schedule 2 of the Act (Savings, transitional and other provisions) relating to existing operators or authorised taxi networks under the <i>Passenger Transport Act 1990</i>, or</li>
+                                      <li>&bull;&nbsp;consider a person who was the holder of a taxi or private hire vehicle driver authority under the <i>Passenger Transport Act 1990</i> ineligible to drive under the <i>Point to Point Transport (Taxis and Hire Vehicles) Act 2016</i></li>  
+                                    </ul>
+                                <br/>
+                                <p>
+                                    It is a requirement under the <i>Administrative Decisions Review Act 1997</i> that a person seeking to apply for an administrative review through NCAT first seek an internal review with the Point to Point Transport Commissioner (the Commissioner). Limited circumstances allow for a person to make an application direct to NCAT without first seeking an internal review, further information on this can be found at <a href="http://www.ncat.nsw.gov.au/" target="_blank">www.ncat.nsw.gov.au</a>.
+                                </p>
+                                <br/>
+                                <p>
+                                    Within 21 days after the application for the internal review is lodged (or such other period as the Commissioner and applicant agree on), the Commissioner must notify the applicant in writing of:
+                                </p>
+                                <br/>
+                                    <ul>
+                                      <li>&bull;&nbsp;the outcome of the internal review</li>
+                                      <li>&bull;&nbsp;the reasons for the decision in the internal review, and</li>
+                                      <li>&bull;&nbsp;the right of the person to have the decision reviewed by NCAT</li> 
+                                    </ul>                            
+                        		</p>
+                    	</div>
+                </div>
+                
+                <div id="generalErrorMsgDiv" class="slds-notify slds-notify--alert slds-theme--error slds-theme--alert-texture" role="alert" style="display:none;">
+                    <span style="color: #ffffff;">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        &nbsp;{!$Label.c.Error_Message_Review_All_Error_Messages}
+                    </span>
+                </div> 
+  
+                <!-- Section 1 for Applicant Details -->
+                
+                <div class="slds-grid">                    
+                    <div class="slds-col sectionHeader">                            
+                        <b><h2>Applicant Details</h2></b>
+                    </div>
+                </div>
+                
+                <div class="slds-grid">                    
+                    <div class="slds-col">
+                       <label class="slds-form-element__label">
+                           
+                           	<aura:if isTrue="{!v.portalContextName}">
+                                <aura:if isTrue="{!v.portalContextName == 'ASP'}">
+                                        Authorisation Number &nbsp;
+                                    <aura:set attribute="else">
+                                        Licence Number &nbsp;
+                                    </aura:set>
+                                </aura:if>
+                                <aura:set attribute="else">
+                                    Authorisation/Licence Number &nbsp;
+                                </aura:set>
+                        	</aura:if>
+                           <span class="requiredField">*</span>&nbsp;<i class="fa fa-question-circle" aria-hidden="true" title="Please enter the authorisation number/taxi licence number for which you wish to lodge an internal review. For example, [BSP-****** ] or [TSP-******]or [TLH-******]or [****]."></i></label>
+                        <aura:if isTrue="{!v.isConsole}">
+                           	<c:customLookup objectAPIName="Authorisation__c" IconName="standard:account" selectedRecord="{!v.reviewFormWrpObj.authorisationNumber}" objectId="{!v.accountId}" aura:id="Auth-Lic-Num-Lookup" aspStatusList="{!v.aspStatusList}" taxiStatusList="{!v.taxiStatusList}"/>
+                                <aura:if isTrue="{!v.authLookupValidationError}">
+                                    <div class="slds-text-color_error slds-p-left_x-small">
+                                        <b>{!$Label.c.Error_Message_Required_Input}</b>
+                                    </div>
+                                </aura:if>
+                            <aura:set attribute="else">
+                                <ui:inputText maxlength="255" disabled="{!v.reviewFormWrpObj.isAuthorisationNumberValid == true}"  aura:id="Auth-Lic-Num-Input" value="{!v.reviewFormWrpObj.authorisationNumber}" class="sentenceCaseInput slds-input" blur="{!c.fetchApplicationDetails}" />
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                    <div class="slds-col">
+                       <label class="slds-form-element__label">Name of person/entity seeking review</label>
+                        <ui:inputText maxlength="255" disabled="true" aura:id="Person-Entity-Name-Input" value="{!v.reviewFormWrpObj.accountName}" class="sentenceCaseInput slds-input"/>
+                    </div>
+                 </div> 
+              
+                                
+                 <div class="slds-grid">                    
+                    <div class="slds-col">                            
+                       <label class="slds-form-element__label">Contact Number</label>
+                        <ui:inputText maxlength="255" disabled="true" aura:id="Con-No-Input" value="{!v.reviewFormWrpObj.contact.Phone}" class="sentenceCaseInput slds-input"/>
+                    </div>
+                    <div class="slds-col">
+                        <label class="slds-form-element__label">Representative Name(if the Account is a corporation entity)</label>
+                        <ui:inputText maxlength="255" disabled="true" aura:id="Rep-Name-Input" value="{!v.reviewFormWrpObj.contact.Name}" class="sentenceCaseInput slds-input"/>
+                    </div>
+                </div>
+                
+                <div class="slds-grid">                    
+                    <div class="slds-col">                            
+                       <label class="slds-form-element__label">Contact Email</label>
+                       <ui:inputEmail aura:id="Con-Email-Input" disabled="true" value="{!v.reviewFormWrpObj.contact.Email}" class="sentenceCaseInput slds-input"/>
+                    </div>
+                    <div class="slds-col">  
+                        <div style="display:inline;">
+                            <legend class="slds-form-element__label">
+                                Address&nbsp;
+                            </legend>
+                            
+                            <ui:inputText disabled="true" aura:id="address" value="{!v.reviewFormWrpObj.userAddress}" class="slds-input"></ui:inputText>
+                        </div>                                                
+                    </div>
+                </div>
+                
+                <!-- Section 2 for Review Details -->
+                
+                <div class="slds-grid">                    
+                    <div class="slds-col sectionHeader">                            
+                        <b><h2>Review Details</h2></b>
+                    </div>
+                </div>
+                
+                <div class="slds-grid">                    
+                    <div class="slds-col">                           
+                       <label class="slds-form-element__label">Date of Decision&nbsp;<span class="requiredField">*</span>&nbsp;</label>
+                        <ui:inputDate aura:id="Decision-Date" disabled="{!v.readOnly}" value="{!v.reviewFormWrpObj.csObj.Date_of_Original_Decision__c}"  displayDatePicker="true" class="field" />                                             
+                    </div>
+                    <div class="slds-col">
+                        <label class="slds-form-element__label">Do you have a copy of the decision?</label>
+                        <ui:inputCheckbox aura:id="Attached-Copy-Of-Decision" disabled="{!v.readOnly}" value="{!v.reviewFormWrpObj.decisionCopy}"/>
+                    </div>
+                </div>
+                
+                 <div class="slds-grid">                    
+                    <div class="slds-col">                            
+                       <label class="slds-form-element__label">Grounds for review&nbsp;<span class="requiredField">*</span>&nbsp;<i class="fa fa-question-circle" aria-hidden="true" title="Please enter a maximum of 1000 characters"></i></label>
+                         <ui:inputTextArea aura:id="Ground-For-Review" disabled="{!v.readOnly}" value="{!v.reviewFormWrpObj.csObj.Ground_For_Review__c}"  rows="3" maxlength="1000"/>
+                    </div>
+                    <div class="slds-col">
+                        <aura:if isTrue="{!v.reviewFormWrpObj.decisionCopy == false}">
+                            <label class="slds-form-element__label">Description of Decision&nbsp;<span class="requiredField">*</span>&nbsp;<i class="fa fa-question-circle" aria-hidden="true" title="Please enter a maximum of 1000 characters"></i></label>
+                            <ui:inputTextArea aura:id="Desc-of-Decision" disabled="{!v.readOnly}" value="{!v.reviewFormWrpObj.csObj.Decision_Description__c}" rows="3" maxlength="1000"/>
+                        </aura:if>                       
+                    </div>
+                </div>           
+            </div>
+		</div>        
+        
+        <div class="slds-card__footer">
+            <aura:if isTrue="{!and(not(v.readOnly), v.reviewEdit)}">
+	            <div align="right">
+	                <ui:button class="slds-button slds-button--neutral" press="{!c.cancelReviewEdit}"> 
+	                    <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+	                </ui:button>
+	                <ui:button class="slds-button slds-button--neutral" press="{!c.saveReviewChanges}"> 
+	                    <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save
+	                </ui:button>
+	            </div>               
+            </aura:if>
+            <aura:if isTrue="{!and(not(v.readOnly), not(v.reviewEdit))}">
+               <ui:button aura:id="submitButton" class="slds-button slds-button--neutral" press="{!c.renderNextSection}"> 
+                   <i style="color:#54698d !important;" class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Continue
+               </ui:button>
+               <ui:button class="slds-button slds-button--neutral" press="{!c.cancelForm}"> 
+                   <i style="color:#54698d !important;" class="fa fa-times" aria-hidden="true"></i>&nbsp;&nbsp;Cancel
+               </ui:button>               
+            </aura:if>
+        </div>            	
+	</article>
+	</div>
+</aura:component>

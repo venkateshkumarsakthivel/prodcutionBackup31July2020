@@ -1,0 +1,262 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" controller="ManageAccountPaymentsController">
+    
+    <ltng:require scripts="{!$Resource.JqueryLatest}" afterScriptsLoaded="{!c.doInit}"/>
+    <ltng:require styles="{!$Resource.FontAwesome + '/css/font-awesome.css'}" />
+     
+    <aura:attribute name="customerNumber" type="String" access="private" />
+    <aura:attribute name="accountName" type="String" />
+    <aura:attribute name="paymentsList" type="Order[]"/> 
+    <aura:attribute name="currentAuthorisationsSortOrderASC" type="Boolean"/>
+    <aura:attribute name="currentTab" type="String" />
+    <aura:attribute name="isDisabled" type="Boolean"  />
+     <aura:attribute name="paymentreferencecheck" type="string"  />
+    
+    <aura:attribute name="statuscheck" type="String"  />
+    
+    <aura:attribute name="renderPaymentDetailsModal" type="Boolean" default="false" />
+    <aura:attribute name="selectedOrderId" type="String" />
+    <aura:attribute name="selectedOrderPaymentReference" type="String" />
+    <aura:attribute name="totalAmountToPay" type="decimal" />
+    <aura:attribute name="renderSubmitPaymentQueryModal" type="Boolean" default="false" />
+    <aura:attribute name="paymentRecordID" type="String"/>
+    <aura:attribute name="typeFromApplication" type="String" />
+    <aura:handler name="closeApplication" event="c:TaxiFormModalClosureEvent" action="{!c.closePaymentModal}"/>
+        
+    <!--<lightning:spinner variant="brand" aura:id="spinner" size="large" ></lightning:spinner>-->
+    
+    
+    
+    <!-- Modal dialog -->
+    
+    <div class="slds-hide" style="height: 640px;" aura:id="modal-Container">
+	  <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+	    <div class="slds-modal__container">
+	      
+	      <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+	        <p>
+	        Hello 
+			</p>
+	      </div>
+	      <footer class="slds-modal__footer">
+	        <button class="slds-button slds-button_brand">Save</button>
+	      </footer>
+	    </div>
+	  </section>
+	  <div class="slds-backdrop slds-backdrop_open"></div>
+	</div>
+    
+    
+    <article class="slds-card" id="paymentsComponent">
+        
+        <div class="slds-page-header">
+            <div class="slds-grid">
+                <div class="slds-col slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <c:svgIcon class="slds-icon slds-icon-standard-user"
+                                       svgPath="/industryportal/resource/slds221/assets/icons/standard-sprite/svg/symbols.svg#file" category="standard" size="small" name="fleet">
+                            </c:svgIcon>
+                        </div>
+                        <div class="slds-media__body" style="text-align:left;"> 
+                            <p class="slds-text-title--caps slds-line-height--reset">{!$Label.c.ASP_ACCT_MGMT_Header} - {!v.customerNumber}</p>
+                            <h2 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Account">{!v.accountName}</h2>
+                        </div>
+                        <!-- removed the submit query button-->
+                        <aura:if isTrue="{!v.currentTab == 'pendingPayments'}">
+                            <ui:button class="slds-button slds-button--neutral headerButtons" press="{!c.pay}"> 
+                                <i style="color:#54698d !important;" class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;&nbsp;{!$Label.c.ACCT_MGMT_Pay_Button}
+                            </ui:button>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slds-tabs--scoped" style="padding-top:10px;">
+            
+            <ul class="slds-tabs--scoped__nav" role="tablist" style="float:left;" aura:id="paymentsSubmenu">
+                <li class="slds-tabs--scoped__item  casesTab" title="Pending" role="presentation" aura:id="pendingPayments">
+                    <a class="slds-tabs--scoped__link " href="javascript:void(0);" role="tab" onclick="{!c.getPendingPayments}" tabindex="0" aria-selected="true" aria-controls="tab-scoped-1">Pending</a></li>
+                <li class="slds-tabs--scoped__item casesTab" title="Paid" role="presentation" aura:id="paidPayments">
+                    <a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" onclick="{!c.getPaidPayments}" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-2">Paid</a></li>
+            </ul>
+            
+            <div style="clear:both;"></div>
+            
+            <div style="height: 450px;overflow-x:hidden;display: block;">
+                <table role="grid" class="slds-table slds-table--fixed-layout slds-table--bordered slds-no-row-hover" style="background-color: #eef1f6;">
+                    
+                    <thead style="background: #003577;">
+                        <tr class="slds-line-height--reset">
+                            
+                            <aura:if isTrue="{!v.currentTab == 'pendingPayments'}">
+                                <th scope="col" class="selectCol">
+                                    <span class="slds-align--absolute-left tableheader" title="Select">
+                                        SELECT
+                                    </span> 
+                                </th>
+                            </aura:if>
+                           
+                            <th scope="col" style="width:13%;" class="tabColSort" id="authorisationCol" onclick="{!c.sortPaymentsByAuthorisation}" >
+                                <span class="slds-text-title--caps tableheader">
+                                    Authorisation #
+                                    <span>
+                                        <aura:if isTrue="{!v.currentAuthorisationsSortOrderASC}">
+                                            &#8593;
+                                            <aura:set attribute="else">
+                                                &#8595;
+                                            </aura:set>
+                                        </aura:if>
+                                    </span>
+                                </span>
+                            </th>
+                            
+                            <th scope="col" class="tabCol">
+                                <span class="slds-text-title--caps tableheader" title="Type">Type</span>
+                            </th>
+                            
+                            <th scope="col" class="tabCol">
+                                <span class="slds-text-title--caps tableheader" title="Amount">Amount</span>
+                            </th>
+                            
+                            <th scope="col" class="tabCol">
+                                <span class="slds-text-title--caps tableheader" title="Status">Status</span>
+                            </th>
+                            
+                            <aura:if isTrue="{!v.currentTab == 'pendingPayments'}">
+                                <th scope="col" class="tabCol">
+                                    <span class="slds-text-title--caps slds-align--absolute-center tableheader" title="Due Date">Due Date</span>
+                                </th>
+                                <aura:set attribute="else">
+                                    <th scope="col" class="tabCol">
+                                        <span class="slds-text-title--caps slds-align--absolute-center tableheader" title="Received Date">Received Date</span>
+                                    </th>
+                                </aura:set>
+                            </aura:if>
+                            
+                            <th scope="col" class="tabCol">
+                                <span class="slds-text-title--caps tableheader" title="Payment Reference">Payment Reference</span>
+                            </th>
+                            
+                        </tr>
+                    </thead>
+                    
+                    <tbody>
+                        <aura:iteration var="order" items="{!v.paymentsList}"> 
+                            <tr class="slds-line-height--reset"> 
+                                
+                                <aura:if isTrue="{!v.currentTab == 'pendingPayments'}">
+                                    <td scope="col" class="selectCol" >
+                                        <input type="radio" name="payment" disabled="{!v.isDisabled}" class="radio" onclick="{!c.handleClick}" data-paymentmethod="{!order.Payment_Method__c}" data-orderstatus="{!order.Status}" data-authtype="{!order.Order_Type_From_Application__c}"  data-RecId="{!order.Id}" data-PaymentRefNo="{!order.Payment_Reference__c}" data-TotalAmount="{!order.Amount_Due__c}" data-TypeFromApplication="{!order.Order_Type_From_Application__c}"/> 
+                                    </td>
+                                   
+                                    
+                                </aura:if>
+                                
+                                <td scope="col" class="tabCol" style="width:13%;">
+                                    <ui:outputText class="slds-truncate wrap"
+                                      value="{!(order.Order_Type_From_Application__c != 'Authorisation fee' ? order.Authorisation__r.Name : order.Payment_Type__c) }" />
+                                    
+                                </td>
+                                
+                                <td scope="col" class="tabCol" >
+                                    <div class="slds-truncate wrap">
+                                        <ui:outputText value="{!order.Order_Type_From_Application__c}" />
+                                    </div>
+                                </td>
+                                
+                                <td scope="col" class="tabCol" >
+                                    <div class="slds-truncate wrap">
+                                        <ui:outputCurrency value="{!order.Amount_Due__c}" />
+                                    </div>
+                                </td>
+                                
+                                <td scope="col" class="tabCol" >
+                                    <div class="slds-truncate wrap">
+                                        <ui:outputText value="{!order.Status}" />
+                                    </div>
+                                </td>
+                                
+                                <aura:if isTrue="{!v.currentTab == 'pendingPayments'}">
+                                    <td scope="col" class="tabCol" >
+                                          <aura:if isTrue="{!and((order.Status == 'Payment Due'), (order.Order_Type_From_Application__c == 'Renewal'))}">   
+                                            <div class="slds-truncate slds-align--absolute-center wrap">
+                                                <ui:outputDate value="{!order.Pending_Due_Date__c}" format="dd/MM/yyyy"/>
+                                            </div>
+                                        </aura:if>
+                                         <aura:if isTrue="{!and((order.Status == 'Payment Due'), (order.Order_Type_From_Application__c != 'Renewal'))}">   
+                                            <div class="slds-truncate slds-align--absolute-center wrap">
+                                                <ui:outputDate value="{!order.EffectiveDate}" format="dd/MM/yyyy"/>
+                                            </div>
+                                        </aura:if>
+                                        
+                                        <aura:if isTrue="{!order.Status == 'Payment Rejected'}" >
+                                            <div class="slds-truncate slds-align--absolute-center wrap">
+                                                Overdue
+                                            </div>
+                                        </aura:if>
+                                    </td>
+                                    <aura:set attribute="else">
+                                        <td scope="col" class="tabCol" >
+                                            <div class="slds-truncate slds-align--absolute-center wrap">
+                                                <ui:outputDate value="{!order.Received_Date__c}" format="dd/MM/yyyy"/>
+                                            </div>
+                                        </td>
+                                    </aura:set>
+                                </aura:if>
+                                
+                                <td scope="col" class="tabCol" >
+                                    <div class="slds-truncate wrap">
+                                        <aura:if isTrue="{!order.Order_Type_From_Application__c != 'Authorisation fee'}">
+                                        	<ui:outputText value="{!order.Payment_Reference__c}" />
+                                        </aura:if>
+                                        <aura:if isTrue="{!order.Order_Type_From_Application__c == 'Authorisation fee'}">
+                                            <a class="paymentInfoLink" onclick="{!c.displayPayementInformationComponent}" href="javascript:void(0);"
+                                               title="PaymentInfo" target="_blank" data-RecId="{!order.Id}">
+                                        		<ui:outputText value="{!order.Payment_Reference__c}" />
+                                            </a>
+                                        </aura:if>
+                                    </div>
+                                </td>
+                                
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+    </article>
+    
+    <p>{!v.body}</p>
+    <aura:if isTrue="{!v.renderSubmitPaymentQueryModal}">
+        
+        <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aura:id="PaymentMessageBox">
+            <div class="slds-modal__container" style="width:80% !important;">
+                <div class="slds-modal__content slds-p-around--medium">
+                    <c:SubmitPaymentQueryMainForm record_Id="{!v.paymentRecordID}"/>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+    </aura:if>
+    
+    
+    <aura:if isTrue="{!v.renderPaymentDetailsModal}">
+        
+        <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aura:id="PaymentMessageBox">
+            <div class="slds-modal__container" style="width:80% !important;">
+                <div class="slds-modal__header">
+                </div>        
+                
+                <div class="slds-modal__content slds-p-around--medium">
+                    <c:PSPBankDetailsForm isInitiatedFromManageAccount="true" orderId="{!v.selectedOrderId}" paymentReferenceNumber="{!v.selectedOrderPaymentReference}" application_fee="{!v.totalAmountToPay}" typeFromApplication ="{!v.typeFromApplication}"/>
+                </div>
+                
+                <div class="slds-modal__footer">    
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open" aura:id = "backdrop"></div>
+    </aura:if>
+</aura:component>

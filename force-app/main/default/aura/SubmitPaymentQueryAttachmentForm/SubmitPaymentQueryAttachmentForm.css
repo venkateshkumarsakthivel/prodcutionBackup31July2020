@@ -1,0 +1,42 @@
+.THIS .requiredField {
+    
+    color: red;
+    font-weight: bold;
+}
+
+.THIS .sectionTitleNote {   
+    color: black;
+    float:right;
+}
+
+.THIS .slds-form-element__label {
+    
+    color: #000000;
+    font-weight: bold;
+    font-size: 15px;
+    margin-top: .25rem;
+}
+
+.THIS .slds-icon_container{
+    border-radius: 0.25rem;
+   	background-color: #34becd;
+}
+.THIS .customErrorMsg {
+    
+    color: rgb(194, 57, 52);
+    font-weight:bold;
+    font-size: .875rem;
+    position: relative;
+    top:-35px;
+    left:15px;
+}
+.THIS hr { 
+    display: block;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: -17px;
+    margin-right: -17px;
+    border-style: inset;
+    border-width: 0px;
+    border-top: 1px solid #d4d4d4;
+}
